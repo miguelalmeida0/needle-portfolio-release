@@ -1,0 +1,203 @@
+/*
+ * Approved result-reward treatment.
+ *
+ * This file is intentionally isolated from the shell/chrome styles. The SearchSidebar,
+ * MapToolbar, TruthLens, InspectorPanel and AccuracyControl retain their v6.2 contract;
+ * only the central #1 text-search result receives this richer presentation.
+ */
+
+.featured-match-node {
+  top: 48%;
+  width: 176px;
+  gap: 6px;
+  filter: drop-shadow(0 10px 28px rgba(57, 66, 61, .08));
+}
+
+.featured-match-node__spark {
+  display: grid;
+  height: 18px;
+  place-items: center;
+  margin-bottom: -2px;
+  color: #6f91ff;
+}
+
+.featured-match-node__label {
+  min-height: 18px;
+  padding: 0;
+  color: #4f5552;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-size: 9px;
+  font-weight: 760;
+  letter-spacing: .09em;
+}
+
+.featured-match-node__border {
+  width: 170px;
+  height: auto;
+  padding: 3px;
+  background: conic-gradient(
+    from var(--featured-angle),
+    #52cee7 0deg,
+    #6590ff 78deg,
+    #8c7aff 126deg,
+    #ffd95b 205deg,
+    #ff9a64 252deg,
+    #ff6474 315deg,
+    #52cee7 360deg
+  );
+  border-radius: 21px;
+  box-shadow:
+    -14px -5px 30px rgba(71, 201, 226, .12),
+    13px 8px 32px rgba(255, 103, 118, .11),
+    0 16px 32px rgba(37, 48, 43, .15);
+  animation-duration: 14s;
+}
+
+.featured-match-node__frame {
+  display: grid;
+  grid-template-rows: 126px auto;
+  width: 100%;
+  height: auto;
+  padding: 7px 7px 9px;
+  overflow: hidden;
+  background: #fffefd;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.featured-match-node__image {
+  display: block;
+  width: 100%;
+  height: 126px;
+  overflow: hidden;
+  background: #edeae1;
+  border-radius: 10px;
+}
+
+.featured-match-node__image img,
+.featured-match-node__image .artwork-image-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  user-select: none;
+}
+
+.featured-match-node__copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+  padding: 8px 3px 1px;
+}
+
+.featured-match-node__copy strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #222725;
+  font-size: 13px;
+  font-weight: 680;
+  line-height: 1.18;
+  letter-spacing: -.022em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.featured-match-node__copy small {
+  overflow: hidden;
+  color: #606763;
+  font-size: 8px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featured-match-node__copy em {
+  overflow: hidden;
+  margin-top: 2px;
+  color: #777d79;
+  font-size: 7px;
+  font-style: normal;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featured-match-node__rank {
+  top: 54px;
+  right: -2px;
+  width: 34px;
+  height: 34px;
+  color: #fff;
+  background: #4f7fff;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(53, 91, 211, .26), 0 0 0 3px rgba(80, 120, 255, .10);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.featured-match-node:hover .featured-match-node__border,
+.featured-match-node:focus-visible .featured-match-node__border {
+  transform: translateY(-2px) scale(1.018);
+  box-shadow:
+    -16px -7px 36px rgba(71, 201, 226, .15),
+    15px 10px 38px rgba(255, 103, 118, .14),
+    0 20px 40px rgba(37, 48, 43, .18);
+}
+
+/* The old tooltip is not part of the approved card: identity now lives inside the card. */
+.featured-match-node__tooltip { display: none; }
+
+@media (max-width: 1180px) {
+  .featured-match-node { width: 156px; }
+  .featured-match-node__border { width: 150px; }
+  .featured-match-node__frame { grid-template-rows: 108px auto; }
+  .featured-match-node__image { height: 108px; }
+  .featured-match-node__rank { top: 47px; right: -3px; width: 31px; height: 31px; font-size: 12px; }
+  .featured-match-node__copy strong { font-size: 12px; }
+}
+
+@media (max-width: 860px) {
+  .featured-match-node { width: 142px; gap: 5px; }
+  .featured-match-node__border { width: 136px; border-radius: 18px; }
+  .featured-match-node__frame { grid-template-rows: 94px auto; padding: 6px 6px 7px; border-radius: 15px; }
+  .featured-match-node__image { height: 94px; border-radius: 9px; }
+  .featured-match-node__image img,
+  .featured-match-node__image .artwork-image-fallback { border-radius: 9px; }
+  .featured-match-node__copy { gap: 1px; padding: 6px 2px 0; }
+  .featured-match-node__copy strong { font-size: 11px; }
+  .featured-match-node__copy small { font-size: 7px; }
+  .featured-match-node__copy em { display: none; }
+  .featured-match-node__rank { top: 41px; right: -4px; width: 28px; height: 28px; border-width: 3px; font-size: 11px; }
+}
+
+@media (max-width: 680px) {
+  .featured-match-node { top: 47%; width: 124px; gap: 4px; }
+  .featured-match-node__spark { display: none; }
+  .featured-match-node__label { min-height: 15px; font-size: 7px; letter-spacing: .075em; }
+  .featured-match-node__border { width: 118px; height: auto; padding: 2px; border-radius: 17px; }
+  .featured-match-node__frame { grid-template-rows: 79px auto; padding: 5px 5px 6px; border-radius: 15px; }
+  .featured-match-node__image { height: 79px; border-radius: 8px; }
+  .featured-match-node__image img,
+  .featured-match-node__image .artwork-image-fallback { border-radius: 8px; }
+  .featured-match-node__copy { padding: 5px 1px 0; }
+  .featured-match-node__copy strong { font-size: 9px; }
+  .featured-match-node__copy small { font-size: 6.5px; }
+  .featured-match-node__rank { top: 31px; right: -4px; width: 25px; height: 25px; font-size: 9px; }
+}
+
+@media (max-width: 420px) {
+  .featured-match-node { width: 108px; }
+  .featured-match-node__border { width: 102px; }
+  .featured-match-node__frame { grid-template-rows: 66px auto; }
+  .featured-match-node__image { height: 66px; }
+  .featured-match-node__copy strong { font-size: 8px; }
+  .featured-match-node__copy small { display: none; }
+  .featured-match-node__rank { top: 27px; width: 23px; height: 23px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featured-match-node__border { animation: none; }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "needle-portfolio-release",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "start": "node scripts/serve.mjs --root dist --packs data-packs --host 0.0.0.0"
+  },
+  "dependencies": {
+    "sharp": "0.35.5"
+  }
+}

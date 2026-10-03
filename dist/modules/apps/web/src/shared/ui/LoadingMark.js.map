@@ -1,0 +1,1 @@
+{"version":3,"file":"LoadingMark.js","sourceRoot":"","sources":["../../../../../../apps/web/src/shared/ui/LoadingMark.tsx"],"names":[],"mappings":"AAAA,OAAO,EAAE,KAAK,EAAE,MAAM,aAAa,CAAC;AAEpC,MAAM,UAAU,WAAW,CAAC,KAAkC;IAC5D,OAAO,CACL,8BAAM,SAAS,EAAC,cAAc,EAAC,IAAI,EAAC,QAAQ,gBAAa,KAAK,CAAC,KAAK,IAAI,SAAS;QAC/E,iCAAO;QAAA,iCAAO;QAAA,iCAAO,CAChB,CACR,CAAC;AACJ,CAAC"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"id.js","sourceRoot":"","sources":["../../../../../../apps/web/src/shared/utils/id.ts"],"names":[],"mappings":"AAAA,IAAI,QAAQ,GAAG,CAAC,CAAC;AACjB,MAAM,UAAU,eAAe,CAAC,MAAM,GAAG,SAAS;IAChD,QAAQ,IAAI,CAAC,CAAC;IACd,OAAO,GAAG,MAAM,IAAI,IAAI,CAAC,GAAG,EAAE,CAAC,QAAQ,CAAC,EAAE,CAAC,IAAI,QAAQ,CAAC,QAAQ,CAAC,EAAE,CAAC,EAAE,CAAC;AACzE,CAAC"}

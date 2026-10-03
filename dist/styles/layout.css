@@ -1,0 +1,47 @@
+.app-shell {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(560px, 1fr) var(--inspector-width);
+  grid-template-rows: 74px minmax(0, 1fr) 126px;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 680px;
+  overflow: hidden;
+  background: var(--paper);
+}
+.boot-screen {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 15px;
+  color: var(--ink-650);
+  background: var(--paper);
+}
+.boot-screen__mark {
+  display: grid;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  color: var(--ink-950);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font: 32px/1 var(--serif);
+}
+.boot-screen p { margin: 0; font-size: 13px; letter-spacing: .02em; }
+.status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 999px; font-size: 11px; }
+.status-pill--mint { color: #286b5e; background: var(--mint-soft); }
+.status-pill--blue { color: var(--blue-dark); background: var(--blue-soft); }
+.status-pill--neutral { color: var(--ink-650); background: var(--surface-muted); }
+.boot-screen strong { color: var(--ink-900); font-size: 13px; font-weight: 650; }
+.boot-screen__progress { width: min(280px, 70vw); height: 3px; overflow: hidden; background: var(--line-soft); border-radius: 99px; }
+.boot-screen__progress i { display: block; height: 100%; background: var(--blue); border-radius: inherit; transition: width 160ms ease; }
+.boot-screen--error { max-width: none; padding: 32px; text-align: center; }
+.boot-screen--error h2 { margin: 0; color: var(--ink-950); font: 28px/1.1 var(--serif); }
+.boot-screen--error p { max-width: 620px; line-height: 1.55; }
+.boot-screen--error button { margin-top: 8px; padding: 10px 16px; color: white; background: var(--ink-900); border-radius: 7px; }
+.inspector-text-query { display: grid; width: 100%; height: 100%; place-content: center; justify-items: center; gap: 9px; padding: 18px; color: var(--ink-650); background: var(--surface-muted); text-align: center; }
+.inspector-text-query strong { display: -webkit-box; max-width: 180px; overflow: hidden; color: var(--ink-900); font: 17px/1.25 var(--serif); -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.inspector-text-query small { font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }

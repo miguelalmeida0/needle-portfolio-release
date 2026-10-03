@@ -1,0 +1,9 @@
+{
+  "name": "Needle \u2014 Expressive Visual Search",
+  "short_name": "Needle",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f6f1",
+  "theme_color": "#f7f6f1",
+  "icons": []
+}

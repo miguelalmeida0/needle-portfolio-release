@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "met-10k-lean-v2",
+  "version": "2",
+  "label": "Met 10K lean search pack",
+  "createdAt": "2026-08-07T09:44:46.661Z",
+  "license": "CC0-1.0",
+  "recordCount": 10000,
+  "imageCount": 120,
+  "previewImageCount": 120,
+  "assetBytes": 11606008,
+  "imageDigest": "468ed74e6c51f0110a36f80bc0cdcde12588f81eba4f9ef87cba1be2478c8062",
+  "corpusSha256": "c52bdc345b74c48c8a5e51ecb0df66ff11d7baa8c2acfc0a983b08131f99674c",
+  "source": {
+    "dataset": "metmuseum/openaccess",
+    "datasetUrl": "https://huggingface.co/datasets/metmuseum/openaccess",
+    "csvUrl": "https://huggingface.co/datasets/metmuseum/openaccess/resolve/main/openaccess.csv.gz?download=true",
+    "csvSha256": "ea654951c5adbef3f73f2f73f58af8aa9c2954eea49dd1dca811362205003914"
+  },
+  "embedding": {
+    "kind": "metadata-art-v3",
+    "semanticDimensions": 116,
+    "visualDimensions": 32,
+    "description": "Field-weighted Met Open Access metadata across 10,000 works, with 120 locally verified opening previews and lazy official image assets."
+  },
+  "build": {
+    "targetSize": 10000,
+    "assetMode": "lean",
+    "candidateCount": 14500,
+    "failedImages": 0,
+    "concurrency": 4,
+    "node": "v26.0.0",
+    "platform": "darwin-arm64"
+  }
+}
