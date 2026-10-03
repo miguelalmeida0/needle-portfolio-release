@@ -1,0 +1,34 @@
+import fs from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import assert from 'node:assert/strict';
+import { validateCorpus } from '../dist/modules/packages/museum-corpus/src/corpus.repository.js';
+const read = path => fs.readFile(path);
+const hash = bytes => createHash('sha256').update(bytes).digest('hex');
+const pointer = JSON.parse(await read('data-packs/active.json'));
+assert.match(pointer.packId, /^[a-z0-9-]+$/);
+const pack = `data-packs/${pointer.packId}`;
+const manifestBytes = await read(`${pack}/manifest.json`);
+const manifest = JSON.parse(manifestBytes);
+const corpusBytes = await read(`${pack}/corpus.json`);
+const corpus = JSON.parse(corpusBytes);
+const graph = JSON.parse(await read('dist/data/search-graph.json'));
+assert.equal(hash(manifestBytes), pointer.manifestSha256, 'Active manifest checksum');
+assert.equal(hash(corpusBytes), manifest.corpusSha256, 'Corpus checksum');
+assert.equal(graph.corpusSha256, manifest.corpusSha256, 'Graph/corpus identity');
+assert.equal(graph.encoderVersion, 1, 'Graph encoder version');
+assert.equal(corpus.items.length, 10000, 'Frozen corpus record count');
+assert.equal(pointer.recordCount, corpus.items.length);
+assert.equal(manifest.recordCount, corpus.items.length);
+validateCorpus(corpus);
+const previews = corpus.items.filter(item => item.previewRank);
+assert.equal(previews.length, 120, 'Opening preview count');
+assert.equal(previews.length, manifest.previewImageCount);
+for (const item of previews) {
+  const source = item.thumbnailUrl ?? item.imageUrl;
+  const prefix = `/packs/${pointer.packId}/images/`;
+  assert.ok(source.startsWith(prefix) && !source.includes('..'));
+  const bytes = await read(`${pack}/images/${source.slice(prefix.length)}`);
+  assert.ok(bytes.length > 0, `Opening image ${item.id}`);
+}
+assert.equal(hash(await read('dist/data/corpus.json')), hash(corpusBytes), 'Static export and active corpus');
+console.log('Release integrity: 10,000 records, 120 opening images, matching manifest/corpus/graph.');

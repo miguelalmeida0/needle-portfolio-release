@@ -108,6 +108,7 @@ async function existingFile(candidate) {
 
 async function resolveFile(requestUrl) {
   const pathname = decodeURIComponent(new URL(requestUrl, 'http://localhost').pathname);
+  if (pathname.split('/').some(segment => segment.startsWith('.'))) return null;
   const packFile = await existingFile(await resolvePackFile(pathname));
   if (packFile) return { ...packFile, pathname, pack: true };
 

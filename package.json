@@ -7,7 +7,13 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "start": "node scripts/serve.mjs --root dist --packs data-packs --host 0.0.0.0"
+    "start": "node scripts/serve.mjs --root dist --packs data-packs --host 0.0.0.0",
+    "prepare:previews": "NEEDLE_IMAGE_CACHE_ROOT=.needle-cache/derivatives node prepare-previews.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "check:integrity": "node scripts/verify-release.mjs",
+    "security:check": "node scripts/check-secrets.mjs",
+    "security:history": "node scripts/check-secrets.mjs --history",
+    "verify": "npm run security:check && npm run check:integrity && npm test"
   },
   "dependencies": {
     "sharp": "0.35.5"

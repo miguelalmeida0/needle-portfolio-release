@@ -2,3 +2,12 @@ node_modules
 .needle-cache
 .git
 *.log
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+tests
+docs
+.github
