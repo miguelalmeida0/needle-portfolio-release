@@ -1,14 +1,11 @@
 import { React, useRef, useState } from '../../shared/react.js';
 import { Icon } from '../../shared/icons.js';
+import { LogoMark } from '../../shared/ui/LogoMark.js';
 import { SearchComposer } from '../search/SearchComposer.js';
 import { RecentQueries } from '../history/RecentQueries.js';
 import { QueryCanvas } from '../query/QueryCanvas.js';
 import { SavedCollections } from '../collections/SavedCollections.js';
 import { useAppRuntime, useAppState } from '../../app/app.context.js';
-function NeedleMark() {
-    return (React.createElement("svg", { className: "needle-mark", viewBox: "0 0 34 46", "aria-hidden": "true" },
-        React.createElement("path", { d: "M22 2 11 23l6-1-5 22 12-25-6 2Z", fill: "none", stroke: "currentColor", strokeWidth: "1.35" })));
-}
 export function SearchSidebar() {
     const runtime = useAppRuntime();
     const state = useAppState();
@@ -16,7 +13,7 @@ export function SearchSidebar() {
     const [workspaceOpen, setWorkspaceOpen] = useState(false);
     return (React.createElement("aside", { className: `search-sidebar${workspaceOpen ? ' is-workspace-open' : ''}` },
         React.createElement("div", { className: "brand-lockup" },
-            React.createElement(NeedleMark, null),
+            React.createElement(LogoMark, { className: "needle-mark" }),
             React.createElement("span", { className: "brand-lockup__copy" },
                 React.createElement("strong", null, "Needle")),
             React.createElement("button", { type: "button", className: "workspace-mobile-toggle", onClick: () => setWorkspaceOpen((open) => !open), "aria-expanded": workspaceOpen, "aria-label": workspaceOpen ? 'Close search workspace' : 'Open search workspace' },
@@ -55,4 +52,3 @@ export function SearchSidebar() {
                 } },
                 React.createElement(Icon, { name: "bookmark" })))));
 }
-//# sourceMappingURL=SearchSidebar.js.map

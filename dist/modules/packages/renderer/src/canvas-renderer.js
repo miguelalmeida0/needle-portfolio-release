@@ -1,3 +1,4 @@
+import { hexToRgba } from './color.js';
 export class CanvasSpatialRenderer {
     kind = 'canvas2d';
     #canvas;
@@ -23,14 +24,16 @@ export class CanvasSpatialRenderer {
         context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
         context.fillStyle = '#f8f7f2';
         context.fillRect(0, 0, width, height);
+        const [red, green, blue] = hexToRgba(scene.selectionColor).map(channel => Math.round(channel * 255));
+        const selection = alpha => `rgba(${red}, ${green}, ${blue}, ${alpha})`;
         for (const connection of scene.connections) {
             context.beginPath();
             context.moveTo(connection.fromX * width, connection.fromY * height);
             context.lineTo(connection.toX * width, connection.toY * height);
             context.strokeStyle = connection.emphasis === 'neighbor'
-                ? 'rgba(72, 116, 255, .52)'
+                ? selection(.40)
                 : connection.emphasis === 'trace'
-                    ? 'rgba(66, 108, 236, .25)'
+                    ? selection(.16)
                     : 'rgba(71, 83, 78, .045)';
             context.lineWidth = connection.emphasis === 'neighbor' ? 1.25 : 0.75;
             context.stroke();
@@ -41,9 +44,9 @@ export class CanvasSpatialRenderer {
             context.beginPath();
             context.arc(x, y, point.highlighted ? 3.2 : point.visited ? 1.9 : .85, 0, Math.PI * 2);
             context.fillStyle = point.highlighted
-                ? 'rgba(72, 116, 255, .78)'
+                ? selection(.78)
                 : point.visited
-                    ? 'rgba(72, 116, 255, .32)'
+                    ? selection(.32)
                     : 'rgba(54, 62, 58, .075)';
             context.fill();
         }
@@ -52,4 +55,3 @@ export class CanvasSpatialRenderer {
         this.#context.clearRect(0, 0, this.#canvas.width, this.#canvas.height);
     }
 }
-//# sourceMappingURL=canvas-renderer.js.map

@@ -22,7 +22,7 @@
   border-radius: 8px;
   font-size: 12px;
 }
-.toolbar-button:hover, .toolbar-button.is-active { border-color: #bdc6ea; background: white; }
+.toolbar-button:hover, .toolbar-button.is-active { border-color: var(--line); background: white; }
 .toolbar-button--view { min-width: 104px; justify-content: space-between; font-weight: 600; }
 .toolbar-help { display: inline-grid; width: 30px; height: 30px; place-items: center; color: var(--ink-650); }
 .filter-anchor { position: relative; }
@@ -63,4 +63,4 @@
 .view-popover button:hover, .view-popover button.is-selected { color: var(--ink-950); background: var(--surface-muted); }
 .view-popover button span { font-size: 11px; font-weight: 650; }
 .view-popover button small { color: var(--ink-500); font-size: 9px; line-height: 1.35; }
-.toolbar-count { display: grid; min-width: 17px; height: 17px; place-items: center; margin-left: 1px; color: white; background: var(--blue); border-radius: 999px; font-size: 8px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.toolbar-count { display: grid; min-width: 17px; height: 17px; place-items: center; margin-left: 1px; color: white; background: var(--selection); border-radius: 999px; font-size: 8px; font-weight: 700; font-variant-numeric: tabular-nums; }

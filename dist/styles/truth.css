@@ -19,18 +19,18 @@
   box-shadow: 0 8px 22px rgba(31,37,34,.055);
   pointer-events: auto;
 }
-.truth-lens__icon { display: grid; width: 28px; height: 28px; place-items: center; color: var(--blue-dark); background: var(--blue-soft); border-radius: 7px; }
+.truth-lens__icon { display: grid; width: 28px; height: 28px; place-items: center; color: var(--selection-strong); background: var(--surface-muted); border-radius: 7px; }
 .truth-lens__copy { display: grid; gap: 2px; min-width: 0; }
 .truth-lens__copy strong { overflow: hidden; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .truth-lens__copy span { color: var(--ink-500); font-size: 9px; }
 .truth-lens--visual .truth-lens__copy strong { white-space: normal; overflow-wrap: anywhere; }
 .truth-lens--visual .truth-lens__copy span { display: block; }
-.truth-lens > button { display: inline-flex; height: 32px; align-items: center; gap: 7px; padding: 0 10px; color: white; background: #252a28; border-radius: 6px; font-size: 10px; font-weight: 600; }
-.truth-lens > button:hover:not(:disabled) { background: #171b19; }
+.truth-lens > button { display: inline-flex; height: 32px; align-items: center; gap: 7px; padding: 0 10px; color: white; background: var(--brand-900); border-radius: 6px; font-size: 10px; font-weight: 600; }
+.truth-lens > button:hover:not(:disabled) { background: var(--brand-800); }
 .truth-lens--busy { grid-template-columns: auto minmax(0, 1fr); }
 .truth-lens--result.is-miss { border-color: #e7b7ae; }
 .truth-lens--result.is-miss .truth-lens__icon { color: #9a4437; background: #fff0ed; }
-.truth-lens--result.is-success .truth-lens__icon { color: #286b5e; background: var(--mint-soft); }
+.truth-lens--result.is-success .truth-lens__icon { color: var(--selection-strong); background: var(--selection-soft); }
 .truth-lens__switch { display: inline-flex; padding: 2px; background: var(--surface-muted); border: 1px solid var(--line-soft); border-radius: 7px; }
 .truth-lens__switch button { min-width: 50px; height: 27px; padding: 0 9px; color: var(--ink-500); background: transparent; border-radius: 5px; font-size: 9px; font-weight: 650; }
 .truth-lens__switch button.is-active { color: var(--ink-950); background: white; box-shadow: 0 1px 3px rgba(31,37,34,.08); }

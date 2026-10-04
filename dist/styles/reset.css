@@ -7,8 +7,8 @@ button { border: 0; cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: .55; }
 img { display: block; max-width: 100%; }
 svg { display: block; }
-::selection { color: var(--ink-950); background: #dce5ff; }
-:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+::selection { color: var(--ink-950); background: var(--selection-soft); }
+:focus-visible { outline: 2px solid var(--selection); outline-offset: 3px; }
 .icon-button { display: inline-grid; width: 30px; height: 30px; place-items: center; padding: 0; color: var(--ink-650); background: transparent; border-radius: 7px; }
 .icon-button:hover { color: var(--ink-950); background: var(--surface-muted); }
 .loading-mark { display: inline-flex; align-items: center; gap: 3px; min-width: 23px; }

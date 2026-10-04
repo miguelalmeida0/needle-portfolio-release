@@ -39,7 +39,8 @@
     grid-column: 1;
     grid-row: 1;
     display: grid;
-    grid-template-columns: 150px minmax(0, 1fr);
+    /* Fit the complete lockup and workspace toggle without covering the wordmark. */
+    grid-template-columns: max-content minmax(0, 1fr);
     grid-template-rows: 64px;
     gap: 12px;
     padding: 0 14px;
@@ -59,8 +60,9 @@
   }
   .brand-lockup { grid-column: 1; padding: 0; }
   .brand-lockup__copy strong { font-size: 28px; }
+  .needle-mark { width: 22px; height: 22px; }
   .workspace-mobile-toggle { display: inline-flex; height: 31px; align-items: center; gap: 5px; margin-left: auto; padding: 0 8px; color: var(--ink-650); background: var(--surface-muted); border-radius: 8px; font-size: 8px; }
-  .workspace-mobile-toggle span { display: grid; min-width: 15px; height: 15px; place-items: center; color: white; background: var(--blue); border-radius: 999px; }
+  .workspace-mobile-toggle span { display: grid; min-width: 15px; height: 15px; place-items: center; color: white; background: var(--selection); border-radius: 999px; }
   .sidebar-search { grid-column: 2; align-self: center; padding: 0; border: 0; }
   .sidebar-section-heading { display: none; }
   .search-composer__field,
@@ -132,6 +134,7 @@
   }
   .brand-lockup { grid-column: 1; grid-row: 1; justify-content: center; min-height: 44px; }
   .brand-lockup__copy strong { font-size: 27px; }
+  .needle-mark { width: 21px; height: 21px; }
   .workspace-mobile-toggle { position: absolute; right: 12px; }
   .sidebar-search { grid-column: 1; grid-row: 2; width: 100%; }
   .search-composer__field,

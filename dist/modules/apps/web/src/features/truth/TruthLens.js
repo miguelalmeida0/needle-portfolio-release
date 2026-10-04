@@ -1,5 +1,6 @@
 import { React } from '../../shared/react.js';
 import { Icon } from '../../shared/icons.js';
+import { LogoMark } from '../../shared/ui/LogoMark.js';
 import { LoadingMark } from '../../shared/ui/LoadingMark.js';
 import { useAppRuntime, useAppState } from '../../app/app.context.js';
 import { artworkById, effectiveSearchBudget, missedExactIds, recall } from '../../app/app.selectors.js';
@@ -40,7 +41,7 @@ export function TruthLens() {
     if (!state.exact) {
         return (React.createElement("section", { className: `truth-lens${visualRecipe ? ' truth-lens--visual' : ''}`, "aria-label": "Truth check" },
             React.createElement("span", { className: "truth-lens__icon" },
-                React.createElement(Icon, { name: "lightning", size: 16 })),
+                React.createElement(LogoMark, { size: 20 })),
             React.createElement("div", { className: "truth-lens__copy" },
                 React.createElement("strong", null, topMatch ? `${visualRecipe ? 'Closest available' : 'Top match'} · ${topMatch.title}` : 'Fast answer'),
                 React.createElement("span", null,
@@ -63,4 +64,3 @@ export function TruthLens() {
             React.createElement("button", { type: "button", className: state.resultMode === 'fast' ? 'is-active' : '', onClick: () => runtime.showFast() }, "Fast"),
             React.createElement("button", { type: "button", className: state.resultMode === 'truth' ? 'is-active' : '', onClick: () => void runtime.showTruth() }, "Truth"))));
 }
-//# sourceMappingURL=TruthLens.js.map

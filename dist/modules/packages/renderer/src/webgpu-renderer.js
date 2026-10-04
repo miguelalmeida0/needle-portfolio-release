@@ -93,9 +93,9 @@ export class WebGpuSpatialRenderer {
         };
         for (const connection of scene.connections) {
             const color = connection.emphasis === 'neighbor'
-                ? [0.28, 0.45, 1, 0.54]
+                ? hexToRgba(scene.selectionColor, 0.40)
                 : connection.emphasis === 'trace'
-                    ? [0.28, 0.45, 1, 0.25]
+                    ? hexToRgba(scene.selectionColor, 0.16)
                     : [0.22, 0.26, 0.24, 0.045];
             push(connection.fromX, connection.fromY, color);
             push(connection.toX, connection.toY, color);
@@ -104,9 +104,9 @@ export class WebGpuSpatialRenderer {
         const dy = 0.9 / Math.max(1, scene.height);
         for (const point of scene.points) {
             const color = point.highlighted
-                ? [0.28, 0.45, 1, 0.8]
+                ? hexToRgba(scene.selectionColor, 0.8)
                 : point.visited
-                    ? [0.28, 0.45, 1, 0.28]
+                    ? hexToRgba(scene.selectionColor, 0.28)
                     : hexToRgba(point.clusterColor, 0.075);
             push(point.x - dx, point.y, color);
             push(point.x + dx, point.y, color);
@@ -147,4 +147,3 @@ export class WebGpuSpatialRenderer {
         this.#vertexBuffer = null;
     }
 }
-//# sourceMappingURL=webgpu-renderer.js.map

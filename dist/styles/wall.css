@@ -31,7 +31,7 @@
   backdrop-filter: blur(10px);
 }
 .collection-wall__header > div { display: grid; gap: 2px; }
-.collection-wall__header strong { color: var(--ink-900); font-size: 12px; font-weight: 680; }
+.collection-wall__header strong { color: var(--selection-strong); font-size: 12px; font-weight: 680; }
 .collection-wall__header span { color: var(--ink-500); font-size: 9px; letter-spacing: .015em; }
 .collection-wall__stage { position: relative; min-width: 100%; padding-top: 124px; }
 .collection-card {
@@ -54,8 +54,8 @@
 }
 .collection-card:hover,
 .collection-card:focus-visible { z-index: 3; border-color: #b9b9b2; box-shadow: 0 11px 28px rgba(38,45,41,.12); }
-.collection-card.is-selected { border-color: var(--ink-900); box-shadow: 0 0 0 1px var(--ink-900), 0 11px 28px rgba(38,45,41,.12); }
-.collection-card.is-result { border-color: rgba(80,120,255,.52); }
+.collection-card.is-selected { border-color: var(--selection-strong); box-shadow: 0 0 0 1px var(--selection-strong), 0 11px 28px rgba(38,45,41,.12); }
+.collection-card.is-result:not(.is-selected) { border-color: var(--selection-line); }
 .collection-card__image { position: relative; display: block; width: 100%; overflow: hidden; background: #efeee8; border-radius: 5px; }
 .collection-card__image img,
 .collection-card__image .artwork-image-fallback { width: 100%; height: 100%; object-fit: cover; }
@@ -69,7 +69,7 @@
   place-items: center;
   padding: 0 5px;
   color: white;
-  background: var(--blue);
+  background: var(--selection);
   border: 2px solid white;
   border-radius: 999px;
   font-size: 9px;

@@ -16,7 +16,7 @@
 }
 .inspector-panel__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; color: var(--ink-650); font-size: 9px; font-weight: 700; letter-spacing: .095em; text-transform: uppercase; }
 .inspector-panel__header a { display: grid; width: 26px; height: 26px; place-items: center; color: var(--ink-500); border-radius: 7px; }
-.inspector-panel__header a:hover { color: var(--blue-dark); background: var(--blue-soft); }
+.inspector-panel__header a:hover { color: var(--ink-950); background: var(--surface-muted); }
 .inspector-panel--empty { display: grid; min-height: 220px; place-content: center; color: var(--ink-500); text-align: center; }
 .inspector-panel--empty .inspector-panel__header { position: absolute; top: 16px; left: 16px; }
 
@@ -33,8 +33,9 @@
 .inspector-action-list button:last-child { border-bottom: 0; }
 .inspector-action-list button:hover,
 .inspector-action-list button.is-active { color: var(--ink-950); background: var(--surface-muted); }
-.inspector-action-list button:first-child svg { color: var(--blue); }
+.inspector-action-list button:first-child svg { color: var(--selection); }
 .inspector-action-list button:nth-child(2) svg { color: var(--negative); }
+.inspector-action-list button.is-active svg { color: var(--selection); }
 
 .inspector-section-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .inspector-section-title h3 { margin: 0; color: var(--ink-500); font-size: 8px; font-weight: 750; letter-spacing: .085em; text-transform: uppercase; }

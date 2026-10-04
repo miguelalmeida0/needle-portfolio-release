@@ -1,6 +1,6 @@
 import { React } from '../../shared/react.js';
 import { ArtworkImage } from '../../shared/ui/ArtworkImage.js';
-import { Icon } from '../../shared/icons.js';
+import { LogoMark } from '../../shared/ui/LogoMark.js';
 function dateLabel(artwork) {
     if (artwork.objectDate)
         return artwork.objectDate;
@@ -9,13 +9,10 @@ function dateLabel(artwork) {
     return 'Date unknown';
 }
 export function FeaturedMatchNode(props) {
-    const style = {
-        '--featured-color': props.artwork.clusterColor
-    };
     const className = `featured-match-node${props.selected ? ' is-selected' : ''}`;
-    return (React.createElement("button", { type: "button", "data-artwork-id": props.artwork.id, className: className, style: style, onClick: props.onSelect, "aria-label": `${props.label}: ${props.artwork.title} by ${props.artwork.creator}. Query: ${props.queryText}`, "aria-pressed": props.selected },
+    return (React.createElement("button", { type: "button", "data-artwork-id": props.artwork.id, className: className, onClick: props.onSelect, "aria-label": `${props.label}: ${props.artwork.title} by ${props.artwork.creator}. Query: ${props.queryText}`, "aria-pressed": props.selected },
         React.createElement("span", { className: "featured-match-node__spark", "aria-hidden": "true" },
-            React.createElement(Icon, { name: "spark", size: 19 })),
+            React.createElement(LogoMark, { size: 19 })),
         React.createElement("span", { className: "featured-match-node__label" }, props.label),
         React.createElement("span", { className: "featured-match-node__border" },
             React.createElement("span", { className: "featured-match-node__frame" },
@@ -28,4 +25,3 @@ export function FeaturedMatchNode(props) {
                     React.createElement("em", null, "The Metropolitan Museum of Art")))),
         React.createElement("span", { className: "featured-match-node__rank", "aria-hidden": "true" }, "1")));
 }
-//# sourceMappingURL=FeaturedMatchNode.js.map

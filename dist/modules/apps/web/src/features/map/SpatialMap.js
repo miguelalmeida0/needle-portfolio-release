@@ -95,6 +95,7 @@ export function SpatialMap() {
             };
         });
         const scene = {
+            selectionColor: getComputedStyle(containerRef.current).getPropertyValue('--selection').trim(),
             width: size.width,
             height: size.height,
             devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
@@ -168,4 +169,3 @@ export function SpatialMap() {
                 " real traversal edges")),
         React.createElement(MapControls, { onZoomIn: () => zoom(.12), onZoomOut: () => zoom(-.12), onReset: reset, onExpand: toggleFullscreen })));
 }
-//# sourceMappingURL=SpatialMap.js.map
