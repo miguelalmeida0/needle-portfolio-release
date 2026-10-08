@@ -1,9 +1,9 @@
 name: Release verification
 on:
   push:
-    branches: [main]
+    branches: [main, test]
   pull_request:
-    branches: [main]
+    branches: [main, test]
 permissions:
   contents: read
 concurrency:
