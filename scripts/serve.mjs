@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { defaultGlobalDataPacksRoot } from './data-packs/legacy-pack.mjs';
 import { createImageDelivery } from './image-delivery.mjs';
 import { createGzip } from 'node:zlib';
+import { decodePublicPath, existingPublicFile } from './http-boundary.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(scriptDir, '..');
@@ -21,8 +22,13 @@ const allowDemo = process.env.NEEDLE_ALLOW_DEMO === '1';
 const deliverImage = createImageDelivery({
   cacheRoot: process.env.NEEDLE_IMAGE_CACHE_ROOT ?? path.join(projectRoot, '.needle-cache', 'derivatives'),
   resolveLocal: async source => {
-    const candidate = source.startsWith('/packs/') ? await resolvePackFile(source) : safeStaticPath(source);
-    return (await existingFile(candidate))?.filePath ?? null;
+    const pathname = decodePublicPath(source);
+    if (!pathname) return null;
+    const pack = pathname.startsWith('/packs/') ? await resolvePackFile(pathname) : null;
+    const file = pack
+      ? await existingPublicFile(pack.base, pack.candidate)
+      : await existingPublicFile(root, safeStaticPath(pathname));
+    return file?.filePath ?? null;
   }
 });
 
@@ -76,14 +82,14 @@ async function resolvePackFile(pathname) {
     : path.join(dataPacksRoot, pointer.packId);
 
   if (pathname.startsWith('/packs/')) {
-    const relative = decodeURIComponent(pathname.slice('/packs/'.length));
+    const relative = pathname.slice('/packs/'.length);
     const [requestedPackId, ...rest] = relative.split('/');
     if (!requestedPackId || requestedPackId !== pointer.packId || rest.length === 0) return null;
     const candidate = path.resolve(activePackDirectory, rest.join('/'));
-    return inside(activePackDirectory, candidate) ? candidate : null;
+    return inside(activePackDirectory, candidate) ? { base: activePackDirectory, candidate } : null;
   }
   if (pathname !== '/data/corpus.json' && pathname !== '/data/pack-manifest.json') return null;
-  return path.join(activePackDirectory, pathname.endsWith('corpus.json') ? 'corpus.json' : 'manifest.json');
+  return { base: activePackDirectory, candidate: path.join(activePackDirectory, pathname.endsWith('corpus.json') ? 'corpus.json' : 'manifest.json') };
 }
 
 function safeStaticPath(pathname) {
@@ -91,33 +97,19 @@ function safeStaticPath(pathname) {
   return inside(root, candidate) ? candidate : null;
 }
 
-async function existingFile(candidate) {
-  if (!candidate) return null;
-  try {
-    const stats = await fsp.stat(candidate);
-    if (stats.isDirectory()) {
-      const indexPath = path.join(candidate, 'index.html');
-      const indexStats = await fsp.stat(indexPath);
-      return indexStats.isFile() ? { filePath: indexPath, stats: indexStats } : null;
-    }
-    return stats.isFile() ? { filePath: candidate, stats } : null;
-  } catch {
-    return null;
-  }
-}
-
 async function resolveFile(requestUrl) {
-  const pathname = decodeURIComponent(new URL(requestUrl, 'http://localhost').pathname);
-  if (pathname.split('/').some(segment => segment.startsWith('.'))) return null;
-  const packFile = await existingFile(await resolvePackFile(pathname));
+  const pathname = decodePublicPath(new URL(requestUrl, 'http://localhost').pathname);
+  if (!pathname) return null;
+  const pack = await resolvePackFile(pathname);
+  const packFile = pack ? await existingPublicFile(pack.base, pack.candidate) : null;
   if (packFile) return { ...packFile, pathname, pack: true };
 
   if (pathname === '/data/corpus.json' && !allowDemo) return null;
-  const staticFile = await existingFile(safeStaticPath(pathname));
+  const staticFile = await existingPublicFile(root, safeStaticPath(pathname));
   if (staticFile) return { ...staticFile, pathname, pack: false };
 
   if (path.extname(pathname)) return null;
-  const indexFile = await existingFile(path.join(root, 'index.html'));
+  const indexFile = await existingPublicFile(root, path.join(root, 'index.html'));
   return indexFile ? { ...indexFile, pathname, pack: false } : null;
 }
 
@@ -178,14 +170,14 @@ const server = http.createServer(async (request, response) => {
     }
     const stream = fs.createReadStream(resolved.filePath);
     stream.on('error', (error) => {
-      if (!response.headersSent) writeError(response, 500, `Needle could not serve this file.\n${error.message}`);
+      if (!response.headersSent) writeError(response, 500, 'Needle could not serve this file.');
       else response.destroy(error);
     });
     request.on('aborted', () => stream.destroy());
     if (compress) stream.pipe(createGzip()).pipe(response);
     else stream.pipe(response);
   } catch (error) {
-    if (!response.headersSent) writeError(response, 500, `Needle could not serve this file.\n${error instanceof Error ? error.message : String(error)}`);
+    if (!response.headersSent) writeError(response, 500, 'Needle could not serve this file.');
     else response.destroy(error instanceof Error ? error : new Error(String(error)));
   }
 });
