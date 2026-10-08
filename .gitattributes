@@ -1,0 +1,13 @@
+# The repository contains a published browser export rather than its source workspace.
+# Keep release payloads tracked, but classify generated artifacts for code review.
+dist/** linguist-generated=true
+data-packs/**/*.json linguist-generated=true
+
+# Binary artwork and previews are not meaningful text diffs.
+*.avif binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.webp binary
+*.woff binary
+*.woff2 binary
