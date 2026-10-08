@@ -2,7 +2,7 @@
 
 Visual search across 10,000 artworks from The Metropolitan Museum of Art.
 
-[Open Needle](https://needle.miguelalmeida.xyz) · [Architecture](docs/architecture.md) · [Operations](docs/operations.md) · [Security](SECURITY.md)
+[Open Needle](https://needle.miguelalmeida.xyz) · [Documentation](docs/README.md) · [Architecture](docs/architecture.md) · [Operations](docs/operations.md) · [Security](SECURITY.md)
 
 Needle combines a prepared HNSW graph with field-weighted museum metadata and a lexical index. Retrieval runs in a browser worker. A Node server delivers the frozen corpus, application modules and size-specific artwork previews.
 
@@ -41,7 +41,7 @@ Open `http://localhost:8000`. The image runs as the unprivileged `node` user and
 | `prepare-previews.mjs` | Build-time AVIF preparation using the runtime image pipeline |
 | `tests/` | Release integrity, request boundaries and image-cache behavior |
 
-This is the deployable release package, exported from application revision `de4c6c46a4503d369a98f9f0a5aab0f5fce5e2f6`. It is not the original frontend development workspace. Browser changes require a new validated application export; server and documentation changes can be made here.
+**Do not remove `dist/` or `data-packs/` as generic generated folders.** This is the deployable release package, exported from application revision `de4c6c46a4503d369a98f9f0a5aab0f5fce5e2f6`. It is not the original frontend development workspace. Browser changes require a new validated application export; server and documentation changes can be made here.
 
 ## Verification
 
