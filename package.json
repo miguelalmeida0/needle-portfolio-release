@@ -13,7 +13,12 @@
     "check:integrity": "node scripts/verify-release.mjs",
     "security:check": "node scripts/check-secrets.mjs",
     "security:history": "node scripts/check-secrets.mjs --history",
-    "verify": "npm run security:check && npm run check:integrity && npm test"
+    "verify": "npm run security:check && npm run check:integrity && npm test",
+    "assemble:release": "node scripts/assemble-release.mjs",
+    "postinstall": "npm run assemble:release",
+    "preverify": "npm run assemble:release",
+    "precheck:integrity": "npm run assemble:release",
+    "prestart": "npm run assemble:release"
   },
   "dependencies": {
     "sharp": "0.35.5"

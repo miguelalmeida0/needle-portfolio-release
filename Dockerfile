@@ -10,6 +10,6 @@ COPY prepare-previews.mjs ./prepare-previews.mjs
 COPY LICENSE THIRD_PARTY_NOTICES.md ./
 RUN mkdir -p /app/.needle-cache/derivatives && chown -R node:node /app/.needle-cache
 USER node
-RUN node prepare-previews.mjs
+RUN node scripts/assemble-release.mjs && node prepare-previews.mjs
 EXPOSE 8000
 CMD ["node", "scripts/serve.mjs", "--root", "dist", "--packs", "data-packs", "--host", "0.0.0.0"]

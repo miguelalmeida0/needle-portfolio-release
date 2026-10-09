@@ -64,3 +64,11 @@ npm audit --omit=dev
 ## License
 
 Application code: [MIT](LICENSE). Dataset and artwork attribution: [third-party notices](THIRD_PARTY_NOTICES.md).
+
+## Release assembly
+
+`data-packs/` owns the canonical corpus. `npm ci` recreates `dist/data/corpus.json` byte-for-byte; `npm run assemble:release` does the same before a static export. The Docker build, integrity verification and npm start also assemble it. Ship the assembled `dist/` directory for static hosting. The 10,000 records, static fallback URL, graph and live browser assets are unchanged.
+
+Older hashed JS/CSS generations remain available for existing tabs and cached entrypoints. Retire them only after a measured compatibility window; do not delete immutable public URLs during housekeeping.
+
+[Cleanup and preservation record](docs/CLEANUP_2026-10-09.md)
