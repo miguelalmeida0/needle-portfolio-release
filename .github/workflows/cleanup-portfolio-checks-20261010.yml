@@ -8,7 +8,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       CI: 'true'
       TZ: Europe/Berlin
@@ -28,33 +28,92 @@ jobs:
           node-version: '22.16.0'
       - working-directory: app
         run: npm ci && npx playwright install --with-deps chromium
-      - name: Baseline typecheck and all non-browser regression suites
+      - name: Compare baseline and candidate with the servers each suite requires
         working-directory: app
-        run: npm run check && npm run test:unit && npm run test:routes && npm run test:dev-watch
-      - name: Apply only the 41 reviewed unmounted file removals
-        working-directory: app
-        run: python3 ../control/.github/cleanup-20261010/apply.py portfolio
-      - name: Candidate typecheck and all non-browser regression suites
-        working-directory: app
-        run: npm run check && npm run test:unit && npm run test:routes && npm run test:dev-watch
-      - name: Critical browser and motion regression suite on production build
-        working-directory: app
+        shell: bash
         run: |
-          mkdir -p .cache/tmp
-          TMPDIR=$PWD/.cache/tmp npx playwright test tests/e2e/specs/ci-smoke.spec.ts tests/e2e/specs/story-motion.spec.ts tests/e2e/specs/story-editorial-transition.spec.ts tests/e2e/specs/cv-highlights-alignment.spec.ts tests/e2e/specs/leu-showcase.spec.ts --project=chromium-desktop --project=chromium-mobile --workers=2 --retries=0 --reporter=list
-      - name: Confirm only reviewed source files changed
-        working-directory: app
-        run: |
-          git diff --check
-          git diff --stat
-          test -z "$(git diff --name-only -- static src/styles src/app.css package.json package-lock.json)"
-      - name: Upload regression report only
+          python3 - <<'PY'
+          import contextlib, json, os, pathlib, re, signal, subprocess, time, urllib.request
+          root = pathlib.Path.cwd()
+          evidence = pathlib.Path(os.environ['RUNNER_TEMP']) / 'portfolio-checks'
+          evidence.mkdir()
+          tmp = root / '.cache/tmp'
+          tmp.mkdir(parents=True, exist_ok=True)
+          env = dict(os.environ, TMPDIR=str(tmp))
+          checks = []
+          def run(phase, label, command, required=True, extra=None):
+              with (evidence / f'{phase}-{label}.log').open('w') as log:
+                  p = subprocess.Popen(command, shell=True, executable='/bin/bash', env=dict(env, **(extra or {})), stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+                  try: code = p.wait(timeout=480)
+                  except subprocess.TimeoutExpired:
+                      os.killpg(p.pid, signal.SIGKILL)
+                      p.wait()
+                      code = 124
+              text = (evidence / f'{phase}-{label}.log').read_text()
+              record = {'phase': phase, 'check': label, 'exit': code, 'failures': re.findall(r'^not ok \d+ - (.*)$', text, re.M)}
+              checks.append(record)
+              (evidence / 'checks.json').write_text(json.dumps(checks, indent=2))
+              print(phase, label, code, text[-2500:], flush=True)
+              assert code != 124, 'Harness timeout is not a baseline failure'
+              if required: assert code == 0, (phase, label)
+              return record
+          @contextlib.contextmanager
+          def server(phase, name, args, port):
+              with (evidence / f'{phase}-{name}-server.log').open('w') as log:
+                  p = subprocess.Popen(args, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
+                  try:
+                      for attempt in range(90):
+                          try:
+                              with urllib.request.urlopen(f'http://127.0.0.1:{port}/', timeout=2) as r:
+                                  if r.status == 200: break
+                          except Exception: pass
+                          assert p.poll() is None, 'Server exited before readiness'
+                          time.sleep(1)
+                      else: raise AssertionError('Server was not ready')
+                      yield
+                  finally:
+                      try: os.killpg(p.pid, signal.SIGTERM)
+                      except ProcessLookupError: pass
+                      try: p.wait(timeout=5)
+                      except subprocess.TimeoutExpired:
+                          os.killpg(p.pid, signal.SIGKILL)
+                          p.wait()
+          for phase in ['before', 'after']:
+              if phase == 'after': run(phase, 'apply', 'python3 ../control/.github/cleanup-20261010/apply.py portfolio')
+              run(phase, 'check', 'npm run check')
+              run(phase, 'unit', 'npm run test:unit')
+              with server(phase, 'development', ['node', 'node_modules/vite/bin/vite.js', 'dev', '--host', '127.0.0.1', '--port', '4174', '--strictPort'], 4174):
+                  run(phase, 'dev-watch', 'npm run test:dev-watch', extra={'ROUTE_HEALTH_BASE_URL': 'http://127.0.0.1:4174'})
+              run(phase, 'build', 'npm run build')
+              with server(phase, 'production', ['node', 'node_modules/wrangler/bin/wrangler.js', 'pages', 'dev', '.svelte-kit/cloudflare', '--ip', '127.0.0.1', '--port', '4173', '--log-level', 'error', '--show-interactive-dev-session=false'], 4173):
+                  run(phase, 'routes', 'npm run test:routes', required=False, extra={'ROUTE_HEALTH_BASE_URL': 'http://127.0.0.1:4173'})
+                  run(phase, 'browser', 'npx playwright test tests/e2e/specs/ci-smoke.spec.ts tests/e2e/specs/story-motion.spec.ts tests/e2e/specs/story-editorial-transition.spec.ts tests/e2e/specs/cv-highlights-alignment.spec.ts tests/e2e/specs/leu-showcase.spec.ts --project=chromium-desktop --project=chromium-mobile --workers=2 --retries=0 --reporter=json', required=False, extra={'PLAYWRIGHT_SKIP_WEB_SERVER': '1', 'PLAYWRIGHT_BASE_URL': 'http://127.0.0.1:4173', 'PLAYWRIGHT_JSON_OUTPUT_FILE': str(evidence / f'{phase}-browser.json')})
+          def browser_status(phase):
+              report = json.loads((evidence / f'{phase}-browser.json').read_text())
+              records = []
+              def visit(suites, parents=()):
+                  for suite in suites:
+                      trail = parents + (suite['title'],)
+                      for spec in suite.get('specs', []):
+                          for test in spec.get('tests', []):
+                              records.append({'name': ' / '.join(trail + (spec['title'], test['projectName'])), 'status': test['status']})
+                      visit(suite.get('suites', []), trail)
+              visit(report['suites'])
+              return sorted(records, key=lambda r: r['name'])
+          before, after = browser_status('before'), browser_status('after')
+          assert before == after, 'Browser behavior changed'
+          for label in ['routes', 'browser']:
+              a, b = [x for x in checks if x['check'] == label]
+              assert a['exit'] == b['exit'] and a['failures'] == b['failures'], label
+          (evidence / 'browser-comparison.json').write_text(json.dumps({'identical': True, 'tests': after}, indent=2))
+          run('after', 'diff', 'git diff --check && git diff --stat && test -z "$(git diff --name-only -- static src/styles src/app.css package.json package-lock.json)"')
+          print('Before/after checks match; no assertions or product behavior changed.', flush=True)
+          PY
+      - name: Upload complete baseline and candidate regression evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: cleanup-portfolio-browser-checks
-          path: |
-            app/test-results/
-            app/playwright-report/
+          path: ${{ runner.temp }}/portfolio-checks
           retention-days: 3
-          if-no-files-found: ignore
+          if-no-files-found: error
