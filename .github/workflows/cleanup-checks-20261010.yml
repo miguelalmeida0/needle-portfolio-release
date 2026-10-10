@@ -1,0 +1,58 @@
+name: Temporary before-after cleanup checks
+on:
+  push:
+    branches: [test]
+    paths: [.github/workflows/cleanup-checks-20261010.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repo: second-voice
+            sha: 7ba42e6488a9a22fa4cd0ede865c13849a274ea1
+            node: '22'
+          - repo: portfolio
+            sha: c95d3657479d0beae6889afb0905d743de210f08
+            node: '22.16.0'
+          - repo: needle-portfolio-release
+            sha: 06ded5be56f2d411c89ff83c9cfb1b57a6a0a0ea
+            node: '26'
+          - repo: flow
+            sha: 7a4ad9e7b9a2ec2e3657ac6c483229854849805f
+            node: '22'
+    env:
+      CI: 'true'
+      NEXT_TELEMETRY_DISABLED: '1'
+      TZ: Europe/Berlin
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: miguelalmeida0/${{ matrix.repo }}
+          ref: ${{ matrix.sha }}
+          path: app
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Verify identical behavior and explicit cleanup candidate
+        working-directory: app
+        env:
+          TARGET_REPO: ${{ matrix.repo }}
+        run: python3 ../control/.github/cleanup-20261010/verify.py "$TARGET_REPO" "$RUNNER_TEMP/cleanup-evidence"
+      - name: Save verification evidence, never dependency or font files
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cleanup-verification-${{ matrix.repo }}
+          path: ${{ runner.temp }}/cleanup-evidence
+          retention-days: 3
+          if-no-files-found: error
