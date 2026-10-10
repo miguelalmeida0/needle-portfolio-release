@@ -1,9 +1,11 @@
 name: Release verification
 on:
+  # Main releases are checked on push; test work is verified via PR or dispatch.
   push:
-    branches: [main, test]
+    branches: [main]
   pull_request:
     branches: [main, test]
+  workflow_dispatch:
 permissions:
   contents: read
 concurrency:
