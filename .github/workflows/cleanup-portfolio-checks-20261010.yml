@@ -1,0 +1,60 @@
+name: Temporary Portfolio cleanup regression checks
+on:
+  push:
+    branches: [test]
+    paths: [.github/workflows/cleanup-portfolio-checks-20261010.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      TZ: Europe/Berlin
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: control
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: miguelalmeida0/portfolio
+          ref: c95d3657479d0beae6889afb0905d743de210f08
+          path: app
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.16.0'
+      - working-directory: app
+        run: npm ci && npx playwright install --with-deps chromium
+      - name: Baseline typecheck and all non-browser regression suites
+        working-directory: app
+        run: npm run check && npm run test:unit && npm run test:routes && npm run test:dev-watch
+      - name: Apply only the 41 reviewed unmounted file removals
+        working-directory: app
+        run: python3 ../control/.github/cleanup-20261010/apply.py portfolio
+      - name: Candidate typecheck and all non-browser regression suites
+        working-directory: app
+        run: npm run check && npm run test:unit && npm run test:routes && npm run test:dev-watch
+      - name: Critical browser and motion regression suite on production build
+        working-directory: app
+        run: |
+          mkdir -p .cache/tmp
+          TMPDIR=$PWD/.cache/tmp npx playwright test tests/e2e/specs/ci-smoke.spec.ts tests/e2e/specs/story-motion.spec.ts tests/e2e/specs/story-editorial-transition.spec.ts tests/e2e/specs/cv-highlights-alignment.spec.ts tests/e2e/specs/leu-showcase.spec.ts --project=chromium-desktop --project=chromium-mobile --workers=2 --retries=0 --reporter=list
+      - name: Confirm only reviewed source files changed
+        working-directory: app
+        run: |
+          git diff --check
+          git diff --stat
+          test -z "$(git diff --name-only -- static src/styles src/app.css package.json package-lock.json)"
+      - name: Upload regression report only
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cleanup-portfolio-browser-checks
+          path: |
+            app/test-results/
+            app/playwright-report/
+          retention-days: 3
+          if-no-files-found: ignore
