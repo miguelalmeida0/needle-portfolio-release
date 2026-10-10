@@ -40,6 +40,7 @@ try {
     const browser = await type.launch();
     try {
       for (const width of [390, 1440]) for (const route of routes) {
+        console.log('Capture', phase, engine, width, route);
         const page = await browser.newPage({ viewport: { width, height: 1000 }, reducedMotion: 'reduce', locale: 'en-US', timezoneId: 'Europe/Berlin' });
         await page.clock.setFixedTime(new Date('2026-10-10T12:00:00Z'));
         await page.addInitScript(() => {
@@ -48,12 +49,19 @@ try {
         });
         const errors = [];
         page.on('pageerror', error => errors.push(error.message));
-        const response = await page.goto(base + route, { waitUntil: 'networkidle', timeout: 60000 });
-        await page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(image => image.decode().catch(() => {}))); });
+        const response = await page.goto(base + route, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        await page.locator('h1').first().waitFor({ state: 'visible', timeout: 30000 });
+        await page.evaluate(async () => {
+          for (const image of document.images) image.loading = 'eager';
+          await Promise.race([
+            Promise.all([document.fonts.ready, ...[...document.images].map(image => image.decode().catch(() => {}))]),
+            new Promise(resolve => setTimeout(resolve, 8000)),
+          ]);
+        });
         await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' });
-        await page.waitForTimeout(500);
+        await page.waitForTimeout(700);
         const name = `${engine}-${width}-${route.replace(/[^a-z0-9]+/gi, '-') || 'home'}`;
-        await page.screenshot({ path: path.join(output, name + '.png'), fullPage: true, animations: 'disabled' });
+        await page.screenshot({ path: path.join(output, name + '.png'), fullPage: true, animations: 'disabled', timeout: 30000 });
         const appearance = await page.evaluate(() => [...document.querySelectorAll('h1,h2,h3,p,button,input,textarea,nav,main,section,article,a')].map(el => {
           const box = el.getBoundingClientRect(), css = getComputedStyle(el);
           return { tag: el.tagName, text: el.textContent?.trim().slice(0,100), x: box.x, y: box.y, w: box.width, h: box.height,
