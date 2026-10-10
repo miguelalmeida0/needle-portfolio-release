@@ -1,0 +1,68 @@
+name: Temporary cleanup source evidence
+on:
+  push:
+    branches: [test]
+    paths: [.github/workflows/cleanup-evidence-20261010.yml]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - repo: second-voice
+            sha: 7ba42e6488a9a22fa4cd0ede865c13849a274ea1
+          - repo: portfolio
+            sha: c95d3657479d0beae6889afb0905d743de210f08
+          - repo: needle-portfolio-release
+            sha: 06ded5be56f2d411c89ff83c9cfb1b57a6a0a0ea
+          - repo: flow
+            sha: 7a4ad9e7b9a2ec2e3657ac6c483229854849805f
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: miguelalmeida0/${{ matrix.repo }}
+          ref: ${{ matrix.sha }}
+          persist-credentials: false
+      - name: Capture tracked text and exact file inventory only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, pathlib, subprocess, zipfile
+          root = pathlib.Path.cwd()
+          out = root / '.cleanup-evidence'
+          out.mkdir()
+          inventory = []
+          with zipfile.ZipFile(out / 'source.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
+              for entry in subprocess.check_output(['git', 'ls-tree', '-rlz', 'HEAD']).split(b'\0'):
+                  if not entry: continue
+                  meta, rawpath = entry.split(b'\t', 1)
+                  mode, kind, sha, size = meta.decode().split()
+                  if kind != 'blob': continue
+                  name = rawpath.decode()
+                  record = {'path': name, 'gitSha': sha, 'size': int(size), 'mode': mode}
+                  file = root / name
+                  if mode != '120000' and int(size) < 4000000:
+                      data = file.read_bytes()
+                      try:
+                          data.decode('utf-8')
+                          text = b'\0' not in data
+                      except UnicodeDecodeError:
+                          text = False
+                      if text:
+                          archive.writestr(name, data)
+                          record['captured'] = True
+                          record['sha256'] = hashlib.sha256(data).hexdigest()
+                  inventory.append(record)
+              archive.writestr('snapshot-manifest.json', json.dumps({'head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), 'files': inventory}, indent=2))
+          print('Tracked files:', len(inventory), 'Text files captured:', sum(bool(x.get('captured')) for x in inventory))
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cleanup-source-${{ matrix.repo }}
+          path: .cleanup-evidence/source.zip
+          retention-days: 2
+          if-no-files-found: error
