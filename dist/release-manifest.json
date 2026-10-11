@@ -660,6 +660,11 @@
       "sha256": "3f41dbccf8bedf1cf9faec404425eea0a0d9f81e1844b0efe200438551e07b4e"
     },
     {
+      "path": "dist/assets/bootstrap-EB000506.js",
+      "bytes": 214678,
+      "sha256": "eb00050694a80bd00ae55f1be879f027d1a06f9897e1ec0929a36405f8f9a60e"
+    },
+    {
       "path": "dist/assets/bootstrap-STARTUP20261007.js",
       "bytes": 108212,
       "sha256": "c17227f6fd2e08ce2b21121547191fe7f04d3259692af4a62c70f052546d38f0"
@@ -735,6 +740,11 @@
       "sha256": "b41d891e6b51f7750afb5afb6bbde748d262c45d4981eb5edecd4447d0fb2ac7"
     },
     {
+      "path": "dist/assets/styles-30CE847C.css",
+      "bytes": 63030,
+      "sha256": "30ce847c0cd32e75245607a5ce323921f9bd0ff91b10dbf2bd42fee1d364d8d0"
+    },
+    {
       "path": "dist/assets/styles-70072C3F.css",
       "bytes": 62822,
       "sha256": "70072c3fee248a2bf267eae76d05c105d0d32b052862af4f2af31a577e2aa889"
@@ -801,8 +811,8 @@
     },
     {
       "path": "dist/index.html",
-      "bytes": 955,
-      "sha256": "e8c2a44fe213617c8a96d69e84f9eb823d6c0b3970049031c6abc0e9ae903f02"
+      "bytes": 965,
+      "sha256": "119d1ed6b1956113013099359f2c1326d2b553cb36cb503dc77a95aaa992c73d"
     },
     {
       "path": "dist/manifest.webmanifest",
@@ -831,8 +841,8 @@
     },
     {
       "path": "dist/modules/apps/web/src/app/app.reducer.js",
-      "bytes": 8639,
-      "sha256": "7c8b48a4812917dabfbc1b8b587211ac45283890ea37a9ae9fc6c9aeb25f4a58"
+      "bytes": 8971,
+      "sha256": "44896ec009129fef026155bef489ca307369c53085f9a35bfaa9083e82ea9314"
     },
     {
       "path": "dist/modules/apps/web/src/app/app.reducer.js.map",
@@ -1851,8 +1861,8 @@
     },
     {
       "path": "dist/styles/responsive.css",
-      "bytes": 8848,
-      "sha256": "bd0e709fe5e7481e234ae4eb67526c4994c5dbf3bfbc7d51f8bc66c1c808f3cf"
+      "bytes": 9074,
+      "sha256": "ab6e315ce14c9ac0dd872cc0f6051971b2e6aaf2e81b32f4c40aa29515acfe64"
     },
     {
       "path": "dist/styles/sidebar.css",
@@ -1966,8 +1976,8 @@
     },
     {
       "path": "tests/mobile-default.test.mjs",
-      "bytes": 2299,
-      "sha256": "1f0a3db5247baebc8121553781ccef2d76385491c085c0513d0113d702630255"
+      "bytes": 4001,
+      "sha256": "040ec76460e67bdb40b576d20f93132a98bdb116c744ca1468a0192ddba95f65"
     }
   ]
 }
