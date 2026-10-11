@@ -214,3 +214,8 @@
   .featured-match-node__label { letter-spacing: .035em; }
   .featured-match-node__rank { top: 20px; right: -2px; }
 }
+
+/* iOS mobile focus: computed form font size at least 16px, no zoom-lock meta tag. */
+@media (max-width: 980px) {
+  .search-composer input, .query-filter-menu__search input, textarea, select { font-size: 16px !important; }
+}
