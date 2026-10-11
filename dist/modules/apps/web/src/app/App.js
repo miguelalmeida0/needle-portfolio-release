@@ -11,7 +11,7 @@ import { FeedbackToast } from '../shared/ui/FeedbackToast.js';
 const DetailSearchOverlay = React.lazy(() => import('../features/detail/DetailSearchOverlay.js').then(module => ({ default: module.DetailSearchOverlay })));
 export function App() {
     const mapView = useAppSelector(state => state.mapView);
-    const hasDiscovery = useAppSelector(state => discoveryItems(state).length > 0);
+    const hasDiscovery = useAppSelector(state => !state.viewportIsMobile && discoveryItems(state).length > 0);
     return (React.createElement("div", { className: `app-shell${hasDiscovery ? ' has-discovery' : ''}` },
         React.createElement(DiscoverySlot, null),
         React.createElement(MapToolbar, null),
