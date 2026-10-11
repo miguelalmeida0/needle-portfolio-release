@@ -26,6 +26,7 @@ export const initialAppState = {
     corpusImageProgress: { completed: 0, succeeded: 0, failed: 0, required: 0, total: 0 },
     visualIndexProgress: { completed: 0, total: 0, failures: 0 },
     mapView: typeof window !== 'undefined' && window.matchMedia('(max-width: 680px)').matches ? 'wall' : 'space',
+    viewportIsMobile: typeof window !== 'undefined' && window.matchMedia('(max-width: 680px)').matches,
     challenge: null,
     savedCollections: [],
     branches: [],
@@ -141,6 +142,10 @@ export function appReducer(state, event) {
             };
         case 'MODE_CHANGED':
             return { ...state, resultMode: event.mode };
+        case 'VIEWPORT_CHANGED':
+            return event.isMobile === state.viewportIsMobile
+                ? state
+                : { ...state, viewportIsMobile: event.isMobile, mapView: event.isMobile ? 'wall' : 'space' };
         case 'MAP_VIEW_CHANGED':
             return { ...state, mapView: event.view };
         case 'ARTWORK_SELECTED':
