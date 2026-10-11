@@ -811,8 +811,8 @@
     },
     {
       "path": "dist/index.html",
-      "bytes": 965,
-      "sha256": "119d1ed6b1956113013099359f2c1326d2b553cb36cb503dc77a95aaa992c73d"
+      "bytes": 955,
+      "sha256": "ab3b41f14a1e923cbad0f9e43492aa62e2ffd7762977454b137a11b0d153e647"
     },
     {
       "path": "dist/manifest.webmanifest",
