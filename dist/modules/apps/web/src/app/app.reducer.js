@@ -1,4 +1,5 @@
 export const initialAppState = {
+    discoveryReady: false,
     status: 'booting',
     corpus: null,
     bootstrapRecordCount: 0,
@@ -8,6 +9,7 @@ export const initialAppState = {
     queryKind: 'text',
     queryArtworkId: null,
     selectedArtworkId: null,
+    featuredArtworkId: null,
     queryVector: null,
     queryTerms: [],
     queryFilters: [],
@@ -71,12 +73,18 @@ export function appReducer(state, event) {
         case 'BOOTSTRAP_FAILED':
             return { ...state, status: 'error', errorMessage: event.message };
         case 'SEARCH_FAILED':
-            return { ...state, status: state.corpus ? 'ready' : 'error', errorMessage: event.message };
+            return { ...state, discoveryReady: false, status: state.corpus ? 'ready' : 'error', errorMessage: event.message };
         case 'DRAFT_CHANGED':
             return { ...state, draftQuery: event.value };
+        case 'TEXT_SEARCH_CLEARED':
+            return { ...state, featuredArtworkId: null, status: 'ready', discoveryReady: false, draftQuery: '', activeQuery: '',
+                queryTerms: [], queryVector: null, queryKind: 'text', queryArtworkId: null,
+                selectedArtworkId: null, approximate: null, exact: null, resultMode: 'fast',
+                uploadedPreviewUrl: null, activeBranchId: null, challenge: null, errorMessage: null };
         case 'QUERY_RECIPE_CHANGED':
             return {
                 ...state,
+                discoveryReady: false,
                 queryTerms: event.terms,
                 queryFilters: event.filters,
                 activeBranchId: event.activeBranchId === undefined ? state.activeBranchId : event.activeBranchId
@@ -84,6 +92,8 @@ export function appReducer(state, event) {
         case 'SEARCH_STARTED':
             return {
                 ...state,
+                featuredArtworkId: null,
+                discoveryReady: false,
                 status: 'searching',
                 activeQuery: event.query,
                 draftQuery: event.queryKind === 'text' ? event.query : state.draftQuery,
@@ -99,7 +109,7 @@ export function appReducer(state, event) {
                 errorMessage: null
             };
         case 'SEARCH_COMPLETED':
-            return { ...state, status: 'ready', approximate: event.response, history: event.history, errorMessage: null };
+            return { ...state, discoveryReady: true, status: 'ready', approximate: event.response, history: event.history, errorMessage: null };
         case 'TRUTH_STARTED':
             return { ...state, status: 'truth-checking', errorMessage: null };
         case 'TRUTH_COMPLETED':
@@ -109,6 +119,7 @@ export function appReducer(state, event) {
         case 'PROBE_COMPLETED':
             return {
                 ...state,
+                featuredArtworkId: null,
                 status: 'ready',
                 activeQuery: event.query,
                 draftQuery: event.query,
@@ -134,8 +145,10 @@ export function appReducer(state, event) {
             return { ...state, mapView: event.view };
         case 'ARTWORK_SELECTED':
             return { ...state, selectedArtworkId: event.artworkId, compareArtworkIds: state.compareArtworkIds.length === 1 && event.artworkId ? state.compareArtworkIds : state.compareArtworkIds };
+        case 'ARTWORK_FEATURED':
+            return { ...state, featuredArtworkId: event.artworkId };
         case 'EF_SEARCH_CHANGED':
-            return { ...state, efSearch: event.value };
+            return { ...state, discoveryReady: false, efSearch: event.value };
         case 'CLUSTER_FILTER_CHANGED':
             return { ...state, activeClusterId: event.clusterId };
         case 'RENDERER_READY':
@@ -159,7 +172,7 @@ export function appReducer(state, event) {
         case 'BRANCHES_CHANGED':
             return { ...state, branches: event.branches, activeBranchId: event.activeBranchId };
         case 'COLLECTION_SCOPE_CHANGED':
-            return { ...state, scopedCollectionId: event.collectionId };
+            return { ...state, discoveryReady: false, scopedCollectionId: event.collectionId };
         case 'COMPARE_CHANGED':
             return { ...state, compareArtworkIds: event.artworkIds };
         case 'DETAIL_SEARCH_CHANGED':

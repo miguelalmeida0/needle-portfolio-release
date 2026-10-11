@@ -1,0 +1,49 @@
+/* Discovery is part of Search, not a second results plane. */
+.discovery-shelf { min-width: 0; margin-top: 16px; }
+.discovery-shelf h2 { margin: 0 0 10px; color: var(--ink-650); font: 600 9px/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; }
+.discovery-track { display: grid; gap: 8px; max-height: min(460px, calc(100dvh - 290px)); margin: 0; padding: 3px 4px 6px; list-style: none; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--ink-350) transparent; }
+.discovery-track > li { min-width: 0; }
+.discovery-card { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 10px; align-items: center; width: 100%; min-height: 58px; padding: 2px 0; text-align: left; color: var(--ink-950); background: transparent; border-radius: 4px; cursor: pointer; }
+.discovery-card__frame { position: relative; display: grid; place-items: center; width: 54px; height: 58px; overflow: hidden; border-radius: 5px; background: var(--surface-muted); transition: transform 180ms cubic-bezier(.16,1,.3,1), box-shadow 180ms ease; }
+.discovery-card__frame img { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; object-fit: contain; }
+.discovery-card__frame .artwork-image-fallback { width: 100%; height: 100%; font-size: 9px; }
+.discovery-card__copy { display: grid; gap: 4px; }
+.discovery-card strong { color: var(--ink-950); font: 400 13px/1.25 var(--serif); overflow-wrap: anywhere; }
+.discovery-card small { color: var(--ink-650); font: 10px/1.4 var(--sans); }
+.discovery-card[aria-pressed="true"] strong { text-decoration: underline; text-decoration-color: var(--selection-strong); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.discovery-card:focus-visible, .discovery-return:focus-visible, #discovery-heading:focus-visible { outline: 2px solid var(--selection-strong); outline-offset: 2px; }
+.discovery-card:focus-visible .discovery-card__frame { box-shadow: 0 4px 10px rgba(30,37,33,.12); }
+.discovery-return { min-height: 44px; width: 100%; margin-bottom: 10px; padding: 8px 0; color: var(--selection-strong); background: transparent; text-align: left; font: 12px/1.3 var(--sans); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
+.discovery-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (hover: hover) and (pointer: fine) { .discovery-card:hover .discovery-card__frame { transform: translateY(-2px); box-shadow: 0 5px 12px rgba(30,37,33,.12); } }
+@media (max-width: 980px) {
+  .app-shell.has-discovery { grid-template-rows: auto 58px minmax(580px, 72vh) auto auto; }
+  .has-discovery .search-sidebar { grid-template-rows: auto; align-items: start; }
+  .has-discovery .sidebar-search { align-self: start; padding-block: 10px; min-width: 0; }
+  .discovery-shelf { margin-top: 12px; }
+  .discovery-track { grid-auto-flow: column; grid-auto-columns: 132px; gap: 12px; max-height: 224px; overflow: auto; scroll-snap-type: x proximity; }
+  .discovery-track > li { scroll-snap-align: start; }
+  .discovery-card { display: flex; flex-direction: column; align-items: stretch; justify-content: start; gap: 8px; }
+  .discovery-card__frame { width: 100%; height: 104px; flex: 0 0 104px; }
+  .discovery-card strong { font-size: 13px; }
+}
+@media (max-width: 680px) {
+  .app-shell.has-discovery { grid-template-rows: auto 56px 530px auto auto; }
+  .has-discovery .search-sidebar { grid-template-rows: 45px auto; }
+  .has-discovery .sidebar-search { padding-block: 0; }
+}
+@media (min-width: 681px) and (max-width: 980px) {
+  .inspector-panel:has(> .discovery-return) > .discovery-return { grid-column: 1 / -1; grid-row: 1; }
+  .inspector-panel:has(> .discovery-return) > .inspector-panel__header { grid-row: 2; }
+  .inspector-panel:has(> .discovery-return) > .inspector-preview--hero { grid-row: 3 / span 2; }
+  .inspector-panel:has(> .discovery-return) > .inspector-copy--artwork { grid-row: 3; }
+  .inspector-panel:has(> .discovery-return) > .inspector-action-list { grid-row: 4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .discovery-card__frame { transition: none; transform: none !important; clip-path: none !important; }
+  .discovery-card__copy { transform: none !important; opacity: 1 !important; }
+  .discovery-card:hover .discovery-card__frame { transform: none; }
+  .discovery-track { scroll-behavior: auto; }
+  .inspector-panel:has(> .discovery-return), .inspector-panel:has(> .discovery-return) * { animation: none !important; transition: none !important; }
+  .inspector-panel:has(> .discovery-return) { transform: none !important; clip-path: none !important; }
+}

@@ -16,7 +16,7 @@ export function ArtworkNode(props) {
         props.dimmed ? 'is-dimmed' : ''
     ].filter(Boolean).join(' ');
     const date = props.artwork.objectDate || (props.artwork.year ? String(props.artwork.year) : 'Date unknown');
-    return (React.createElement("button", { type: "button", "data-artwork-id": props.artwork.id, className: classNames, style: style, onClick: props.onSelect, "aria-label": `${props.artwork.title} by ${props.artwork.creator}, ${props.artwork.clusterLabel}${props.rank ? `, result ${props.rank}` : ''}`, "aria-pressed": props.selected },
+    return (React.createElement("button", { type: "button", "data-artwork-id": props.artwork.id, "data-flip-id": props.artwork.id, className: classNames, style: style, onClick: props.onSelect, "aria-label": `${props.artwork.title} by ${props.artwork.creator}, ${props.artwork.clusterLabel}${props.rank === 1 ? ', Best match, result 1' : props.rank ? `, result ${props.rank}` : ''}`, "aria-pressed": props.selected },
         React.createElement(ArtworkImage, { src: props.artwork.thumbnailUrl ?? props.artwork.imageUrl, alt: "", eager: props.matched, priority: props.rank === 2, sizes: "60px", fallbackLabel: "Met", width: props.artwork.imageWidth, height: props.artwork.imageHeight, dominantColor: props.artwork.dominantColor }),
         props.rank && React.createElement("span", { className: "artwork-node__rank" }, props.rank),
         props.missed && React.createElement("span", { className: "artwork-node__missed" }, "missed by fast search"),

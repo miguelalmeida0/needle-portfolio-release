@@ -3,15 +3,19 @@ import { Icon } from '../../shared/icons.js';
 import { ArtworkImage } from '../../shared/ui/ArtworkImage.js';
 import { useAppRuntime, useAppState } from '../../app/app.context.js';
 import { compareArtworks, queryArtwork, selectedArtwork, selectedHit, selectedMatchEvidence, selectedSimilarity } from '../../app/app.selectors.js';
+import { bestTextMatch, canFeatureArtwork, featuredTextMatch } from '../../app/app.selectors.js';
+import { createFeaturedArtworkCommands } from '../../../../../src/core/commands/featured-artwork.js';
+import { CommandButton } from '../../../../../src/ui/primitives/CommandButton.js';
 import { ComparePanel } from '../compare/ComparePanel.js';
 function artworkSummary(creator, objectDate, year) {
     const maker = creator || 'Unknown maker';
     const date = objectDate || (year === null ? 'Date unknown' : String(year));
     return `${maker} · ${date}`;
 }
-export function InspectorPanel() {
+export function InspectorPanel(props = {}) {
     const runtime = useAppRuntime();
     const compareTrigger = useRef(null);
+    const actions = useRef(null);
     const state = useAppState();
     const selected = selectedArtwork(state);
     const query = queryArtwork(state);
@@ -20,6 +24,17 @@ export function InspectorPanel() {
     const isCurrentMatch = Boolean(selectedHit(state));
     const similarity = selectedSimilarity(state);
     const comparing = compareArtworks(state).length >= 2;
+    const featured = featuredTextMatch(state);
+    const best = bestTextMatch(state);
+    const manuallyFeatured = Boolean(state.featuredArtworkId && featured?.id === state.featuredArtworkId);
+    const commands = createFeaturedArtworkCommands({
+        featureArtwork: id => runtime.featureArtwork(id),
+        selectArtwork: id => runtime.selectArtwork(id),
+        restoreBestMatch: () => {
+            actions.current?.querySelector('[data-command="view.artwork.feature"]')?.focus({ preventScroll: true });
+            runtime.restoreBestMatch();
+        },
+    });
     if (!artwork) {
         return (React.createElement("aside", { className: "inspector-panel inspector-panel--empty", "aria-label": "Search inspector" },
             React.createElement("div", { className: "inspector-panel__header" },
@@ -27,7 +42,8 @@ export function InspectorPanel() {
             React.createElement("p", null, "Select an artwork to refine the search.")));
     }
     const inCollections = state.savedCollections.filter((collection) => collection.artworkIds.includes(artwork.id));
-    return (React.createElement("aside", { className: "inspector-panel", "aria-label": "Search inspector" },
+    return (React.createElement("aside", { className: "inspector-panel", "aria-label": "Search inspector", ref: props.panelRef },
+        props.discoveryReturn,
         React.createElement("div", { className: "inspector-panel__header" },
             React.createElement("span", null, "Inspector"),
             React.createElement("a", { href: artwork.objectUrl, target: "_blank", rel: "noreferrer", "aria-label": "Open the Met source record" },
@@ -35,10 +51,16 @@ export function InspectorPanel() {
         React.createElement("div", { className: "inspector-preview inspector-preview--hero" },
             React.createElement(ArtworkImage, { src: artwork.detailImageUrl ?? artwork.imageUrl ?? artwork.thumbnailUrl, alt: artwork.title, role: "detail", sizes: "(max-width: 900px) 90vw, 280px", fallbackSrc: artwork.thumbnailUrl, fallbackLabel: "Artwork", width: artwork.imageWidth, height: artwork.imageHeight, dominantColor: artwork.dominantColor })),
         React.createElement("div", { className: "inspector-copy inspector-copy--artwork" },
-            React.createElement("h2", null, artwork.title),
+            React.createElement("h2", { tabIndex: -1 }, artwork.title),
             React.createElement("p", null, artworkSummary(artwork.creator, artwork.objectDate, artwork.year)),
             React.createElement("span", null, artwork.department || 'The Metropolitan Museum of Art')),
-        React.createElement("div", { className: "inspector-action-list", "aria-label": "Refine from this artwork" },
+        React.createElement("div", { className: "inspector-action-list", "aria-label": "Refine from this artwork", ref: actions },
+            canFeatureArtwork(state, artwork.id) && React.createElement(CommandButton, { command: commands.feature(artwork.id), label: manuallyFeatured && featured?.id === artwork.id ? 'Featured artwork' : 'Make main artwork', selected: manuallyFeatured && featured?.id === artwork.id },
+                React.createElement(Icon, { name: "spark", size: 16 }),
+                React.createElement("span", null, manuallyFeatured && featured?.id === artwork.id ? 'Featured artwork' : 'Make main artwork')),
+            manuallyFeatured && best && React.createElement(CommandButton, { command: commands.restore(), label: `Restore best match: ${best.title}` },
+                React.createElement(Icon, { name: "arrow-right", size: 16 }),
+                React.createElement("span", null, "Restore best match")),
             runtime.experimentalVisual && React.createElement(React.Fragment, null,
                 React.createElement("button", { type: "button", onClick: () => void runtime.moreLike(artwork.id) },
                     React.createElement(Icon, { name: "spark", size: 16 }),

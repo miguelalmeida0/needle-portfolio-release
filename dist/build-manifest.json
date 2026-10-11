@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-10-03T18:28:48.474Z",
+  "builtAt": "2026-10-11T18:18:14.442Z",
   "architecture": "react-worker-hnsw-webgpu-versioned-met-data-packs",
   "dataPipeline": "offline-hugging-face-csv-to-stable-hybrid-search-pack",
   "sourceMaps": true

@@ -4,7 +4,7 @@ import { VisualIndexEnricher } from '../../../../packages/query-encoder/src/visu
 import { RecallProbeService } from '../../../../packages/search-runtime/src/recall-probe.service.js';
 import { SearchService } from '../../../../packages/search-runtime/src/search.service.js';
 import { BrowserCorpusRepository } from '../../../../packages/museum-corpus/src/corpus.repository.js';
-import { effectiveSearchBudget } from './app.selectors.js';
+import { canFeatureArtwork, effectiveSearchBudget } from './app.selectors.js';
 import { loadHistory, saveHistory } from '../shared/utils/history.js';
 import { createRequestId } from '../shared/utils/id.js';
 import { loadVisualCache, saveVisualCache } from '../shared/utils/visual-cache.js';
@@ -77,8 +77,13 @@ export class AppRuntime {
             return;
         }
         const query = state.draftQuery.trim();
-        if (!query)
+        if (!query) {
+            if (state.queryKind === 'text') {
+                this.#beginRecipeIntent();
+                this.store.dispatch({ type: 'TEXT_SEARCH_CLEARED' });
+            }
             return;
+        }
         const textTerm = this.#textTerm(query);
         const terms = [textTerm, ...state.queryTerms.filter((term) => term.kind !== 'text')].slice(0, 10);
         await this.#executeRecipe(terms, state.queryFilters, { addToHistory: true, focusResults: false, activeBranchId: null });
@@ -323,6 +328,20 @@ export class AppRuntime {
     }
     selectArtwork(artworkId) {
         this.store.dispatch({ type: 'ARTWORK_SELECTED', artworkId });
+    }
+    activateRecommendation(artworkId) {
+        if (this.store.getSnapshot().selectedArtworkId === artworkId)
+            this.featureArtwork(artworkId);
+        else
+            this.selectArtwork(artworkId);
+    }
+    featureArtwork(artworkId) {
+        if (canFeatureArtwork(this.store.getSnapshot(), artworkId)) {
+            this.store.dispatch({ type: 'ARTWORK_FEATURED', artworkId });
+        }
+    }
+    restoreBestMatch() {
+        this.store.dispatch({ type: 'ARTWORK_FEATURED', artworkId: null });
     }
     setEfSearch(value) {
         this.#recipeIntent++;

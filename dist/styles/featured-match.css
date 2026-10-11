@@ -180,3 +180,7 @@
 @media (prefers-reduced-motion: reduce) {
   .featured-match-node__border { animation: none; }
 }
+
+/* Manual feature changes use scoped GSAP FLIP. */
+.featured-match-node { animation: none; }
+.featured-match-node__copy em { color: #606763; }

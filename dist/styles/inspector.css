@@ -83,3 +83,8 @@
 .compare-panel__facts { display: grid; gap: 4px; margin: 8px 0 0; }
 .compare-panel__facts > div { display: flex; justify-content: space-between; gap: 8px; color: var(--ink-500); font-size: 7px; }
 .compare-panel__facts dd { margin: 0; color: var(--ink-650); text-align: right; }
+
+.inspector-action-list button[data-command="view.artwork.feature"],
+.inspector-action-list button[data-command="view.artwork.restore"] { min-height: 44px; }
+.inspector-action-list button[data-command]:focus-visible { outline: 2px solid var(--selection-strong); outline-offset: -3px; }
+.inspector-action-list button[data-command][aria-pressed="true"] { color: var(--selection-strong); background: var(--selection-soft); }
