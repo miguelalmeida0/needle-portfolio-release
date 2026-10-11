@@ -25,7 +25,7 @@ export const initialAppState = {
     indexPhase: 'semantic',
     corpusImageProgress: { completed: 0, succeeded: 0, failed: 0, required: 0, total: 0 },
     visualIndexProgress: { completed: 0, total: 0, failures: 0 },
-    mapView: 'space',
+    mapView: typeof window !== 'undefined' && window.matchMedia('(max-width: 680px)').matches ? 'wall' : 'space',
     challenge: null,
     savedCollections: [],
     branches: [],
@@ -183,4 +183,3 @@ export function appReducer(state, event) {
             return state;
     }
 }
-//# sourceMappingURL=app.reducer.js.map

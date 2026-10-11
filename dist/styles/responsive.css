@@ -67,6 +67,8 @@
   .sidebar-section-heading { display: none; }
   .search-composer__field,
   .search-composer input { height: 43px; }
+  /* iOS Safari zooms focused inputs with computed font sizes below 16px. */
+  .search-composer input { font-size: 16px; }
 
   .sidebar-scroll {
     position: fixed;
