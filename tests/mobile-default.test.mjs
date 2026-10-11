@@ -29,6 +29,8 @@ test('served bootstrap and stylesheet ship the mobile defaults without disabling
   const script = html.match(/<script type="module" src="(\/assets\/bootstrap-[A-Z0-9]+\.js)"/);
   const style = html.match(/<link rel="stylesheet" href="(\/assets\/styles-[A-Z0-9]+\.css)"/);
   assert.ok(script, 'production bootstrap is linked');
+  assert.doesNotMatch(html, /(?:src|href)="\/dist\//, 'public asset URLs must not contain the disk directory /dist/');
+  assert.ok(!html.includes('/dist/assets/'), 'public entrypoints must use the server web root');
   assert.ok(style, 'production CSS is linked');
 
   const js = await fs.readFile(new URL('../dist' + script[1], import.meta.url), 'utf8');
