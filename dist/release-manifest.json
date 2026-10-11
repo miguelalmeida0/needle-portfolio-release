@@ -630,6 +630,11 @@
       "sha256": "087fccfa9fd31b8c88c590305af0e0108711e07b1db819c4e55e850fb12d78b9"
     },
     {
+      "path": "dist/assets/bootstrap-0D143BD8.js",
+      "bytes": 214753,
+      "sha256": "0d143bd88502ac011f4c06690f421123c8ea84dd9f115714d2df3a764f0b1fc1"
+    },
+    {
       "path": "dist/assets/bootstrap-27FN2X5T.js",
       "bytes": 107798,
       "sha256": "8fe8cb0b44e0d96216748ae4af3af581b6ed48eac03de599226206d69dbbbfa9"
@@ -812,7 +817,7 @@
     {
       "path": "dist/index.html",
       "bytes": 955,
-      "sha256": "ab3b41f14a1e923cbad0f9e43492aa62e2ffd7762977454b137a11b0d153e647"
+      "sha256": "2e81e42c452e40b39a6dc836468c047871a60511b98a0afb2f57bbc83afe43c0"
     },
     {
       "path": "dist/manifest.webmanifest",
@@ -831,8 +836,8 @@
     },
     {
       "path": "dist/modules/apps/web/src/app/App.js",
-      "bytes": 2378,
-      "sha256": "189e75f58eee8d9d81e24f5342a664d8de53dd4f08224a59e7a0ea4d132af604"
+      "bytes": 2405,
+      "sha256": "bbd46a72a7a08169a51a31e7e7b38d4c21af1181e04cb38c42eb78d8920d8d41"
     },
     {
       "path": "dist/modules/apps/web/src/app/App.js.map",
@@ -911,8 +916,8 @@
     },
     {
       "path": "dist/modules/apps/web/src/app/DiscoverySlot.js",
-      "bytes": 3587,
-      "sha256": "4eb1098da367d1bc947a1f275b8a7d7076e70a23cfc9e588d2e39caaad3feb21"
+      "bytes": 3680,
+      "sha256": "abc13b1dfe0c2c6c777062a83c11623346d293e547a625c07e7af427eb2fdbc9"
     },
     {
       "path": "dist/modules/apps/web/src/app/DiscoverySlot.js.map",
@@ -1976,8 +1981,8 @@
     },
     {
       "path": "tests/mobile-default.test.mjs",
-      "bytes": 4001,
-      "sha256": "040ec76460e67bdb40b576d20f93132a98bdb116c744ca1468a0192ddba95f65"
+      "bytes": 5278,
+      "sha256": "c8e1f2133529687ea8681f8b846fc007bd3a5809131fa23fc6b223b8be5e1394"
     }
   ]
 }
