@@ -12,6 +12,7 @@ export function DiscoverySlot() {
     const runtime = useAppRuntime();
     const items = useAppSelector(discoveryItems);
     const selected = useAppSelector(state => state.selectedArtworkId);
+    const isPhone = useAppSelector(state => state.viewportIsMobile);
     const [origin, setOrigin] = useState(null);
     const panel = useRef(null);
     const sequence = useRef(0);
@@ -53,8 +54,8 @@ export function DiscoverySlot() {
         },
     });
     return React.createElement(React.Fragment, null,
-        React.createElement(SearchSidebar, { discovery: items.length > 0 ? React.createElement(DiscoveryShelf, { key: sequence.current, items: items, selected: selected, select: commands.select }) : null }),
-        React.createElement(InspectorPanel, { panelRef: panel, discoveryReturn: origin && selected === origin ?
+        React.createElement(SearchSidebar, { discovery: !isPhone && items.length > 0 ? React.createElement(DiscoveryShelf, { key: sequence.current, items: items, selected: selected, select: commands.select }) : null }),
+        React.createElement(InspectorPanel, { panelRef: panel, discoveryReturn: !isPhone && origin && selected === origin ?
                 React.createElement(CommandButton, { command: commands.back(), label: "Back to recommendations", className: "discovery-return" }, "Back to recommendations") : null }));
 }
 //# sourceMappingURL=DiscoverySlot.js.map
