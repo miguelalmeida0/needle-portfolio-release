@@ -67,3 +67,16 @@ test('production assets subscribe to viewport changes and enforce 16px editable 
   assert.match(css, /\.search-composer input,\.query-filter-menu__search input,textarea,select\{font-size:16px!important\}/);
   assert.doesNotMatch(html, /user-scalable\s*=\s*no|maximum-scale\s*=/);
 });
+
+test('mobile collection wall is the only artwork grid; desktop still shows recommendations', async () => {
+  const html = await fs.readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
+  const jsPath = html.match(/\/assets\/bootstrap-[A-Z0-9]{8}\.js/)[0];
+  const bundle = await fs.readFile(new URL('../dist' + jsPath, import.meta.url), 'utf8');
+  const app = await fs.readFile(new URL('../dist/modules/apps/web/src/app/App.js', import.meta.url), 'utf8');
+  const slot = await fs.readFile(new URL('../dist/modules/apps/web/src/app/DiscoverySlot.js', import.meta.url), 'utf8');
+  assert.ok(bundle.includes('e=pt(t=>!t.viewportIsMobile&&kr(t).length>0)'), 'no expanded layout on phones');
+  assert.ok(bundle.includes('discovery:!isPhone&&e.length>0?'), 'shelf not mounted on phones');
+  assert.ok(bundle.includes('discoveryReturn:!isPhone&&r&&t===r?'), 'no dead inspector back link');
+  assert.ok(app.includes('!state.viewportIsMobile && discoveryItems(state).length > 0'));
+  assert.ok(slot.includes('discovery: !isPhone && items.length > 0'));
+});
