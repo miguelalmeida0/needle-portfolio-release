@@ -40,3 +40,28 @@ test('served bootstrap and stylesheet ship the mobile defaults without disabling
   assert.doesNotMatch(html, /user-scalable\s*=\s*no|maximum-scale\s*=/,
     'pinch-to-zoom must remain enabled');
 });
+
+test('crossing the mobile breakpoint always switches to the mobile wall, preserving explicit choices inside the breakpoint', async () => {
+  const reducerURL = new URL('../dist/modules/apps/web/src/app/app.reducer.js', import.meta.url);
+  const { initialAppState, appReducer } = await import(reducerURL.href + '?viewport=responsive');
+  const start = { ...initialAppState, mapView: 'space', viewportIsMobile: false };
+  const mobile = appReducer(start, { type: 'VIEWPORT_CHANGED', isMobile: true });
+  assert.equal(mobile.mapView, 'wall');
+  assert.equal(mobile.viewportIsMobile, true);
+  const chosen = appReducer(mobile, { type: 'MAP_VIEW_CHANGED', view: 'space' });
+  assert.equal(appReducer(chosen, { type: 'VIEWPORT_CHANGED', isMobile: true }), chosen);
+  const desktop = appReducer(chosen, { type: 'VIEWPORT_CHANGED', isMobile: false });
+  assert.equal(desktop.mapView, 'space');
+});
+
+test('production assets subscribe to viewport changes and enforce 16px editable text', async () => {
+  const html = await fs.readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
+  const jsName = html.match(/\/assets\/bootstrap-[A-Z0-9]{8}\.js/)[0];
+  const cssName = html.match(/\/assets\/styles-[A-Z0-9]{8}\.css/)[0];
+  const js = await fs.readFile(new URL('../dist' + jsName, import.meta.url), 'utf8');
+  const css = await fs.readFile(new URL('../dist' + cssName, import.meta.url), 'utf8');
+  assert.match(js, /VIEWPORT_CHANGED/);
+  assert.match(js, /addEventListener\?\.\("change",sync\)/);
+  assert.match(css, /\.search-composer input,\.query-filter-menu__search input,textarea,select\{font-size:16px!important\}/);
+  assert.doesNotMatch(html, /user-scalable\s*=\s*no|maximum-scale\s*=/);
+});
