@@ -1,0 +1,52 @@
+/* WCAG 2.2 AA: readable catalog metadata without changing the artwork presentation. */
+:is(
+  .query-canvas__scope,
+  .query-term__copy strong,
+  .query-term__copy small,
+  .query-term__polarity,
+  .query-canvas__chips button,
+  .query-filter-anchor > button,
+  .query-filter-menu__top strong,
+  .query-filter-menu__options span,
+  .query-filter-menu__options small,
+  .query-filter-menu__clear,
+  .query-filter-menu__empty,
+  .recent-queries__heading > span,
+  .recent-query__copy strong,
+  .query-branches button,
+  .saved-collections__list > button,
+  .saved-collections__list small,
+  .saved-collections__list p,
+  .saved-collections__new,
+  .sidebar-primary-actions button,
+  .search-startup-status,
+  .inspector-panel__header,
+  .inspector-copy--artwork p,
+  .inspector-copy--artwork > span,
+  .inspector-action-list button,
+  .inspector-section-title h3,
+  .inspector-section-title > span,
+  .inspector-detail-search strong,
+  .inspector-detail-search small,
+  .inspector-why li,
+  .inspector-details summary,
+  .inspector-details dt,
+  .inspector-details dd,
+  .inspector-collections__list button,
+  .inspector-collections > p,
+  .compare-panel__heading strong,
+  .compare-panel__cards strong,
+  .compare-panel__cards small,
+  .compare-panel__facts > div
+) { font-size: 11px; line-height: 1.4; }
+
+/* The 21px remove action was hidden for touchscreen users and undersized. */
+.query-term { padding-right: 36px; }
+.query-term__remove { width: 28px; height: 28px; opacity: 1; }
+.query-term__remove:focus-visible { outline: 2px solid var(--selection); outline-offset: 2px; }
+.query-canvas__chips button,
+.query-filter-anchor > button { min-height: 30px; height: auto; }
+.inspector-action-list button { min-height: 36px; }
+@media (prefers-reduced-motion: reduce) {
+  .query-term__remove { transition: none; }
+}
