@@ -65,12 +65,15 @@ export class AppRuntime {
     }
     setDraft(value) {
         this.#recipeIntent++;
+        // Older worker responses cannot replace results after the user edits,
+        // even while the input method editor is still composing.
+        this.#activeSearchSequence++;
         this.store.dispatch({ type: 'DRAFT_CHANGED', value });
     }
     setMapView(view) {
         this.store.dispatch({ type: 'MAP_VIEW_CHANGED', view });
     }
-    async submitDraft() {
+    async submitDraft(addToHistory = true) {
         const state = this.store.getSnapshot();
         if (!state.corpus) {
             this.#pendingDraft = true;
@@ -86,7 +89,7 @@ export class AppRuntime {
         }
         const textTerm = this.#textTerm(query);
         const terms = [textTerm, ...state.queryTerms.filter((term) => term.kind !== 'text')].slice(0, 10);
-        await this.#executeRecipe(terms, state.queryFilters, { addToHistory: true, focusResults: false, activeBranchId: null });
+        await this.#executeRecipe(terms, state.queryFilters, { addToHistory, focusResults: false, activeBranchId: null });
     }
     async searchText(text, addToHistory = true, focusResults = false, resetRecipe = true) {
         const state = this.store.getSnapshot();
