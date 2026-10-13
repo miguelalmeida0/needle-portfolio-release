@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import postcss from 'postcss';
+import { rootTokens, resolveTokens } from '../scripts/style-contract.mjs';
 
 const text = async (path) => readFile(new URL('../' + path, import.meta.url), 'utf8');
 function luminance(hex) {
@@ -26,8 +28,22 @@ test('active immutable CSS passes 4.5:1 for catalog text tokens', async () => {
     assert.ok(token, 'defined --' + variable);
     assert.ok(ratio(token[1], background) >= 4.5, variable + ': ' + ratio(token[1], background));
   }
-  assert.match(css, /\.query-term__remove \{ width: 28px; height: 28px; opacity: 1;/);
-  assert.match(css, /\.inspector-action-list button \{ min-height: 36px; \}/);
+  // Check final unconditional declarations, independent of minification or
+  // primitive/semantic token spelling. Keep the same accessibility dimensions.
+  const values = rootTokens(css);
+  const ast = postcss.parse(css);
+  const value = (selector, property) => {
+    let result;
+    ast.walkRules(selector, rule => {
+      if (rule.parent.type !== 'root') return;
+      rule.walkDecls(property, declaration => { result = resolveTokens(declaration.value, values); });
+    });
+    return result;
+  };
+  assert.equal(value('.query-term__remove', 'width'), '28px');
+  assert.equal(value('.query-term__remove', 'height'), '28px');
+  assert.equal(value('.query-term__remove', 'opacity'), '1');
+  assert.equal(value('.inspector-action-list button', 'min-height'), '36px');
   assert.match(css, /\.query-term__copy small,/);
 });
 test('unbundled source keeps accessibility styles in sync', async () => {
