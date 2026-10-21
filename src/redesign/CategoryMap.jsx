@@ -15,15 +15,18 @@ import {
   visibleHits,
 } from "../../dist/modules/apps/web/src/app/app.selectors.js";
 import { visibleArtworkNodes } from "../../dist/modules/apps/web/src/features/map/map-visibility.js";
-import { ArtworkImage } from "../../dist/modules/apps/web/src/shared/ui/ArtworkImage.js";
+import { ArtworkImage } from "./GalleryImage.jsx";
 import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
 
 // Presentation only: production selectors still decide membership, match rank,
 // saved scope and filters. The semantic renderer remains available in Search tools.
-export function CategoryMap({ onOpen }) {
+export function CategoryMap({ onOpen, active = true }) {
   const runtime = useAppRuntime();
-  const state = useGalleryState();
+  const currentState = useGalleryState();
   const viewportRef = useRef(null);
+  const lastVisibleState = useRef(currentState);
+  if (active) lastVisibleState.current = currentState;
+  const state = lastVisibleState.current;
   const [compact, setCompact] = useState(() => window.innerWidth < 620);
   const [zoom, setZoom] = useState(1);
   const [fullscreenError, setFullscreenError] = useState("");

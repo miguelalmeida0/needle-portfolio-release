@@ -18,7 +18,7 @@ import {
 import { discoveryItems } from "../../dist/modules/apps/web/src/app/discovery.selectors.js";
 import { LogoMark } from "../../dist/modules/apps/web/src/shared/ui/LogoMark.js";
 import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
-import { ArtworkImage } from "../../dist/modules/apps/web/src/shared/ui/ArtworkImage.js";
+import { ArtworkImage } from "./GalleryImage.jsx";
 import { SearchComposer } from "../../dist/modules/apps/web/src/features/search/SearchComposer.js";
 import { QueryCanvas } from "../../dist/modules/apps/web/src/features/query/QueryCanvas.js";
 import { QueryFilterMenu } from "../../dist/modules/apps/web/src/features/query/QueryFilterMenu.js";
@@ -411,7 +411,7 @@ export function NeedleApp() {
                 </button>
               </div>
             </div>
-            <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} />
+            <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} active={route.view === 'results'} />
           </main>
         )}
         {visited.has("map") && (
@@ -419,7 +419,7 @@ export function NeedleApp() {
             <h1 id="needle-map-title" className="needle-sr-only" tabIndex={-1}>
               Artworks by category
             </h1>
-            <CategoryMap onOpen={openArtwork} />
+            <CategoryMap onOpen={openArtwork} active={route.view === 'map'} />
           </main>
         )}
         {visited.has("advanced") && (

@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from "../../dist/modules/apps/web/src/shared/react.js";
-import { ArtworkImage } from "../../dist/modules/apps/web/src/shared/ui/ArtworkImage.js";
+import { ArtworkImage } from "./GalleryImage.jsx";
 import {
   useAppRuntime,
   useGalleryState,
@@ -21,12 +21,15 @@ const positions = new Map();
 
 // Keep the deployed wall's selection, ordering, windowing and keyboard behavior.
 // Only the image geometry and visible presentation differ from that component.
-export function CollectionWall({ onOpen, scrollRef } = {}) {
+export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
   const runtime = useAppRuntime();
-  const state = useGalleryState();
+  const currentState = useGalleryState();
   const containerRef = useRef(null);
   const frameRef = useRef(0);
   const scrollPositionRef = useRef(0);
+  const lastVisibleState = useRef(currentState);
+  if (active) lastVisibleState.current = currentState;
+  const state = lastVisibleState.current;
   const positionKey = `${state.corpus?.source.packId}:${state.activeQuery}:${state.activeClusterId}:${JSON.stringify(state.queryFilters)}:${state.scopedCollectionId}`;
   const [viewport, setViewport] = useState({
     width: 900,

@@ -79,7 +79,7 @@ for (const [name, state] of Object.entries(states)) {
   });
 }
 
-test('image buttons retain the original image pipeline and select before opening details', () => {
+test('image buttons retain the original artwork sources and select before opening details', () => {
   const calls = [];
   const { cards, ArtworkImage } = renderDesign(states.all, { width: 1440, height: 680, scrollTop: 0 }, calls);
   const first = cards[0], id = first.props['data-artwork-id'];
