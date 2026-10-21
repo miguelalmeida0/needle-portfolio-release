@@ -1,0 +1,13 @@
+# Map focus and opening copy
+
+User's 22:37/22:38 screenshots: keep the editable search placeholder rather than inserting the startup demo sentence; door/cat matches were hard to find in the category map.
+
+Before repair, live `doors` search returned eight actual door works. On entering the map, their Architecture & place category began at viewport y=1622. All eight existed but the fixed catalogue category order placed unrelated categories above them. Cats were outlined within categories but barely larger than context images.
+
+Presentation correction: sort category groups by their best original search rank, retain existing within-group order and all original scoped nodes, give matching groups more horizontal space and larger match images, name the current query in the match legend, and return the map viewport to the top for a new query. Original search/ranking, category membership, context items, saved scopes, filters, commands and image URLs are preserved.
+
+The initially interpreted removal of the whole introduction was superseded during browser verification: the literal “a dramatic landscape under a restless sky” is the engine's startup draft. The final presentation keeps the original heading, instructions and examples. An authored startup wrapper clears only the untouched demo draft after startup on the initial home route. It preserves user input and IME activity during startup, never submits a new query, and retains the engine's original background results. Non-home startup routes are unchanged.
+
+`npm run verify`: all 68 checks pass. The existing category-map regression now exercises reversed catalogue ordering and asserts that the best match is presented first; it fails on the former component and passes on the repair. Existing membership, all-match inclusion, context, saved-scope, keyboard and image delivery tests remain green. Two startup regressions execute the wrapper with the original runtime/store, checking the empty initial draft, unchanged active query, other-route isolation and typed/IME draft preservation. `git diff --check` passes.
+
+On the first map deployment (`d57feef`, bootstrap 9CD2C1F8), live Chrome verified all eight decoded door matches at y=194/382 rather than y=1622. After a real wheel scroll to 900px, typing `cats` in place returned the map to zero, showed the best cat match first, and decoded all eight current match images at 144px width. The two matching categories started at y=194; Photography and Ink followed at y=546. Browser navigation initially timed out; a normal reload recovered the connection and confirmed the deployed bootstrap before these checks.

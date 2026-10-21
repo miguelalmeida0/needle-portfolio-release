@@ -319,7 +319,22 @@ export function NeedleApp() {
           <main className="needle-home">
             <HomeBackdrop items={state.corpus?.items ?? []} />
             <section className="needle-home-panel">
+              <h1>What would you like to see?</h1>
+              <p>
+                Describe a picture in your own words. Needle finds it by what’s
+                in it, not by its catalogue title.
+              </p>
               <div ref={slot} className="needle-home-search-slot" />
+              <div className="needle-examples">
+                <p>Or try one</p>
+                <div>
+                  {examples.map((text) => (
+                    <button key={text} onClick={() => exampleSearch(text)}>
+                      {text}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {hasResults && (
                 <button className="needle-resume" onClick={results}>
                   Return to your results <Icon name="arrow-right" size={16} />

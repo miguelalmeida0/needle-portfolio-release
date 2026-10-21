@@ -4,6 +4,7 @@ import { AppRuntime } from "../../dist/modules/apps/web/src/app/app.runtime.js";
 import { installArtworkIntent } from "../../dist/modules/apps/web/src/shared/images/image-intent.js";
 import { artworkById } from "../../dist/modules/apps/web/src/app/app.selectors.js";
 import { NeedleApp } from "./NeedleApp.jsx";
+import { startEmptySearch } from "./start-empty-search.mjs";
 
 const root = document.getElementById("root");
 if (!root) throw new Error("Needle root element was not found.");
@@ -33,7 +34,7 @@ window.SHAP.ReactDom.render(
   </React.StrictMode>,
   root,
 );
-void runtime.start();
+void startEmptySearch(runtime, root, window.location);
 const releaseIntent = installArtworkIntent(root, (id) =>
   artworkById(runtime.store.getSnapshot(), id),
 );
