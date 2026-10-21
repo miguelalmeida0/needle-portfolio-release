@@ -82,7 +82,8 @@ test('cached legacy assets retain mobile discovery policy while the new collecti
   assert.ok(bundle.includes('discoveryReturn:!isPhone&&r&&t===r?'), 'no dead inspector back link');
   assert.ok(app.includes('!state.viewportIsMobile && discoveryItems(state).length > 0'));
   assert.ok(slot.includes('discovery: !isPhone && items.length > 0'));
-  assert.ok(active.includes('What would you like to see?'));
+  assert.ok(active.includes('Describe something difficult to find'));
+  assert.ok(!active.includes('What would you like to see?'), 'opening screen keeps the editable placeholder without the removed introduction');
   assert.ok(active.includes('needle-wall'));
   assert.match(presentation, /<CollectionWall onOpen=\{openArtwork\}/);
   assert.match(presentation, /route\.overlay === ["']tools["'] &&\s*\(?\s*<Tools/);

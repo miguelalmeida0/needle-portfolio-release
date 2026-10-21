@@ -64,8 +64,9 @@ export function CategoryMap({ onOpen, active = true }) {
     }
     return (state.corpus?.clusters ?? []).flatMap((cluster) => {
       const artworks = grouped.get(cluster.id);
-      return artworks?.length ? [{ ...cluster, artworks }] : [];
-    });
+      const bestRank = Math.min(...(artworks ?? []).map(item => hitRanks.get(item.id) ?? Infinity));
+      return artworks?.length ? [{ ...cluster, artworks, bestRank }] : [];
+    }).sort((left, right) => left.bestRank - right.bestRank || 0);
   }, [
     items,
     hits,
@@ -74,6 +75,10 @@ export function CategoryMap({ onOpen, active = true }) {
     state.corpus,
     compact,
   ]);
+
+  useEffect(() => {
+    viewportRef.current?.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [state.activeQuery]);
 
   const resize = (delta) =>
     setZoom((current) =>
@@ -105,7 +110,7 @@ export function CategoryMap({ onOpen, active = true }) {
     >
       <div className="needle-map__legend">
         <span>
-          <i aria-hidden="true" /> Search matches
+          <i aria-hidden="true" /> {state.activeQuery ? `${hits.length} matches for “${state.activeQuery}”` : 'Search matches'}
         </span>
         <span>Alongside the collection</span>
         {state.activeClusterId && (
@@ -118,7 +123,7 @@ export function CategoryMap({ onOpen, active = true }) {
         <div className="needle-map__groups">
           {groups.map((cluster) => (
             <section
-              className={`needle-map__group${state.activeClusterId && state.activeClusterId !== cluster.id ? " is-muted" : ""}`}
+              className={`needle-map__group${Number.isFinite(cluster.bestRank) ? " has-matches" : ""}${state.activeClusterId && state.activeClusterId !== cluster.id ? " is-muted" : ""}`}
               key={cluster.id}
               aria-labelledby={`map-category-${cluster.id}`}
             >
@@ -149,7 +154,7 @@ export function CategoryMap({ onOpen, active = true }) {
                         alt=""
                         eager={rank != null}
                         priority={rank === 1}
-                        sizes={`${Math.ceil((compact ? (rank != null ? 60 : 56) : rank != null ? 90 : 82) * zoom)}px`}
+                        sizes={`${Math.ceil((compact ? (rank != null ? 100 : 56) : rank != null ? 144 : 82) * zoom)}px`}
                         fallbackLabel="Met"
                         width={artwork.imageWidth}
                         height={artwork.imageHeight}

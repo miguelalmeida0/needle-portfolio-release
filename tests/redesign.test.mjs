@@ -126,7 +126,7 @@ test('category map keeps every real match, unrelated context and saved-scope iso
   const originalWindow = globalThis.window;
   try {
     for (const width of [390, 1440]) {
-      for (const state of [states.all, states.scope]) {
+      for (const state of [states.all, states.scope, { ...states.all, corpus: { ...corpus, clusters: [...corpus.clusters].reverse() } }]) {
         globalThis.window = { innerWidth: width };
         const calls = [];
         const mapState = { ...state, approximate: { ...state.approximate, trace: { visitedIds: [] } } };
@@ -154,6 +154,7 @@ test('category map keeps every real match, unrelated context and saved-scope iso
         assert.equal(new Set(ids).size, ids.length, 'each real artwork appears once');
         assert.ok(ids.every(id => scopedIds.has(id)), 'no fabricated or out-of-scope image');
         assert.ok(visibleHits(state).every(hit => ids.includes(hit.id)), 'all fast matches remain on the map');
+        assert.equal(ids[0], visibleHits(state)[0].id, 'the best match category comes first regardless of catalogue category order');
         if (state.scopedCollectionId) assert.equal(ids.length, scopedIds.size);
         else {
           assert.equal(categories.length, 12);

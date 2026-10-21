@@ -16,9 +16,10 @@
 .needle-map__legend button { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; background: none; color: var(--brand-700); font: inherit; cursor: pointer; }
 .needle-map__groups { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; gap: 28px 26px; }
 .needle-map__group { min-width: 0; }
+.needle-map__group.has-matches { grid-column: span 2; }
 .needle-map__images { display: flex; align-items: center; align-content: start; flex-wrap: wrap; gap: 6px; }
 .needle-map__artwork { display: block; flex: 0 0 auto; width: calc(82px * var(--map-zoom)); height: calc(104px * var(--map-zoom)); padding: 0; border: 0; border-radius: 2px; background: transparent; cursor: pointer; overflow: hidden; transition: opacity 180ms ease; }
-.needle-map__artwork.is-match { width: calc(90px * var(--map-zoom)); height: calc(114px * var(--map-zoom)); outline: 2px solid var(--brand-700); outline-offset: -2px; }
+.needle-map__artwork.is-match { width: calc(144px * var(--map-zoom)); height: calc(182px * var(--map-zoom)); outline: 2px solid var(--brand-700); outline-offset: -2px; }
 .needle-map__artwork > img, .needle-map__artwork > .artwork-image-fallback { display: block; width: 100%; height: 100%; object-fit: cover; }
 .needle-map__artwork.is-dimmed { opacity: .3; }
 .needle-map__artwork:hover, .needle-map__artwork:focus-visible { opacity: 1; }
@@ -39,7 +40,7 @@
   .needle-map__groups { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 18px; }
   .needle-map__legend { margin-bottom: 22px; gap: 8px 14px; font-size: 11px; }
   .needle-map__artwork { width: calc(56px * var(--map-zoom)); height: calc(72px * var(--map-zoom)); }
-  .needle-map__artwork.is-match { width: calc(60px * var(--map-zoom)); height: calc(78px * var(--map-zoom)); }
+  .needle-map__artwork.is-match { width: calc(100px * var(--map-zoom)); height: calc(128px * var(--map-zoom)); }
   .needle-map__controls button { width: 36px; height: 36px; }
 }
 @media (prefers-reduced-motion: reduce) { .needle-map__artwork { transition: none; } }
