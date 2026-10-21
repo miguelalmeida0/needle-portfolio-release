@@ -11,13 +11,13 @@ const source = transformed
 const compile = new Function(
   'React', 'useEffect', 'useMemo', 'useRef', 'useState', 'ArtworkImage',
   'useAppRuntime', 'useGalleryState', 'matchesQueryFilters', 'scopedCorpusItems',
-  'visibleHits', 'wallWindow', 'ResizeObserver',
+  'visibleHits', 'wallWindow', 'ResizeObserver', 'requestAnimationFrame', 'cancelAnimationFrame',
   source + '\nreturn CollectionWall;'
 );
 
 // Run the actual component's observer effect. Rendering and the browser's native
 // scroll clamp are outside this harness; retaining geometry prevents that clamp.
-function observeWall(element, initialViewport) {
+function observeWall(element, initialViewport, scrollElement) {
   const effects = [];
   let viewport = initialViewport;
   let updates = 0;
@@ -41,9 +41,10 @@ function observeWall(element, initialViewport) {
     current => ({ current: refs++ === 0 ? element : current }),
     () => [viewport, update => { viewport = update(viewport); updates++; }],
     () => undefined, () => ({}), () => state, () => true, () => [], () => [],
-    () => ({ start: 0, end: 0 }), ResizeObserver
+    () => ({ start: 0, end: 0 }), ResizeObserver,
+    callback => { callback(); return 0; }, () => {}
   );
-  component();
+  component({ scrollRef: scrollElement ? { current: scrollElement } : undefined });
   const disconnect = effects[0]();
   return {
     resize: () => resize(),
@@ -76,6 +77,42 @@ test('hidden wall resizes retain deep-scroll geometry until a valid viewport ret
   assert.deepEqual(wall.viewport(), { width: 390, height: 844, scrollTop: 250000 });
   assert.equal(wall.updates(), updatesBeforeHiding + 1);
   assert.equal(wall.disconnect(), true, 'observer cleanup remains attached');
+});
+
+// Regression: ISSUE-001 — the entire results page must drive virtualized rows.
+// Found by /qa on 2026-10-21. Browser replay is recorded in docs/needle-qa-scroll-images.md.
+test('page scrolling measures the page viewport and subtracts the results heading', () => {
+  const listeners = new Map();
+  const element = {
+    clientWidth: 1440, clientHeight: 700000,
+    getBoundingClientRect: () => ({ top: 220 - page.scrollTop }),
+  };
+  const page = {
+    clientHeight: 600, scrollTop: 500,
+    getBoundingClientRect: () => ({ top: 0 }),
+    addEventListener: (name, listener) => listeners.set(name, listener),
+    removeEventListener: name => listeners.delete(name),
+  };
+  const originalFrame = globalThis.requestAnimationFrame;
+  const originalCancel = globalThis.cancelAnimationFrame;
+  globalThis.requestAnimationFrame = callback => { callback(); return 0; };
+  globalThis.cancelAnimationFrame = () => {};
+  try {
+    const wall = observeWall(element, { width: 900, height: 680, scrollTop: 0 }, page);
+    assert.deepEqual(wall.viewport(), { width: 1440, height: 600, scrollTop: 280 });
+    assert.equal(typeof listeners.get('scroll'), 'function');
+    page.scrollTop = 1800;
+    listeners.get('scroll')();
+    assert.equal(wall.viewport().scrollTop, 1580, 'wheel/page scroll advances the mounted window');
+    element.clientWidth = 0;
+    wall.resize();
+    assert.equal(wall.viewport().scrollTop, 1580, 'a hidden view keeps its scroll window');
+    wall.disconnect();
+    assert.equal(listeners.has('scroll'), false);
+  } finally {
+    globalThis.requestAnimationFrame = originalFrame;
+    globalThis.cancelAnimationFrame = originalCancel;
+  }
 });
 
 test('an initially hidden mounted wall keeps its previous geometry', () => {

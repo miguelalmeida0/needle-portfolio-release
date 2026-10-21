@@ -74,6 +74,7 @@ export function NeedleApp() {
   const root = useRef(null),
     header = useRef(null),
     pages = useRef(null),
+    resultsViewport = useRef(null),
     slot = useRef(null),
     search = useRef(null),
     filter = useRef(null);
@@ -343,7 +344,7 @@ export function NeedleApp() {
           </main>
         )}
         {visited.has("results") && (
-          <main className="needle-results" hidden={route.view !== "results"}>
+          <main ref={resultsViewport} className="needle-results" hidden={route.view !== "results"}>
             <div className="needle-results-summary">
               <div>
                 <p>{collection?.name || "From The Met collection"}</p>
@@ -410,7 +411,7 @@ export function NeedleApp() {
                 </button>
               </div>
             </div>
-            <CollectionWall onOpen={openArtwork} />
+            <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} />
           </main>
         )}
         {visited.has("map") && (

@@ -21,7 +21,7 @@ const positions = new Map();
 
 // Keep the deployed wall's selection, ordering, windowing and keyboard behavior.
 // Only the image geometry and visible presentation differ from that component.
-export function CollectionWall({ onOpen } = {}) {
+export function CollectionWall({ onOpen, scrollRef } = {}) {
   const runtime = useAppRuntime();
   const state = useGalleryState();
   const containerRef = useRef(null);
@@ -67,31 +67,51 @@ export function CollectionWall({ onOpen } = {}) {
     state.savedCollections,
     hitRanks,
   ]);
+  const wallOffset = () => {
+    const page = scrollRef?.current;
+    const wall = containerRef.current;
+    return page && wall
+      ? wall.getBoundingClientRect().top - page.getBoundingClientRect().top + page.scrollTop
+      : 0;
+  };
   useEffect(() => {
     const element = containerRef.current;
     if (!element) return undefined;
+    const scrollElement = scrollRef?.current ?? element;
     const update = () => {
       const width = element.clientWidth;
-      const height = element.clientHeight;
+      const height = scrollElement.clientHeight;
       // Hidden views report zero size; retain the wall's geometry and scroll range.
       if (width <= 0 || height <= 0) return;
       setViewport((current) => ({
         ...current,
         width,
         height,
+        scrollTop: scrollRef ? Math.max(0, scrollElement.scrollTop - wallOffset()) : current.scrollTop,
       }));
+    };
+    const onScroll = () => {
+      scrollPositionRef.current = scrollElement.scrollTop;
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = requestAnimationFrame(update);
     };
     update();
     const observer = new ResizeObserver(update);
     observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
+    if (scrollElement !== element) observer.observe(scrollElement);
+    scrollElement.addEventListener?.('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      scrollElement.removeEventListener?.('scroll', onScroll);
+      cancelAnimationFrame(frameRef.current);
+    };
+  }, [scrollRef]);
   useEffect(() => {
-    const element = containerRef.current;
+    const element = scrollRef?.current ?? containerRef.current;
     if (!element) return;
     element.scrollTop = positions.get(positionKey) ?? 0;
     scrollPositionRef.current = element.scrollTop;
-    setViewport((current) => ({ ...current, scrollTop: element.scrollTop }));
+    setViewport((current) => ({ ...current, scrollTop: Math.max(0, element.scrollTop - wallOffset()) }));
     return () => {
       cancelAnimationFrame(frameRef.current);
       positions.delete(positionKey);
@@ -128,7 +148,7 @@ export function CollectionWall({ onOpen } = {}) {
   return (
     <section
       ref={containerRef}
-      className="needle-wall"
+      className={`needle-wall${scrollRef ? ' needle-wall--page-scroll' : ''}`}
       aria-label={`Collection wall with ${items.length.toLocaleString()} image-backed artworks`}
       onScroll={(event) => {
         const scrollTop = event.currentTarget.scrollTop;
@@ -162,13 +182,15 @@ export function CollectionWall({ onOpen } = {}) {
         if (next < 0 || next >= items.length) return;
         event.preventDefault();
         const element = containerRef.current;
+        const scrollElement = scrollRef?.current ?? element;
         if (!element) return;
         const top = Math.floor(next / columns) * rowHeight;
         if (
-          top < element.scrollTop ||
-          top + rowHeight > element.scrollTop + viewport.height
+          top < viewport.scrollTop ||
+          top + rowHeight > viewport.scrollTop + viewport.height
         ) {
-          element.scrollTop = top;
+          scrollElement.scrollTop = top + wallOffset();
+          scrollPositionRef.current = scrollElement.scrollTop;
           setViewport((current) => ({ ...current, scrollTop: top }));
         }
         requestAnimationFrame(() =>
@@ -210,6 +232,7 @@ export function CollectionWall({ onOpen } = {}) {
             >
               <ArtworkImage
                 src={artwork.thumbnailUrl ?? artwork.imageUrl}
+                fallbackSrc={artwork.thumbnailFallbackUrls?.[0]}
                 alt={artwork.title}
                 eager={row === Math.floor(viewport.scrollTop / rowHeight)}
                 priority={index < 2 && viewport.scrollTop === 0}

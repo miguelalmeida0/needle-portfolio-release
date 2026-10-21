@@ -107,7 +107,7 @@
 .needle-examples button:hover { background: #efeee6; border-color: #bcbfb1; }
 
 
-.needle-results { display: flex; flex: 1; flex-direction: column; min-height: 0; padding: 0 40px; }
+.needle-results { position: relative; display: flex; flex: 1; flex-direction: column; min-height: 0; padding: 0 40px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .needle-results-summary { display: grid; grid-template-columns: minmax(0, 1fr) 240px; align-items: end; gap: 36px; flex: none; margin: 12px 0 26px; }
 .needle-results-summary h1 { margin: 0 0 16px; font: clamp(36px, 4.1vw, 66px)/1.08 var(--serif); letter-spacing: -1.5px; text-wrap: balance; overflow-wrap: anywhere; }
 .needle-results-summary p { margin: 0 0 8px; color: var(--needle-secondary); font-size: 13px; line-height: 1.5; }
@@ -121,6 +121,7 @@
 .needle-minimap img:nth-child(3n + 1) { transform: translateY(-6px); }
 .needle-minimap:hover { border-color: #9eaa9a; }
 .needle-wall { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-gutter: stable; padding-bottom: 24px; }
+.needle-wall--page-scroll { flex: none; overflow: visible; scrollbar-gutter: auto; }
 .needle-wall__stage { position: relative; min-width: 100%; }
 .needle-artwork { position: absolute; top: 0; left: 0; display: block; padding: 0; overflow: hidden; background: transparent; border: 0; border-radius: 4px; cursor: zoom-in; contain: layout paint style; }
 .needle-artwork > span { display: block; width: 100%; height: 100%; overflow: hidden; }
