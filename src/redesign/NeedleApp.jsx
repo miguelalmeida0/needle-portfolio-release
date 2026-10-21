@@ -37,6 +37,7 @@ import {
 } from "./navigation.mjs";
 import { CollectionWall } from "./CollectionWall.jsx";
 import { CategoryMap } from "./CategoryMap.jsx";
+import { mapArtworks } from "./map-artworks.mjs";
 
 const DetailSearchOverlay = React.lazy(() =>
   import(
@@ -91,10 +92,10 @@ export function NeedleApp() {
     visited.has("advanced") ||
     Boolean(route.backView && route.backView !== "home");
   const hits = visibleHits(state);
-  const preview = hits
-    .slice(0, 12)
-    .map((hit) => artworkById(state, hit.id))
-    .filter(Boolean);
+  const preview = useMemo(() => mapArtworks(state, 12).slice(0, 12), [
+    state.corpus, state.approximate, state.exact, state.resultMode,
+    state.selectedArtworkId, state.scopedCollectionId, state.savedCollections,
+  ]);
   const collection = activeCollection(state);
   const render = (next, animate = false) => {
     const update = () => {
@@ -385,7 +386,7 @@ export function NeedleApp() {
                   )}
                 </div>
               </div>
-              <div className="needle-map-preview">
+              {preview.length > 0 && <div className="needle-map-preview">
                 <button
                   className="needle-minimap"
                   aria-label="Open the artwork map"
@@ -409,7 +410,7 @@ export function NeedleApp() {
                 >
                   See them on the map <Icon name="arrow-right" size={16} />
                 </button>
-              </div>
+              </div>}
             </div>
             <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} active={route.view === 'results'} />
           </main>

@@ -14,9 +14,9 @@ import {
   scopedCorpusItems,
   visibleHits,
 } from "../../dist/modules/apps/web/src/app/app.selectors.js";
-import { visibleArtworkNodes } from "../../dist/modules/apps/web/src/features/map/map-visibility.js";
 import { ArtworkImage } from "./GalleryImage.jsx";
 import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
+import { mapArtworks } from "./map-artworks.mjs";
 
 // Presentation only: production selectors still decide membership, match rank,
 // saved scope and filters. The semantic renderer remains available in Search tools.
@@ -46,16 +46,7 @@ export function CategoryMap({ onOpen, active = true }) {
   }, []);
 
   const groups = useMemo(() => {
-    const nodes = visibleArtworkNodes({
-      items,
-      hits,
-      visitedIds: state.approximate?.trace.visitedIds ?? [],
-      selectedId: state.selectedArtworkId,
-      // This map has no separate query node; retain every scoped match.
-      queryId: null,
-      view: "space",
-      previewLimit: compact ? 72 : 120,
-    });
+    const nodes = mapArtworks(state, compact ? 72 : 120);
     const grouped = new Map();
     for (const item of nodes) {
       const group = grouped.get(item.clusterId) ?? [];

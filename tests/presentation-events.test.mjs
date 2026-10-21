@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mapArtworks } from '../src/redesign/map-artworks.mjs';
 import { readFile } from "node:fs/promises";
 import {
   backLabel,
@@ -309,6 +310,7 @@ async function identityEffect(state, route, visited = [route.view]) {
       current.corpus?.items.find((item) => item.id === id),
     activeCollection: () => null,
     visibleHits: () => [],
+    mapArtworks,
     backLabel,
     isSearchSubmission,
     createNavigation,

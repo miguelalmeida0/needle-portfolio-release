@@ -7,6 +7,7 @@ import { initialAppState, appReducer } from '../dist/modules/apps/web/src/app/ap
 import { matchesQueryFilters, scopedCorpusItems, visibleHits } from '../dist/modules/apps/web/src/app/app.selectors.js';
 import { wallWindow } from '../dist/modules/apps/web/src/features/wall/wall-window.js';
 import { visibleArtworkNodes } from '../dist/modules/apps/web/src/features/map/map-visibility.js';
+import { mapArtworks } from '../src/redesign/map-artworks.mjs';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
 const fixture = JSON.parse(await read('tests/fixtures/design-preservation.json'));
@@ -122,7 +123,7 @@ test('category map keeps every real match, unrelated context and saved-scope iso
   const source = (await transform(await read('src/redesign/CategoryMap.jsx'), { loader: 'jsx', jsx: 'transform', format: 'esm' })).code
     .replace(/^import [\s\S]*? from [^;]+;\n/gm, '').replace(/^export \{[\s\S]*?\};?\s*$/m, '');
   const compile = new Function('React', 'useEffect', 'useMemo', 'useRef', 'useState', 'ArtworkImage', 'Icon', 'useAppRuntime', 'useGalleryState',
-    'matchesQueryFilters', 'scopedCorpusItems', 'visibleHits', 'visibleArtworkNodes', source + '\nreturn CategoryMap;');
+    'matchesQueryFilters', 'scopedCorpusItems', 'visibleHits', 'visibleArtworkNodes', 'mapArtworks', source + '\nreturn CategoryMap;');
   const originalWindow = globalThis.window;
   try {
     for (const width of [390, 1440]) {
@@ -135,7 +136,7 @@ test('category map keeps every real match, unrelated context and saved-scope iso
           () => undefined, callback => callback(), current => ({ current }), initial => [typeof initial === 'function' ? initial() : initial, () => undefined],
           () => undefined, () => undefined,
           () => ({ selectArtwork: id => calls.push(['select', id]), setClusterFilter: id => calls.push(['cluster', id]) }), () => mapState,
-          matchesQueryFilters, scopedCorpusItems, visibleHits, visibleArtworkNodes
+          matchesQueryFilters, scopedCorpusItems, visibleHits, visibleArtworkNodes, mapArtworks
         );
         const tree = component({ onOpen: id => calls.push(['open', id]) });
         const artworks = [], categories = [];

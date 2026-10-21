@@ -7,6 +7,7 @@ import { mediumSource, imagePriority, imageUrl, imageSrcSet, canResize } from '.
 import { matchesQueryFilters, scopedCorpusItems, visibleHits } from '../dist/modules/apps/web/src/app/app.selectors.js';
 import { wallWindow } from '../dist/modules/apps/web/src/features/wall/wall-window.js';
 import { visibleArtworkNodes } from '../dist/modules/apps/web/src/features/map/map-visibility.js';
+import { mapArtworks } from '../src/redesign/map-artworks.mjs';
 import { initialAppState, appReducer } from '../dist/modules/apps/web/src/app/app.reducer.js';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
@@ -83,11 +84,11 @@ for (const name of ['CollectionWall', 'CategoryMap']) {
   test(`${name} keeps hidden image sources stable while instant search changes`, async () => {
     const refs = []; let cursor = 0; let state;
     const component = new Function('React','useEffect','useMemo','useRef','useState','ArtworkImage','Icon','useAppRuntime','useGalleryState',
-      'matchesQueryFilters','scopedCorpusItems','visibleHits','wallWindow','visibleArtworkNodes',
+      'matchesQueryFilters','scopedCorpusItems','visibleHits','wallWindow','visibleArtworkNodes','mapArtworks',
       await executable(await read(`src/redesign/${name}.jsx`)) + `\nreturn ${name};`)(
       React, () => {}, callback => callback(), value => refs[cursor++] ??= { current: value },
       value => [typeof value === 'function' ? value() : value, () => {}], () => {}, () => {}, () => ({}), () => state,
-      matchesQueryFilters, scopedCorpusItems, visibleHits, wallWindow, visibleArtworkNodes);
+      matchesQueryFilters, scopedCorpusItems, visibleHits, wallWindow, visibleArtworkNodes, mapArtworks);
     const originalWindow = globalThis.window; globalThis.window = { innerWidth: 1440 };
     const render = (next, active) => {
       cursor = 0; state = next;
