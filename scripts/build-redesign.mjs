@@ -1,6 +1,7 @@
 import { build } from "esbuild";
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
+import { redesignImages } from "./redesign-images.mjs";
 const checking = process.argv.includes("--check");
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const outputs = [];
@@ -22,6 +23,7 @@ for (const [entry, prefix, extension] of [
       __NEEDLE_SEARCH_WORKER_URL__: '"/assets/search.worker-TI6JI4PU.js"',
     },
     logLevel: "silent",
+    plugins: [redesignImages],
   });
   if (result.warnings.length) throw new Error(JSON.stringify(result.warnings));
   const bytes = result.outputFiles[0].contents;
