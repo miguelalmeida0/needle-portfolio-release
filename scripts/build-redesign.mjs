@@ -1,9 +1,20 @@
 import { build } from "esbuild";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { redesignImages } from "./redesign-images.mjs";
+import { buildPreviewAtlas } from "./build-preview-atlas.mjs";
 const checking = process.argv.includes("--check");
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const atlas = await buildPreviewAtlas();
+const atlasManifest = JSON.stringify(atlas.manifest) + '\n';
+if (checking) {
+  if (await readFile('src/redesign/preview-atlas.json', 'utf8') !== atlasManifest ||
+      digest(await readFile(atlas.filePath)) !== digest(atlas.bytes)) throw new Error('Stale preview atlas');
+} else {
+  await mkdir(atlas.filePath.slice(0, atlas.filePath.lastIndexOf('/')), { recursive: true });
+  await writeFile(atlas.filePath, atlas.bytes);
+  await writeFile('src/redesign/preview-atlas.json', atlasManifest);
+}
 const outputs = [];
 for (const [entry, prefix, extension] of [
   ["src/redesign/bootstrap.jsx", "bootstrap", "js"],
@@ -50,6 +61,7 @@ const manifest = {
 };
 let html = await readFile("dist/index.html", "utf8");
 const updated = html
+  .replace(/\s*<link rel="preload" as="image" href="\/packs\/[^/]+\/previews\/atlas-[A-Z0-9]{8}\.avif" fetchpriority="low"\/>/, '')
   .replace(
     /<script type="module" src="\/assets\/bootstrap-[A-Z0-9]{8}\.js"><\/script>/,
     `<script type="module" src="${manifest.bootstrap}"></script>`,
@@ -60,7 +72,7 @@ const updated = html
   )
   .replace(
     "<title>",
-    `<link rel="stylesheet" href="${manifest.stylesheet}"/>\n    <title>`,
+    `<link rel="stylesheet" href="${manifest.stylesheet}"/>\n    <link rel="preload" as="image" href="${atlas.url}" fetchpriority="low"/>\n    <title>`,
   );
 if (checking) {
   const existing = JSON.parse(

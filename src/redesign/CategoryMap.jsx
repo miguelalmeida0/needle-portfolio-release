@@ -140,6 +140,7 @@ export function CategoryMap({ onOpen, active = true }) {
                       }}
                     >
                       <ArtworkImage
+                        role="map"
                         src={artwork.thumbnailUrl ?? artwork.imageUrl}
                         fallbackSrc={artwork.thumbnailFallbackUrls?.[0]}
                         alt=""

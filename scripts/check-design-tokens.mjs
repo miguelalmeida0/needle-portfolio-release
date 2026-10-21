@@ -58,6 +58,12 @@ assert.equal(hash(await read('dist' + design.bootstrap)), design.bootstrapSha256
 assert.deepEqual([...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)].map(m => m[1]), [`/assets/${manifest.filename}`, design.stylesheet]);
 assert.ok(html.includes(design.bootstrap));
 assert.equal(hash(await read('dist/assets/bootstrap-9FA4D098.js')), manifest.bootstrapSha256, 'Preserve instant-search runtime');
-for (const match of html.matchAll(/(?:src|href)="(\/[^"?#]+)(?:[?#][^"]*)?"/g)) await read('dist' + match[1]);
+const activePack = JSON.parse(await read('data-packs/active.json'));
+for (const match of html.matchAll(/(?:src|href)="(\/[^"?#]+)(?:[?#][^"]*)?"/g)) {
+  const publicPath = match[1];
+  assert.ok(!publicPath.split('/').some(part => part.startsWith('.')), 'Public asset path');
+  await read(publicPath.startsWith(`/packs/${activePack.packId}/`)
+    ? 'data-packs/' + publicPath.slice('/packs/'.length) : 'dist' + publicPath);
+}
 console.log(`PASS: ${source.files.length} ordered source modules reproduce ${manifest.filename}; SHA-256 ${manifest.digest}`);
 console.log(`PASS: ${manifest.newTokens} new tokens; exact production cascade and instant-search bootstrap preserved; no new unresolved static references`);

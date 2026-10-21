@@ -394,6 +394,7 @@ export function NeedleApp() {
                 >
                   {preview.map((item) => (
                     <ArtworkImage
+                      role="map"
                       key={item.id}
                       src={item.thumbnailUrl || item.imageUrl}
                       fallbackSrc={item.thumbnailFallbackUrls?.[0]}

@@ -1,17 +1,37 @@
 import { React, useState } from "../../dist/modules/apps/web/src/shared/react.js";
 import { ArtworkImage as OptimizedArtworkImage } from "../../dist/modules/apps/web/src/shared/ui/ArtworkImage.js";
 import { mediumSource, imagePriority, imageUrl } from "../../dist/modules/apps/web/src/shared/images/image-sizing.js";
+import previewAtlas from './preview-atlas.json';
 
 // The museum already publishes gallery-sized JPEGs with a shared CDN cache.
 // Reuse one original URL across wall/map/preview instead of making each view
 // enqueue a different server transform. Bundled files keep the original cache.
 export function ArtworkImage(props) {
+  // Only the bundled map/mini-map previews share a sheet. Search membership and
+  // the gallery/detail sources are unchanged; non-bundled results stay native.
+  if (props.role === 'map' && previewAtlas.entries[props.src] != null) {
+    return <MapPreview {...props} />;
+  }
   if (props.role === 'detail') props = { ...props, eager: true, priority: true };
   const source = mediumSource(props.src ?? "");
   if (!/^https:\/\/images\.metmuseum\.org\/CRDImages\/[^/]+\/web-large\/[^/?#]+$/i.test(source)) {
     return <OptimizedArtworkImage {...props} />;
   }
   return <MuseumImage key={source} {...props} src={source} />;
+}
+
+function MapPreview(props) {
+  const index = previewAtlas.entries[props.src];
+  const [failed, setFailed] = useState(false);
+  if (failed) return <OptimizedArtworkImage {...props} role="tile" />;
+  // An img (rather than a background) keeps decode/error/accessibility behavior.
+  // Clip one shared image into the button's existing geometry.
+  return <span className="needle-atlas-tile" style={{ display: 'block', position: 'relative', overflow: 'hidden', width: 'var(--atlas-tile-width, 100%)', height: 'var(--atlas-tile-height, 100%)' }}>
+    <img src={previewAtlas.url} alt={props.alt} draggable={false} loading="eager" decoding="async" fetchPriority="low"
+      onError={() => setFailed(true)}
+      style={{ position: 'absolute', maxWidth: 'none', objectFit: 'fill', borderRadius: 0, width: `${previewAtlas.columns * 100}%`, height: `${previewAtlas.rows * 100}%`,
+        left: `${-(index % previewAtlas.columns) * 100}%`, top: `${-Math.floor(index / previewAtlas.columns) * 100}%` }} />
+  </span>;
 }
 
 function MuseumImage(props) {
