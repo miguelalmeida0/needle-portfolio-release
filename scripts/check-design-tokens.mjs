@@ -52,8 +52,11 @@ for (const [label, css] of [['source', source.css], ['bundle', deployed]]) {
   assert.equal(values.size - rootTokens(baseline).size, manifest.newTokens, `${label}: token count`);
 }
 const html = await read('dist/index.html');
-assert.deepEqual([...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)].map(m => m[1]), [`/assets/${manifest.filename}`]);
-assert.ok(html.includes('/assets/bootstrap-9FA4D098.js'));
+const design = JSON.parse(await read('dist/redesign-release.json'));
+assert.equal(hash(await read('dist' + design.stylesheet)), design.stylesheetSha256);
+assert.equal(hash(await read('dist' + design.bootstrap)), design.bootstrapSha256);
+assert.deepEqual([...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/g)].map(m => m[1]), [`/assets/${manifest.filename}`, design.stylesheet]);
+assert.ok(html.includes(design.bootstrap));
 assert.equal(hash(await read('dist/assets/bootstrap-9FA4D098.js')), manifest.bootstrapSha256, 'Preserve instant-search runtime');
 for (const match of html.matchAll(/(?:src|href)="(\/[^"?#]+)(?:[?#][^"]*)?"/g)) await read('dist' + match[1]);
 console.log(`PASS: ${source.files.length} ordered source modules reproduce ${manifest.filename}; SHA-256 ${manifest.digest}`);

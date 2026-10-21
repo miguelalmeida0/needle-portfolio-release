@@ -1,0 +1,456 @@
+{
+  "status": "complete",
+  "verdict": "Ready with fixes",
+  "scope": {
+    "base": "459ef470a7dcd058904476a5edbd576c87c037e1",
+    "branch": "test",
+    "head_sha": "459ef470a7dcd058904476a5edbd576c87c037e1",
+    "pr_url": null,
+    "files_changed": 19
+  },
+  "intent": "Integrate the approved Needle opening, image-only wall, category map and contextual navigation while preserving the deployed images, corpus, search and existing commands. Keep secondary tools reachable and ship only to test.",
+  "intent_confidence": "explicit",
+  "reviewers": [
+    "correctness",
+    "project-standards",
+    "testing",
+    "maintainability",
+    "adversarial",
+    "julik-frontend-races"
+  ],
+  "findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 100,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:187 --       event.key === \"Enter\" &&",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 187,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a target guard to the keydown branch so Enter calls submitted() only when event.target matches the Composer input; retain the existing click capture for .search-composer__submit. Verify Enter on Clear leaves the opening route unchanged and clears the query, while Enter in the input and keyboard activation of Search still navigate.",
+      "title": "Restrict Enter navigation to actual search submissions",
+      "why_it_matters": "Keyboard users who type on the opening screen and press Enter on Clear search are unexpectedly sent to the results screen. The wrapper captures every Enter inside the Composer, while the deployed Clear button only edits the draft; an in-memory execution of the authored JSX confirmed that this event queues a results navigation without a runtime submit. Restricting keyboard capture to the input preserves the existing clear behavior, while the existing submit-click capture already handles keyboard activation of the Search button.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:187 --       event.key === \"Enter\" &&",
+        "src/redesign/NeedleApp.jsx:179-191 -- explicitCapture has no target restriction on its keydown branch and invokes submitted(), which queues results() at line 126.",
+        "dist/modules/apps/web/src/features/search/SearchComposer.js:43 --             draft && (React.createElement(\"button\", { className: \"icon-button search-composer__clear\", type: \"button\", \"aria-label\": \"Clear search\", onClick: () => edit('') },",
+        "Read-only JSX execution with a home route, draft gold, and Enter targeted at the Clear button returned presentationNavigations: [{view: results, overlay: null}]."
+      ]
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:117 --   const openArtwork = () => open(\"artwork\");",
+      "independent_reviewers": [],
+      "line": 117,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "caller-supplied"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Store the opened artwork ID in presentation history. When restoring an artwork entry, select that ID through runtime.selectArtwork after corpus readiness; verify reload and Back/Forward preserve the clicked work without changing search logic.",
+      "title": "Restore the artwork recorded by detail history",
+      "why_it_matters": "Reloading an artwork detail entry can show the default search selection instead of the work the user opened. Presentation history records only that an artwork overlay is open, while the inspector reads the newly initialized runtime selection. Recording the artwork ID and restoring that selection through the existing runtime command preserves the detail identity.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:117 --   const openArtwork = () => open(\"artwork\");",
+        "src/redesign/navigation.mjs:4 -- let current = history.state?.needleDesign ?? initial;",
+        "src/redesign/NeedleApp.jsx:436 -- <InspectorPanel />",
+        "Correctness reviewer confirmed via source trace that AppRuntime.start resets selection via default search while createNavigation restores only view/overlay/depth."
+      ]
+    },
+    {
+      "#": 3,
+      "autofix_class": "manual",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:150 --     window.addEventListener(\"resize\", measure);",
+      "independent_reviewers": [
+        "adversarial"
+      ],
+      "line": 150,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "adversarial"
+      ],
+      "severity": "P2",
+      "suggested_fix": "While home is active, subscribe measure to captured window scroll events and remove the listener in cleanup, matching QueryFilterMenu's positioning pattern. Include visualViewport resize/scroll updates if retaining fixed viewport positioning, and verify the opening panel at a short landscape viewport while scrolling.",
+      "title": "Scrolling the opening page detaches its search input",
+      "why_it_matters": "On a short or landscape viewport, scrolling the opening panel moves its placeholder while the actual search input stays at its previous viewport coordinates. The input can cover the examples or heading instead of its reserved space. Its position is measured from getBoundingClientRect(), but scrolling changes that rectangle without resizing the observed slot; updating the measurement on captured scroll events keeps the fixed input aligned.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:150 --     window.addEventListener(\"resize\", measure);",
+        "src/redesign/NeedleApp.jsx:136 --       const rect = slot.current.getBoundingClientRect();",
+        "src/redesign/NeedleApp.jsx:148-149 --     const observer = new ResizeObserver(measure); /     observer.observe(slot.current);",
+        "Scenario: use a short viewport where the opening panel exceeds available height, scroll .needle-home without changing its width, and its slot rect.top moves while the stored --needle-home-search-top and fixed search input remain unchanged.",
+        "dist/modules/apps/web/src/features/query/QueryFilterMenu.js already subscribes positioning to window scroll in capture phase and visualViewport resize/scroll.",
+        "src/redesign/needle.css:92 -- .needle-home { position: relative; display: grid; flex: 1; min-height: 0; place-items: center; grid-template-columns: minmax(0, 1fr); padding: 30px 24px 100px; overflow: auto; }",
+        "src/redesign/needle.css:98 -- .is-home .needle-search { position: fixed; top: var(--needle-home-search-top, calc(50% - 30px)); left: var(--needle-home-search-left, calc(50% - 240px)); width: var(--needle-home-search-width, 480px); max-width: calc(100vw - 76px); }"
+      ]
+    },
+    {
+      "#": 4,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:159 -- returnFocus.current.focus({ preventScroll: true }); / src/redesign/NeedleApp.jsx:168 -- useEffect(() => { / src/redesign/NeedleApp.jsx:175 -- if (header.current) header.current.inert = false;",
+      "independent_reviewers": [
+        "julik-frontend-races"
+      ],
+      "line": 159,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "julik-frontend-races"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Move the header/pages inert synchronization into a useLayoutEffect declared before the focus-restoration layout effect, so its cleanup/setup clears inert before focus is attempted. Verify opening tools by keyboard and dismissing with Escape restores document.activeElement to its opener; no additional dependency is needed.",
+      "title": "Remove inert before restoring tools opener focus",
+      "why_it_matters": "Closing Search tools with Escape or its close button fails to return keyboard focus to the Search tools opener. The layout effect calls focus while the header is still inert; the passive effect only removes inert afterward, and the saved focus target has already been cleared. Restore interactivity before restoring focus so keyboard users resume at the control that opened the dialog.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:159 -- returnFocus.current.focus({ preventScroll: true }); / src/redesign/NeedleApp.jsx:168 -- useEffect(() => { / src/redesign/NeedleApp.jsx:175 -- if (header.current) header.current.inert = false;",
+        "src/redesign/NeedleApp.jsx:160 clears returnFocus.current immediately after the rejected focus attempt. The header is made inert at line 172 while tools is open, and React layout effects run before passive-effect cleanup."
+      ]
+    },
+    {
+      "#": 6,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:261 --               Back to {route.view === \"results\" ? \"search\" : \"results\"}",
+      "independent_reviewers": [],
+      "line": 261,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "caller-supplied"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Record the previous presentation view in navigation entries and derive the Back label from the real preceding entry. Verify results -> map -> logo -> Back labels map and returns map.",
+      "title": "Name the actual Back destination",
+      "why_it_matters": "After opening the map and clicking the logo, the results page says Back to search, but its button returns to the map. The label guesses from the current view instead of the actual presentation history. Use the preceding entry so the navigation states where it will take the user.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:261 --               Back to {route.view === \"results\" ? \"search\" : \"results\"}",
+        "src/redesign/NeedleApp.jsx:122 -- const results = () => go({ view: \"results\", overlay: null });",
+        "src/redesign/navigation.mjs:29 -- if (current.depth > 0) history.back();",
+        "Caller identified this path and correctness reviewer independently traced results -> map -> logo(results) pushing results over map."
+      ]
+    },
+    {
+      "#": 7,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:399 --                 if (event.target.closest(\"[data-artwork-id]\"))",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 399,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Extend the advanced map click bridge to queue openArtwork for .query-node clicks only when state.queryArtworkId is non-null, alongside the existing [data-artwork-id] case. Verify a local artwork reference recipe opens the source inspector, and text/upload-only query nodes do not open an empty dialog.",
+      "title": "Open details for the semantic query artwork",
+      "why_it_matters": "In local experimental mode, an artwork-only recipe shows its source artwork in the semantic map's Your query button, but clicking that image no longer opens its details. QueryNode selects the artwork through the deployed callback but has no data-artwork-id, so the new modal bridge ignores the click; the legacy inspector was always mounted and responded to the same selection. Handling a query-node click when queryArtworkId identifies a real corpus artwork restores that existing inspection action without opening empty dialogs for text or uploaded queries.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:399 --                 if (event.target.closest(\"[data-artwork-id]\"))",
+        "dist/modules/apps/web/src/features/map/QueryNode.js:6 --     return (React.createElement(\"button\", { type: \"button\", className: `query-node${props.busy ? ' is-busy' : ''}`, onClick: props.onSelect, \"aria-label\": \"Inspect the current query\" },",
+        "dist/modules/apps/web/src/features/map/SpatialMap.js -- QueryNode receives onSelect: () => runtime.selectArtwork(query?.id ?? null), and visibleArtworkNodes excludes this queryId from ordinary artwork buttons.",
+        "dist/modules/apps/web/src/app/app.runtime.js:839-841 -- singleArtworkQueryId returns the artwork ID for a single positive artwork term; QueryCanvas can remove the initial text after adding a positive artwork reference, making this recipe reachable through preserved local controls."
+      ]
+    }
+  ],
+  "actionable_findings": [
+    {
+      "#": 1,
+      "autofix_class": "gated_auto",
+      "confidence": 100,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:187 --       event.key === \"Enter\" &&",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 187,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Add a target guard to the keydown branch so Enter calls submitted() only when event.target matches the Composer input; retain the existing click capture for .search-composer__submit. Verify Enter on Clear leaves the opening route unchanged and clears the query, while Enter in the input and keyboard activation of Search still navigate.",
+      "title": "Restrict Enter navigation to actual search submissions",
+      "why_it_matters": "Keyboard users who type on the opening screen and press Enter on Clear search are unexpectedly sent to the results screen. The wrapper captures every Enter inside the Composer, while the deployed Clear button only edits the draft; an in-memory execution of the authored JSX confirmed that this event queues a results navigation without a runtime submit. Restricting keyboard capture to the input preserves the existing clear behavior, while the existing submit-click capture already handles keyboard activation of the Search button.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:187 --       event.key === \"Enter\" &&",
+        "src/redesign/NeedleApp.jsx:179-191 -- explicitCapture has no target restriction on its keydown branch and invokes submitted(), which queues results() at line 126.",
+        "dist/modules/apps/web/src/features/search/SearchComposer.js:43 --             draft && (React.createElement(\"button\", { className: \"icon-button search-composer__clear\", type: \"button\", \"aria-label\": \"Clear search\", onClick: () => edit('') },",
+        "Read-only JSX execution with a home route, draft gold, and Enter targeted at the Clear button returned presentationNavigations: [{view: results, overlay: null}]."
+      ]
+    },
+    {
+      "#": 2,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:117 --   const openArtwork = () => open(\"artwork\");",
+      "independent_reviewers": [],
+      "line": 117,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "caller-supplied"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Store the opened artwork ID in presentation history. When restoring an artwork entry, select that ID through runtime.selectArtwork after corpus readiness; verify reload and Back/Forward preserve the clicked work without changing search logic.",
+      "title": "Restore the artwork recorded by detail history",
+      "why_it_matters": "Reloading an artwork detail entry can show the default search selection instead of the work the user opened. Presentation history records only that an artwork overlay is open, while the inspector reads the newly initialized runtime selection. Recording the artwork ID and restoring that selection through the existing runtime command preserves the detail identity.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:117 --   const openArtwork = () => open(\"artwork\");",
+        "src/redesign/navigation.mjs:4 -- let current = history.state?.needleDesign ?? initial;",
+        "src/redesign/NeedleApp.jsx:436 -- <InspectorPanel />",
+        "Correctness reviewer confirmed via source trace that AppRuntime.start resets selection via default search while createNavigation restores only view/overlay/depth."
+      ]
+    },
+    {
+      "#": 3,
+      "autofix_class": "manual",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:150 --     window.addEventListener(\"resize\", measure);",
+      "independent_reviewers": [
+        "adversarial"
+      ],
+      "line": 150,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "adversarial"
+      ],
+      "severity": "P2",
+      "suggested_fix": "While home is active, subscribe measure to captured window scroll events and remove the listener in cleanup, matching QueryFilterMenu's positioning pattern. Include visualViewport resize/scroll updates if retaining fixed viewport positioning, and verify the opening panel at a short landscape viewport while scrolling.",
+      "title": "Scrolling the opening page detaches its search input",
+      "why_it_matters": "On a short or landscape viewport, scrolling the opening panel moves its placeholder while the actual search input stays at its previous viewport coordinates. The input can cover the examples or heading instead of its reserved space. Its position is measured from getBoundingClientRect(), but scrolling changes that rectangle without resizing the observed slot; updating the measurement on captured scroll events keeps the fixed input aligned.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:150 --     window.addEventListener(\"resize\", measure);",
+        "src/redesign/NeedleApp.jsx:136 --       const rect = slot.current.getBoundingClientRect();",
+        "src/redesign/NeedleApp.jsx:148-149 --     const observer = new ResizeObserver(measure); /     observer.observe(slot.current);",
+        "Scenario: use a short viewport where the opening panel exceeds available height, scroll .needle-home without changing its width, and its slot rect.top moves while the stored --needle-home-search-top and fixed search input remain unchanged.",
+        "dist/modules/apps/web/src/features/query/QueryFilterMenu.js already subscribes positioning to window scroll in capture phase and visualViewport resize/scroll.",
+        "src/redesign/needle.css:92 -- .needle-home { position: relative; display: grid; flex: 1; min-height: 0; place-items: center; grid-template-columns: minmax(0, 1fr); padding: 30px 24px 100px; overflow: auto; }",
+        "src/redesign/needle.css:98 -- .is-home .needle-search { position: fixed; top: var(--needle-home-search-top, calc(50% - 30px)); left: var(--needle-home-search-left, calc(50% - 240px)); width: var(--needle-home-search-width, 480px); max-width: calc(100vw - 76px); }"
+      ]
+    },
+    {
+      "#": 4,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:159 -- returnFocus.current.focus({ preventScroll: true }); / src/redesign/NeedleApp.jsx:168 -- useEffect(() => { / src/redesign/NeedleApp.jsx:175 -- if (header.current) header.current.inert = false;",
+      "independent_reviewers": [
+        "julik-frontend-races"
+      ],
+      "line": 159,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "julik-frontend-races"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Move the header/pages inert synchronization into a useLayoutEffect declared before the focus-restoration layout effect, so its cleanup/setup clears inert before focus is attempted. Verify opening tools by keyboard and dismissing with Escape restores document.activeElement to its opener; no additional dependency is needed.",
+      "title": "Remove inert before restoring tools opener focus",
+      "why_it_matters": "Closing Search tools with Escape or its close button fails to return keyboard focus to the Search tools opener. The layout effect calls focus while the header is still inert; the passive effect only removes inert afterward, and the saved focus target has already been cleared. Restore interactivity before restoring focus so keyboard users resume at the control that opened the dialog.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:159 -- returnFocus.current.focus({ preventScroll: true }); / src/redesign/NeedleApp.jsx:168 -- useEffect(() => { / src/redesign/NeedleApp.jsx:175 -- if (header.current) header.current.inert = false;",
+        "src/redesign/NeedleApp.jsx:160 clears returnFocus.current immediately after the rejected focus attempt. The header is made inert at line 172 while tools is open, and React layout effects run before passive-effect cleanup."
+      ]
+    },
+    {
+      "#": 6,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:261 --               Back to {route.view === \"results\" ? \"search\" : \"results\"}",
+      "independent_reviewers": [],
+      "line": 261,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "caller-supplied"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Record the previous presentation view in navigation entries and derive the Back label from the real preceding entry. Verify results -> map -> logo -> Back labels map and returns map.",
+      "title": "Name the actual Back destination",
+      "why_it_matters": "After opening the map and clicking the logo, the results page says Back to search, but its button returns to the map. The label guesses from the current view instead of the actual presentation history. Use the preceding entry so the navigation states where it will take the user.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:261 --               Back to {route.view === \"results\" ? \"search\" : \"results\"}",
+        "src/redesign/NeedleApp.jsx:122 -- const results = () => go({ view: \"results\", overlay: null });",
+        "src/redesign/navigation.mjs:29 -- if (current.depth > 0) history.back();",
+        "Caller identified this path and correctness reviewer independently traced results -> map -> logo(results) pushing results over map."
+      ]
+    },
+    {
+      "#": 7,
+      "autofix_class": "gated_auto",
+      "confidence": 75,
+      "file": "src/redesign/NeedleApp.jsx",
+      "first_evidence": "src/redesign/NeedleApp.jsx:399 --                 if (event.target.closest(\"[data-artwork-id]\"))",
+      "independent_reviewers": [
+        "correctness"
+      ],
+      "line": 399,
+      "owner": "downstream-resolver",
+      "pre_existing": false,
+      "requires_verification": true,
+      "reviewers": [
+        "correctness"
+      ],
+      "severity": "P2",
+      "suggested_fix": "Extend the advanced map click bridge to queue openArtwork for .query-node clicks only when state.queryArtworkId is non-null, alongside the existing [data-artwork-id] case. Verify a local artwork reference recipe opens the source inspector, and text/upload-only query nodes do not open an empty dialog.",
+      "title": "Open details for the semantic query artwork",
+      "why_it_matters": "In local experimental mode, an artwork-only recipe shows its source artwork in the semantic map's Your query button, but clicking that image no longer opens its details. QueryNode selects the artwork through the deployed callback but has no data-artwork-id, so the new modal bridge ignores the click; the legacy inspector was always mounted and responded to the same selection. Handling a query-node click when queryArtworkId identifies a real corpus artwork restores that existing inspection action without opening empty dialogs for text or uploaded queries.",
+      "evidence": [
+        "src/redesign/NeedleApp.jsx:399 --                 if (event.target.closest(\"[data-artwork-id]\"))",
+        "dist/modules/apps/web/src/features/map/QueryNode.js:6 --     return (React.createElement(\"button\", { type: \"button\", className: `query-node${props.busy ? ' is-busy' : ''}`, onClick: props.onSelect, \"aria-label\": \"Inspect the current query\" },",
+        "dist/modules/apps/web/src/features/map/SpatialMap.js -- QueryNode receives onSelect: () => runtime.selectArtwork(query?.id ?? null), and visibleArtworkNodes excludes this queryId from ordinary artwork buttons.",
+        "dist/modules/apps/web/src/app/app.runtime.js:839-841 -- singleArtworkQueryId returns the artwork ID for a single positive artwork term; QueryCanvas can remove the initial text after adding a positive artwork reference, making this recipe reachable through preserved local controls."
+      ]
+    }
+  ],
+  "triage_groups": [
+    {
+      "title": "Preserve search and artwork actions",
+      "findings": [
+        1,
+        2,
+        7
+      ],
+      "context": "The presentation wrapper must retain deployed command semantics and artwork identity.",
+      "preferred_resolution": "Apply the input-target guard, persist detail artwork identity, and include semantic query artwork clicks; verify each event path.",
+      "why": "These fixes restore existing actions without changing the search runtime."
+    },
+    {
+      "title": "Keep navigation and focus consistent",
+      "findings": [
+        3,
+        4,
+        6
+      ],
+      "context": "Opening positioning, Back labels and dialog focus must follow actual UI state.",
+      "preferred_resolution": "Update home measurements on scroll, remove inert before focus restoration, and derive Back wording from history.",
+      "why": "Users keep their place and can predict where controls take them."
+    }
+  ],
+  "pre_existing_findings": [],
+  "requirements_completeness": {
+    "R1": "met: approved opening and identity implemented",
+    "R2": "met: responsive image-only wall with production membership/order and callbacks",
+    "R3": "met: category map, contextual works, match indication and persistent search",
+    "R4": "partially addressed: detail identity, Back labels and opening input scroll alignment require findings2,6,3",
+    "R5": "partially addressed: preserved core/data/image hashes and real rankings; keyboard Clear and experimental query inspection need findings1,7",
+    "R6": "partially addressed: all secondary tools reachable; tools focus return needs finding4",
+    "U1": "met: preservation baseline committed before presentation writes",
+    "U2": "implemented; six presentation defects require fixes",
+    "U3": "review and focused deterministic checks complete; caller owns fixes, final browser QA and full verification"
+  },
+  "learnings": [],
+  "agent_native_gaps": [],
+  "deployment_notes": [],
+  "residual_risks": [
+    "Remote Met image delivery could not be fully verified in the restricted preview environment; original URLs and image delivery code remain unchanged."
+  ],
+  "testing_gaps": [
+    "The mounted hidden CollectionWall receives zero ResizeObserver dimensions; browser QA confirmed its temporary stage geometry collapses. Add a zero-size guard and a lifecycle regression for deep scroll -> map -> Back; the hook-stub tests do not exercise ResizeObserver effects."
+  ],
+  "coverage": {
+    "scope_mode": "local-aligned; current staged and unstaged tree versus explicit base459ef47",
+    "plan_source": "explicit legacy plan; R1-R6 and U1-U3 extracted",
+    "roster": "Full risk-driven roster; six reviewers completed; no failed or timed-out reviewer. AGENTS.md used as instruction-file standards fallback. No applicable learnings corpus or declared packs.",
+    "cross_model": "Not run: no attested-different provider CLI (claude, grok, cursor-agent) installed. Adversarial lens used the in-process reviewer; no cross-model agreement claimed.",
+    "validator_shortcuts": 0,
+    "validator_batch": [
+      {
+        "#": 1,
+        "validated": true,
+        "reason": "The wrapper captures Enter from every descendant, including Clear, and queues results navigation before the Clear button click edits the draft."
+      },
+      {
+        "#": 2,
+        "validated": true,
+        "reason": "Navigation restores only presentation state while runtime startup executes the default search, and InspectorPanel reads runtime selection without restoration of the opened artwork ID."
+      },
+      {
+        "#": 3,
+        "validated": true,
+        "reason": "The fixed search position uses the slot viewport rectangle but updates only on resize, while scrolling home moves the slot without resizing it."
+      },
+      {
+        "#": 4,
+        "validated": true,
+        "reason": "The focus-restoration layout effect runs while the opener header remains inert until passive-effect cleanup, then clears the saved focus target."
+      },
+      {
+        "#": 5,
+        "validated": false,
+        "reason": "The cited tests omit this event boundary, but missing integration coverage alone does not establish defective behavior in the cited capture handler."
+      },
+      {
+        "#": 6,
+        "validated": true,
+        "reason": "Results-to-map-to-logo pushes results over map, so history.back returns to map while the page labels the action Back to search."
+      },
+      {
+        "#": 7,
+        "validated": true,
+        "reason": "QueryNode selects its corpus artwork but lacks data-artwork-id, so the new click bridge does not open its artwork inspector."
+      }
+    ],
+    "validator_dropped": {
+      "#": 5,
+      "reason": "Missing integration coverage alone did not establish a defect; not retained as a primary finding or recycled as an advisory claim."
+    },
+    "suppressed_by_confidence": {},
+    "malformed_findings": 0,
+    "malformed_returns": 0,
+    "mode_aware_demotions": 0,
+    "caller_observations": "Findings2 and6 originated with the caller, were independently validated in the one validator batch, and carry no independent-reviewer agreement credit.",
+    "checks": [
+      "check:design passed against active bootstrap5B220A89 and stylesheetEFA4CE94",
+      "check:tokens passed:19 ordered modules reproduce preserved06391554 stylesheet",
+      "Focused redesign, instant-search and mobile tests:18 passed,0 failed",
+      "Caller reported full suite47 passed; final fixes require rerun",
+      "No separate lint or typecheck script configured"
+    ],
+    "excluded_untracked": [
+      "dist/_responsive.html (ephemeral browser QA)",
+      "docs/needle-design-validation.md (caller-authored in-progress validation report)",
+      "Current active generated assets were untracked at dispatch but validated byte-for-byte by check:design; source generators and manifest were reviewed."
+    ],
+    "source_freeze": "Active release5B220A89/EFA4CE94; HEAD459ef470a7dcd058904476a5edbd576c87c037e1. No source fixes applied by review."
+  },
+  "artifact_path": "/tmp/compound-engineering-0/ce-code-review/20261021-175120-0524f471",
+  "run_id": "20261021-175120-0524f471"
+}

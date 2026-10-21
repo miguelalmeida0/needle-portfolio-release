@@ -1,0 +1,8 @@
+{
+  "bootstrap": "/assets/bootstrap-BC245A6F.js",
+  "stylesheet": "/assets/redesign-EC8A3064.css",
+  "bootstrapSha256": "bc245a6fe16bd99cd6b40ffacc4c4a7743e293a50f5794a5b81511d89ff24632",
+  "stylesheetSha256": "ec8a306455aaccb0ccc93e00939f1720cb97a3b1e0dfcef78b82dc60f0f6937f",
+  "preservedBootstrap": "/assets/bootstrap-9FA4D098.js",
+  "preservedStylesheet": "/assets/styles-06391554.css"
+}

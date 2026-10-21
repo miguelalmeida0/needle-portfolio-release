@@ -143,3 +143,10 @@ Durable learning: production main and test diverged; the prototype changes behav
 **VERDICT:** Design contract reviewed; engineering verification and code review required before shipping. No new product/design choices requested beyond the user's explicit approved scope.
 
 NO UNRESOLVED DECISIONS
+
+## Implementation completion
+
+- U1 complete: frozen preservation fixture and 182-file invariance checks committed before UI implementation.
+- U2 complete: production presentation shell, collection wall, category map, original details and relocated tools; one unchanged runtime and image pipeline.
+- U3 complete: 59 tests pass, browser checks at desktop/phone/short landscape sizes, three simplification passes, completed code review and all six findings resolved. See `docs/needle-design-validation.md` and `docs/reviews/2026-10-21-needle-design-resolutions.md`.
+- R1–R6 satisfied. Production promotion remains outside this integration handoff.

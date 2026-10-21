@@ -87,8 +87,8 @@ test('deployed immutable bootstrap agrees with the source contract', async () =>
   assert.doesNotMatch(composer, /debounce\.current|setTimeout\(/);
   assert.match(runtime, /async submitDraft\(addToHistory = true\)/);
   assert.match(runtime, /this\.\#activeSearchSequence\+\+;\s*this\.store\.dispatch\(\{ type: 'DRAFT_CHANGED'/);
-  assert.match(js, /async submitDraft\(q=!0\)/);
-  assert.match(js, /a\.current\|\|s\.submitDraft\(!1\)/);
+  assert.match(js, /async submitDraft\([\w$]+=!0\)/);
+  assert.match(js, /[\w$]+\.current\|\|[\w$]+\.submitDraft\(!1\)/);
   assert.doesNotMatch(js, /n\.current=setTimeout\(\(\)=>\{n\.current=null,s\.submitDraft\(\)\},350\)/);
   const parsed = spawnSync(process.execPath, ['--check', fileURLToPath(new URL('../' + jsPath, import.meta.url))], { encoding: 'utf8' });
   assert.equal(parsed.status, 0, parsed.stderr || parsed.stdout);

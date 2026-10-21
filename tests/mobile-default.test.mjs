@@ -35,7 +35,7 @@ test('served bootstrap and stylesheet ship the mobile defaults without disabling
 
   const js = await fs.readFile(new URL('../dist' + script[1], import.meta.url), 'utf8');
   const css = await fs.readFile(new URL('../dist' + style[1], import.meta.url), 'utf8');
-  assert.ok(js.includes('mapView:typeof window!=="undefined"&&window.matchMedia("(max-width: 680px)").matches?"wall":"space"'),
+  assert.match(js, /mapView:typeof window(?:!=="undefined"|<"u")&&window\.matchMedia\("\(max-width: 680px\)"\)\.matches\?"wall":"space"/,
     'compiled runtime defaults to wall below 681px');
   assert.match(css, /@media\(max-width:980px\)\{\.search-composer input\{font-size:16px\}\}/,
     'mobile search inputs must be 16px to avoid iOS focus zoom');
@@ -63,15 +63,18 @@ test('production assets subscribe to viewport changes and enforce 16px editable 
   const js = await fs.readFile(new URL('../dist' + jsName, import.meta.url), 'utf8');
   const css = await fs.readFile(new URL('../dist' + cssName, import.meta.url), 'utf8');
   assert.match(js, /VIEWPORT_CHANGED/);
-  assert.match(js, /addEventListener\?\.\("change",sync\)/);
+  assert.match(js, /addEventListener\?\.\("change",[\w$]+\)/);
   assert.match(css, /\.search-composer input,\.query-filter-menu__search input,textarea,select\{font-size:16px!important\}/);
   assert.doesNotMatch(html, /user-scalable\s*=\s*no|maximum-scale\s*=/);
 });
 
-test('mobile collection wall is the only artwork grid; desktop still shows recommendations', async () => {
+test('cached legacy assets retain mobile discovery policy while the new collection is primary', async () => {
   const html = await fs.readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
   const jsPath = html.match(/\/assets\/bootstrap-[A-Z0-9]{8}\.js/)[0];
-  const bundle = await fs.readFile(new URL('../dist' + jsPath, import.meta.url), 'utf8');
+  const release = JSON.parse(await fs.readFile(new URL('../dist/redesign-release.json', import.meta.url), 'utf8'));
+  const bundle = await fs.readFile(new URL('../dist' + release.preservedBootstrap, import.meta.url), 'utf8');
+  const active = await fs.readFile(new URL('../dist' + jsPath, import.meta.url), 'utf8');
+  const presentation = await fs.readFile(new URL('../src/redesign/NeedleApp.jsx', import.meta.url), 'utf8');
   const app = await fs.readFile(new URL('../dist/modules/apps/web/src/app/App.js', import.meta.url), 'utf8');
   const slot = await fs.readFile(new URL('../dist/modules/apps/web/src/app/DiscoverySlot.js', import.meta.url), 'utf8');
   assert.ok(bundle.includes('e=pt(t=>!t.viewportIsMobile&&kr(t).length>0)'), 'no expanded layout on phones');
@@ -79,4 +82,9 @@ test('mobile collection wall is the only artwork grid; desktop still shows recom
   assert.ok(bundle.includes('discoveryReturn:!isPhone&&r&&t===r?'), 'no dead inspector back link');
   assert.ok(app.includes('!state.viewportIsMobile && discoveryItems(state).length > 0'));
   assert.ok(slot.includes('discovery: !isPhone && items.length > 0'));
+  assert.ok(active.includes('What would you like to see?'));
+  assert.ok(active.includes('needle-wall'));
+  assert.match(presentation, /<CollectionWall onOpen=\{openArtwork\}/);
+  assert.match(presentation, /route\.overlay === ["']tools["'] &&\s*\(?\s*<Tools/);
+  assert.doesNotMatch(presentation, /<DiscoverySlot|<SearchSidebar/);
 });

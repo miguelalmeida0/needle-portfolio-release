@@ -18,6 +18,8 @@ test('verify assembles once and standalone integrity and startup keep their prep
     'assemble:release': 'node assemble.cjs',
     'security:check': 'node -e \"\"',
     'check:integrity': 'node -e \"\"',
+    'check:tokens': 'node -e \"\"',
+    'check:design': 'node -e \"\"',
     test: 'node -e \"\"',
   } }));
   const run = spawnSync('npm', ['run', 'verify', '--silent'], { cwd, encoding: 'utf8', timeout: 30_000 });

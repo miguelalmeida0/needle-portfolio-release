@@ -36,12 +36,16 @@ Open `http://localhost:8000`. The image runs as the unprivileged `node` user and
 | --- | --- |
 | `dist/` | Exported browser application, worker modules and prepared graph |
 | `data-packs/` | Frozen 10K corpus, active-pack pointer, manifest and 120 opening images |
+| `src/redesign/` | Approved presentation over the preserved production runtime and image components |
+| `scripts/build-redesign.mjs` | Reproducible immutable browser export and active asset manifest |
 | `scripts/serve.mjs` | Static/data-pack routing, HTTP validation and compression |
 | `scripts/image-delivery.mjs` | Bounded derivative generation and disk cache |
 | `prepare-previews.mjs` | Build-time AVIF preparation using the runtime image pipeline |
 | `tests/` | Release integrity, request boundaries and image-cache behavior |
 
 **Do not remove `dist/` or `data-packs/` as generic generated folders.** This is the deployable release package, exported from application revision `de4c6c46a4503d369a98f9f0a5aab0f5fce5e2f6`. It is not the original frontend development workspace. Browser changes require a new validated application export; server and documentation changes can be made here.
+
+The approved presentation is authored in `src/redesign/`. After editing it, run `npm run build:design` and `npm run verify`. The latter verifies that source reproduces the active immutable assets and that the frozen search, corpus and bundled images remain unchanged. `dist/redesign-release.json` records both the active export and preserved prior assets.
 
 ## Verification
 

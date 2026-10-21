@@ -13,14 +13,18 @@
     "check:integrity": "node scripts/verify-release.mjs",
     "security:check": "node scripts/check-secrets.mjs",
     "security:history": "node scripts/check-secrets.mjs --history",
-    "verify": "npm run security:check && npm run check:integrity && npm test",
+    "verify": "npm run security:check && npm run check:integrity && npm run check:tokens && npm run check:design && npm test",
     "assemble:release": "node scripts/assemble-release.mjs",
     "postinstall": "npm run assemble:release",
     "precheck:integrity": "npm run assemble:release",
     "prestart": "npm run assemble:release",
-    "check:tokens": "node scripts/check-design-tokens.mjs"
+    "check:tokens": "node scripts/check-design-tokens.mjs",
+    "build:design": "node scripts/build-redesign.mjs",
+    "check:design": "node scripts/build-redesign.mjs --check",
+    "dev": "node scripts/serve.mjs --root dist --packs data-packs"
   },
   "dependencies": {
+    "gsap": "3.15.0",
     "sharp": "0.35.5"
   },
   "devDependencies": {
