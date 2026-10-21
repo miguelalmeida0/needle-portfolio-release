@@ -1,0 +1,31 @@
+{
+  "baseCommit": "cf6857299a9f875f5c58a0819ab0239772a61a60",
+  "baselineCssSha256": "52e8c8622a724469c715da66a81169c49565910b20e21ab51026371c112d2907",
+  "filename": "styles-06391554.css",
+  "digest": "0639155478a0dafc954b1de7523af49434afdb869f220821b248213db08ad8a5",
+  "sourceFiles": [
+    "dist/styles/index.css",
+    "dist/styles/tokens.css",
+    "dist/styles/semantic-tokens.css",
+    "dist/styles/component-tokens.css",
+    "dist/styles/reset.css",
+    "dist/styles/layout.css",
+    "dist/styles/sidebar.css",
+    "dist/styles/toolbar.css",
+    "dist/styles/map.css",
+    "dist/styles/wall.css",
+    "dist/styles/truth.css",
+    "dist/styles/inspector.css",
+    "dist/styles/tuning.css",
+    "dist/styles/responsive.css",
+    "dist/styles/featured-match.css",
+    "dist/styles/detail.css",
+    "dist/styles/discovery.css",
+    "dist/styles/release-input.css",
+    "dist/styles/accessibility.css"
+  ],
+  "newTokens": 564,
+  "substitutions": 1031,
+  "baselineFile": "dist/assets/styles-69276BA0.css",
+  "bootstrapSha256": "b858a7555279e19b3989a42979c9b957c8748f32b5458669b4978aaac699a5ef"
+}

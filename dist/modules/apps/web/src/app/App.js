@@ -1,8 +1,8 @@
 import { React } from '../shared/react.js';
-import { SearchSidebar } from '../features/sidebar/SearchSidebar.js';
 import { MapToolbar } from '../features/topbar/MapToolbar.js';
 import { SpatialMap } from '../features/map/SpatialMap.js';
-import { InspectorPanel } from '../features/inspector/InspectorPanel.js';
+import { DiscoverySlot } from './DiscoverySlot.js';
+import { discoveryItems } from './discovery.selectors.js';
 import { AccuracyControl } from '../features/tuning/AccuracyControl.js';
 import { useAppState, useAppSelector, useAppRuntime } from './app.context.js';
 import { TruthLens } from '../features/truth/TruthLens.js';
@@ -11,12 +11,12 @@ import { FeedbackToast } from '../shared/ui/FeedbackToast.js';
 const DetailSearchOverlay = React.lazy(() => import('../features/detail/DetailSearchOverlay.js').then(module => ({ default: module.DetailSearchOverlay })));
 export function App() {
     const mapView = useAppSelector(state => state.mapView);
-    return (React.createElement("div", { className: "app-shell" },
-        React.createElement(SearchSidebar, null),
+    const hasDiscovery = useAppSelector(state => !state.viewportIsMobile && discoveryItems(state).length > 0);
+    return (React.createElement("div", { className: `app-shell${hasDiscovery ? ' has-discovery' : ''}` },
+        React.createElement(DiscoverySlot, null),
         React.createElement(MapToolbar, null),
         mapView === 'wall' ? React.createElement(CollectionWall, null) : React.createElement(SpatialMap, null),
         React.createElement(TruthLens, null),
-        React.createElement(InspectorPanel, null),
         React.createElement(AccuracyControl, null),
         React.createElement(DetailSlot, null),
         React.createElement(FeedbackToast, null),

@@ -13,9 +13,18 @@
     "check:integrity": "node scripts/verify-release.mjs",
     "security:check": "node scripts/check-secrets.mjs",
     "security:history": "node scripts/check-secrets.mjs --history",
-    "verify": "npm run security:check && npm run check:integrity && npm test"
+    "verify": "npm run security:check && npm run check:integrity && npm test",
+    "assemble:release": "node scripts/assemble-release.mjs",
+    "postinstall": "npm run assemble:release",
+    "precheck:integrity": "npm run assemble:release",
+    "prestart": "npm run assemble:release",
+    "check:tokens": "node scripts/check-design-tokens.mjs"
   },
   "dependencies": {
     "sharp": "0.35.5"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "postcss": "8.5.30"
   }
 }

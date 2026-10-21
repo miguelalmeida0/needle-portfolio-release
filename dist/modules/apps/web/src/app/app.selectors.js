@@ -52,6 +52,19 @@ export function visibleHits(state) {
     return state.resultMode === 'truth' && state.exact ? state.exact.hits : state.approximate?.hits ?? [];
 }
 export function featuredTextMatch(state) {
+    if (state.featuredArtworkId && canFeatureArtwork(state, state.featuredArtworkId))
+        return artworkById(state, state.featuredArtworkId);
+    return bestTextMatch(state);
+}
+export function canFeatureArtwork(state, id) {
+    const artwork = artworkById(state, id);
+    return state.status === 'ready' && state.queryKind === 'text' && Boolean(artwork)
+        && visibleHits(state).some(hit => hit.id === id)
+        && matchesQueryFilters(artwork, state.queryFilters)
+        && (!state.activeClusterId || artwork.clusterId === state.activeClusterId)
+        && (!state.scopedCollectionId || state.savedCollections.some(collection => collection.id === state.scopedCollectionId && collection.artworkIds.includes(id)));
+}
+export function bestTextMatch(state) {
     if (state.queryKind !== 'text')
         return null;
     const firstHit = visibleHits(state)[0];

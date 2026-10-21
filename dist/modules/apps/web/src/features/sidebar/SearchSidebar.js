@@ -1,12 +1,13 @@
 import { React, useRef, useState } from '../../shared/react.js';
-import { Icon } from '../../shared/icons.js';
 import { LogoMark } from '../../shared/ui/LogoMark.js';
+import { Icon } from '../../shared/icons.js';
 import { SearchComposer } from '../search/SearchComposer.js';
 import { RecentQueries } from '../history/RecentQueries.js';
 import { QueryCanvas } from '../query/QueryCanvas.js';
 import { SavedCollections } from '../collections/SavedCollections.js';
 import { useAppRuntime, useAppState } from '../../app/app.context.js';
-export function SearchSidebar() {
+
+export function SearchSidebar(props = {}) {
     const runtime = useAppRuntime();
     const state = useAppState();
     const collectionsRef = useRef(null);
@@ -24,6 +25,7 @@ export function SearchSidebar() {
             React.createElement("div", { className: "sidebar-section-heading" },
                 React.createElement("h1", { id: "search-title" }, "Search")),
             React.createElement(SearchComposer, null),
+            props.discovery,
             state.errorMessage && React.createElement("p", { className: "sidebar-error", role: "alert" }, state.errorMessage)),
         React.createElement("div", { className: "sidebar-scroll" },
             React.createElement("div", { className: "workspace-mobile-header" },

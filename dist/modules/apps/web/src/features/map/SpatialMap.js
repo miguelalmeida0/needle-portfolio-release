@@ -1,7 +1,9 @@
 import { React, useEffect, useMemo, useRef, useState } from '../../shared/react.js';
 import { createSpatialRenderer } from '../../../../../packages/renderer/src/index.js';
 import { useAppRuntime, useGalleryState } from '../../app/app.context.js';
-import { featuredTextMatch, matchesQueryFilters, missedExactIds, queryArtwork, queryResultLabel, scopedCorpusItems, visibleHits } from '../../app/app.selectors.js';
+import { bestTextMatch, featuredTextMatch, matchesQueryFilters, missedExactIds, queryArtwork, queryResultLabel, scopedCorpusItems, visibleHits } from '../../app/app.selectors.js';
+import { createFeaturedArtworkCommands } from '../../../../../src/core/commands/featured-artwork.js';
+import { useFeaturedTransition } from './useFeaturedTransition.js';
 import { ArtworkNode } from './ArtworkNode.js';
 import { FeaturedMatchNode } from './FeaturedMatchNode.js';
 import { ClusterContours } from './ClusterContours.js';
@@ -26,6 +28,9 @@ export function SpatialMap() {
     const visited = useMemo(() => new Set(state.approximate?.trace.visitedIds ?? []), [state.approximate]);
     const query = queryArtwork(state);
     const featuredMatch = featuredTextMatch(state);
+    const bestMatch = bestTextMatch(state);
+    const commands = createFeaturedArtworkCommands(runtime);
+    useFeaturedTransition(containerRef, featuredMatch?.id);
     const items = scopedCorpusItems(state);
     const packPreviewLimit = state.corpus?.source.previewImageCount ?? Math.min(96, items.length);
     const previewLimit = Math.min(packPreviewLimit, size.width < 620 ? 28 : size.width < 980 ? 44 : 64);
@@ -41,7 +46,7 @@ export function SpatialMap() {
     const clusters = state.corpus?.clusters ?? [];
     const displayCoordinates = useMemo(() => buildDisplayCoordinates(items, hits, state.mapView), [items, hits, state.mapView]);
     const ambientPoints = useMemo(() => state.mapView === 'space' ? buildAmbientPoints(clusters) : [], [clusters, state.mapView]);
-    const connections = useMemo(() => buildConnections(items, hits, state.approximate?.trace.edges ?? [], displayCoordinates, featuredMatch?.id ?? null), [items, hits, state.approximate, displayCoordinates, featuredMatch]);
+    const connections = useMemo(() => buildConnections(items, hits, state.approximate?.trace.edges ?? [], displayCoordinates, bestMatch?.id ?? null), [items, hits, state.approximate, displayCoordinates, bestMatch]);
     const labelResultCoordinates = useMemo(() => hits
         .filter((hit) => hit.id !== featuredMatch?.id)
         .slice(0, 8)
@@ -155,7 +160,7 @@ export function SpatialMap() {
                 }),
                 !featuredMatch && (React.createElement(QueryNode, { artwork: query, uploadedPreviewUrl: state.uploadedPreviewUrl, queryText: state.activeQuery, busy: busy, onSelect: () => runtime.selectArtwork(query?.id ?? null) }))),
             featuredMatch && (React.createElement("div", { className: "map-featured-layer" },
-                React.createElement(FeaturedMatchNode, { key: `${state.resultMode}:${state.activeQuery}:${featuredMatch.id}`, artwork: featuredMatch, queryText: state.activeQuery, label: queryResultLabel(state), selected: state.selectedArtworkId === featuredMatch.id, onSelect: () => runtime.selectArtwork(featuredMatch.id) })))),
+                React.createElement(FeaturedMatchNode, { key: `${state.resultMode}:${state.activeQuery}:${featuredMatch.id}`, artwork: featuredMatch, queryText: state.activeQuery, label: state.featuredArtworkId === featuredMatch.id ? 'Featured artwork' : queryResultLabel(state), selected: state.selectedArtworkId === featuredMatch.id, command: commands.select(featuredMatch.id) })))),
         React.createElement("div", { className: "map-caption", "aria-live": "polite" },
             React.createElement("span", { className: `map-caption__status map-caption__status--${state.rendererKind}` }),
             React.createElement("span", null,
