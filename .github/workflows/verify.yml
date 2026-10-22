@@ -26,6 +26,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run verify
+      - run: python3 -m unittest discover -s tests -p 'deploy_hetzner_test.py'
       - run: npm run security:history
       - run: npm audit --omit=dev
       - run: npm run prepare:previews

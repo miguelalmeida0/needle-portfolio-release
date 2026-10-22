@@ -1,5 +1,26 @@
 # Needle production domain connected
 
+## Restoration, 2026-10-22
+
+The migration described below was reversed at the owner's request. The canonical
+hostname again uses Porkbun A `needle` → `178.105.57.97`, TTL 600, on the existing
+Hetzner server. Other DNS records were preserved. Public DNS and HTTPS confirmed
+the restored route; that server was still serving bootstrap `9FA4D098` at this
+point. DNS restoration alone did not deploy the latest application.
+
+`scripts/deploy-hetzner.py` deploys pinned application commit
+`33c4757020daad40b1ffe459fe4484b06487cff9` to the existing Docker/Caddy host.
+It preserves container environment and image cache, checks a candidate before
+switching loopback port 8000, validates release asset hashes through Caddy HTTPS,
+and retains the previous container for rollback. It changes no DNS or Caddy
+configuration. Run it from the existing root SSH session, using an immutable
+download and SHA-256 verification. Deployment is complete only when its checks
+pass and the public site serves bootstrap `880A9278`.
+
+Local deployment tests: `python3 -m unittest discover -s tests -p 'deploy_hetzner_test.py'`.
+
+## Historical migration (superseded)
+
 2026-10-21. Canonical URL: https://needle.miguelalmeida.xyz/
 
 Changed the existing Porkbun record in place from A `needle` → `178.105.57.97` to CNAME `needle` → `needle-portfolio.onrender.com`, TTL 600. The other four records stayed unchanged. Saved record confirmed in the DNS table. Render custom domain on service `srv-db0ltec9v7es73c13cq0` verified successfully and its dashboard confirmed the certificate was issued.
