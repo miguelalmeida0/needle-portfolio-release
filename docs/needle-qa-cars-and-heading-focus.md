@@ -33,3 +33,11 @@ Use token or phrase boundaries for title boosts; evaluate unknown-subject and no
 ## QA limits
 
 The gstack launcher is absent on this host (exit 127). Repository-native checks and the available connected Chrome are used; no gstack health score or broad search-quality certification is claimed. Search relevance remains an open finding. No provider/network/model migration is part of this repair.
+
+## Live repair verification
+
+Deployment `dep-dbcr9sqvcj2c73fk3400` is live at code commit `6efb3877d724a9949407e717c2dff501611dd7e9` (2026-10-22 07:03:00 UTC / 09:03 Berlin).
+
+Connected Chrome at the exact custom hostname loaded `redesign-02C1673D.css`. With the results title actually focused and matching `:focus-visible`, its outline is `none`. Pressing Tab from the heading focuses Filters, which still matches `:focus-visible` and has `rgb(30, 61, 46) solid 2px` outline. Live cats and doors searches produced the expected top three titled artworks; cars retained the eight reproduced incorrect matches. `npm run verify`: 72 pass, 0 fail, 0 skipped. This verifies the border repair and behavior preservation, not cars relevance.
+
+Screenshot: `evidence/needle-cars-heading-focus-fixed.jpg`.
