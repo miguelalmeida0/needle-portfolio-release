@@ -73,7 +73,7 @@ test('production build routes inspector and comparison images through the galler
   }
   const gallery = metafile.inputs['src/redesign/GalleryImage.jsx'];
   assert.ok(gallery.imports.some(item => item.path.endsWith('/shared/ui/ArtworkImage.js')), 'original fallback loader remains available without a circular alias');
-  assert.match(await read('scripts/build-redesign.mjs'), /plugins:\s*\[redesignImages\]/, 'the production exporter must enable this binding');
+  assert.match(await read('scripts/build-redesign.mjs'), /plugins:\s*\[redesignImages,\s*searchRelevance\]/, 'the production exporter must enable this binding');
 });
 
 const fixture = JSON.parse(await read('tests/fixtures/design-preservation.json'));

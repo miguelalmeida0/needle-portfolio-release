@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { redesignImages } from "./redesign-images.mjs";
 import { buildPreviewAtlas } from "./build-preview-atlas.mjs";
+import { searchRelevance } from './search-relevance.mjs';
 const checking = process.argv.includes("--check");
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const atlas = await buildPreviewAtlas();
@@ -16,6 +17,15 @@ if (checking) {
   await writeFile('src/redesign/preview-atlas.json', atlasManifest);
 }
 const outputs = [];
+const worker = await build({ entryPoints: ['dist/modules/packages/search-runtime/src/search.worker.js'], bundle: true,
+  format: 'esm', target: 'es2022', minify: true, write: false, legalComments: 'none', charset: 'utf8', plugins: [searchRelevance] });
+if (worker.warnings.length) throw new Error(JSON.stringify(worker.warnings));
+const workerBytes = worker.outputFiles[0].contents;
+const workerHash = digest(workerBytes);
+const workerPath = `/assets/search-relevant-${workerHash.slice(0,8).toUpperCase()}.js`;
+if (checking) {
+  if (digest(await readFile('dist' + workerPath)) !== workerHash) throw new Error('Stale relevance worker');
+} else await writeFile('dist' + workerPath, workerBytes);
 for (const [entry, prefix, extension] of [
   ["src/redesign/bootstrap.jsx", "bootstrap", "js"],
   ["src/redesign/needle.css", "redesign", "css"],
@@ -31,10 +41,10 @@ for (const [entry, prefix, extension] of [
     charset: "utf8",
     jsx: "transform",
     define: {
-      __NEEDLE_SEARCH_WORKER_URL__: '"/assets/search.worker-TI6JI4PU.js"',
+      __NEEDLE_SEARCH_WORKER_URL__: JSON.stringify(workerPath),
     },
     logLevel: "silent",
-    plugins: [redesignImages],
+    plugins: [redesignImages, searchRelevance],
   });
   if (result.warnings.length) throw new Error(JSON.stringify(result.warnings));
   const bytes = result.outputFiles[0].contents;
@@ -56,6 +66,8 @@ const manifest = {
   stylesheet: outputs[1].path.slice(4),
   bootstrapSha256: outputs[0].sha256,
   stylesheetSha256: outputs[1].sha256,
+  searchWorker: workerPath,
+  searchWorkerSha256: workerHash,
   preservedBootstrap: "/assets/bootstrap-9FA4D098.js",
   preservedStylesheet: "/assets/styles-06391554.css",
 };

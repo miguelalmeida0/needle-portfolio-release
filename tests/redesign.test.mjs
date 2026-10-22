@@ -225,3 +225,15 @@ test('reloaded presentation route and overlay restore, and first-entry Back stay
   nav.back(); nav.restore(history.state);
   assert.equal(nav.current().overlay, null);
 });
+
+// Text relevance must reach the real rendering boundary: do not append the
+// catalogue behind a short result list or refill an empty search with images.
+test('versioned text results render only qualifying hits and clearing restores browsing', () => {
+  const response = { hits: golden.fast, relevance: { version: 'catalogue-v2', status: 'matched' } };
+  const state = { ...states.all, activeQuery: 'gold', queryKind: 'text', approximate: response };
+  const viewport = { width: 1440, height: 1e7, scrollTop: 0 };
+  assert.deepEqual(renderDesign(state, viewport).cards.map(card => card.props['data-artwork-id']), golden.fast.map(hit => hit.id));
+  const empty = { ...state, approximate: { ...response, hits: [], relevance: { ...response.relevance, status: 'no-match' } } };
+  assert.equal(renderDesign(empty, viewport).cards.length, 0);
+  assert.equal(renderDesign({ ...empty, activeQuery: '' }, viewport).cards.length, corpus.items.length);
+});

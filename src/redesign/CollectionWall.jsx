@@ -41,7 +41,10 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
     [state.approximate, state.exact, state.resultMode],
   );
   const items = useMemo(() => {
-    const source = scopedCorpusItems(state);
+    const response = state.resultMode === 'truth' && state.exact ? state.exact : state.approximate;
+    const onlyMatches = Boolean(state.activeQuery && response?.relevance?.version === 'catalogue-v2');
+    const source = state.activeQuery && state.queryKind === 'text' && state.status === 'searching' ? []
+      : scopedCorpusItems(state).filter(item => !onlyMatches || hitRanks.has(item.id));
     const recipeFiltered =
       state.queryFilters.length > 0
         ? source.filter((item) => matchesQueryFilters(item, state.queryFilters))
@@ -68,6 +71,9 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
     state.queryFilters,
     state.scopedCollectionId,
     state.savedCollections,
+    state.activeQuery,
+    state.queryKind,
+    state.status,
     hitRanks,
   ]);
   const wallOffset = () => {

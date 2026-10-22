@@ -20,6 +20,8 @@
 .needle-app button { -webkit-tap-highlight-color: transparent; }
 .needle-app :focus-visible { outline: 2px solid var(--needle-green); outline-offset: 4px; }
 .needle-app h1[tabindex="-1"]:focus { outline: none; }
+.needle-results-empty { margin: 12px 0 40px; color: var(--needle-ink); font-size: 18px; line-height: 1.6; }
+.needle-results-empty span { color: var(--needle-secondary); font-size: 14px; }
 .needle-app .needle-search input:focus-visible { outline: none; }
 .needle-header {
   position: relative;

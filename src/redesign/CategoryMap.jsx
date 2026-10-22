@@ -174,7 +174,7 @@ export function CategoryMap({ onOpen, active = true }) {
         </div>
       ) : (
         <p className="needle-map__empty" role="status">
-          {state.status === 'booting' ? 'Opening the collection…' : 'No artworks in this collection yet.'}
+          {state.status === 'booting' ? 'Opening the collection…' : state.activeQuery ? `No catalogue matches for “${state.activeQuery}”.` : 'No artworks in this collection yet.'}
         </p>
       )}
       <div className="needle-map__controls" aria-label="Map controls">

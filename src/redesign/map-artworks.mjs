@@ -1,10 +1,12 @@
 import { activeCollection, scopedCorpusItems, visibleHits } from '../../dist/modules/apps/web/src/app/app.selectors.js';
 import { visibleArtworkNodes } from '../../dist/modules/apps/web/src/features/map/map-visibility.js';
+import { textResult } from '../search/result-state.mjs';
 
 // A collection remains browsable after search is cleared. The original map's
 // global preview ranks don't cover arbitrary saved artworks, so fill its bounded
 // presentation sample with real scoped items. Search hits keep their order.
 export function mapArtworks(state, previewLimit = 120) {
+  if (textResult(state)?.relevance.status === 'no-match') return [];
   const items = scopedCorpusItems(state);
   const nodes = visibleArtworkNodes({
     items, hits: visibleHits(state),

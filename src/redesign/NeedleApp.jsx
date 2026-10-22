@@ -38,6 +38,7 @@ import {
 import { CollectionWall } from "./CollectionWall.jsx";
 import { CategoryMap } from "./CategoryMap.jsx";
 import { mapArtworks } from "./map-artworks.mjs";
+import { textResult } from '../search/result-state.mjs';
 
 const DetailSearchOverlay = React.lazy(() =>
   import(
@@ -92,6 +93,7 @@ export function NeedleApp() {
     visited.has("advanced") ||
     Boolean(route.backView && route.backView !== "home");
   const hits = visibleHits(state);
+  const noMatches = textResult(state)?.relevance.status === 'no-match';
   const preview = useMemo(() => mapArtworks(state, 12).slice(0, 12), [
     state.corpus, state.approximate, state.exact, state.resultMode,
     state.selectedArtworkId, state.scopedCollectionId, state.savedCollections,
@@ -413,6 +415,10 @@ export function NeedleApp() {
                 </button>
               </div>}
             </div>
+            {noMatches && <p className="needle-results-empty" role="status">
+              No catalogue matches for “{state.activeQuery}”.<br />
+              <span>Try fewer words or a different subject.</span>
+            </p>}
             <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} active={route.view === 'results'} />
           </main>
         )}
