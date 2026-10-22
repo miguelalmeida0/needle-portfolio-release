@@ -1,0 +1,644 @@
+{
+  "records": 10000,
+  "carCatalogueMatches": 0,
+  "observations": [
+    {
+      "query": "cars",
+      "lexicalMatches": 1,
+      "semanticDimensions": [],
+      "residualOnly": true,
+      "fast": [
+        {
+          "id": "met-647622",
+          "distance": 0.36923576309422734,
+          "rank": 1,
+          "title": "Card Number 139, Emma Carson, from the Actors and Actresses series (N145-6) issued by Duke Sons & Co. to promote Duke Cigarettes"
+        },
+        {
+          "id": "met-287273",
+          "distance": 0.9035812292036273,
+          "rank": 2,
+          "title": "Side Colonnade in the Muroothappa Sarvacar Mundapam"
+        },
+        {
+          "id": "met-287897",
+          "distance": 0.9195918618293897,
+          "rank": 3,
+          "title": "Elinor and Lucy Llewelyn"
+        },
+        {
+          "id": "met-306220",
+          "distance": 0.9245674567109924,
+          "rank": 4,
+          "title": "John Henning, Sculptor"
+        },
+        {
+          "id": "met-286454",
+          "distance": 0.9246396548526145,
+          "rank": 5,
+          "title": "[Rustic Pavilion at Eaux-Bonnes]"
+        },
+        {
+          "id": "met-268578",
+          "distance": 0.9255720811562558,
+          "rank": 6,
+          "title": "William Scott Moncrieff"
+        },
+        {
+          "id": "met-268402",
+          "distance": 0.9256087063433482,
+          "rank": 7,
+          "title": "Edinburgh. Greyfriars' Churchyard"
+        },
+        {
+          "id": "met-287036",
+          "distance": 0.9279861110113818,
+          "rank": 8,
+          "title": "Jérusalem, Porte d'Hérode"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-291577",
+          "distance": 0.2662573310556259,
+          "rank": 1,
+          "title": "Rhodomenia bifida"
+        },
+        {
+          "id": "met-291566",
+          "distance": 0.3399002380174899,
+          "rank": 2,
+          "title": "Sporochnius rhizodes ß paracloxa"
+        },
+        {
+          "id": "met-647622",
+          "distance": 0.36923576309422734,
+          "rank": 3,
+          "title": "Card Number 139, Emma Carson, from the Actors and Actresses series (N145-6) issued by Duke Sons & Co. to promote Duke Cigarettes"
+        },
+        {
+          "id": "met-291574",
+          "distance": 0.4170130232784821,
+          "rank": 4,
+          "title": "Delesseria sinvosa, var."
+        },
+        {
+          "id": "met-591828",
+          "distance": 0.5185273518241436,
+          "rank": 5,
+          "title": "I quattro libri dell'architettura di Andrea Palladio . . ."
+        },
+        {
+          "id": "met-291613",
+          "distance": 0.591059094104128,
+          "rank": 6,
+          "title": "Zygnema curvatum"
+        },
+        {
+          "id": "met-291540",
+          "distance": 0.6079489829462342,
+          "rank": 7,
+          "title": "Polysiphonia thuyoides"
+        },
+        {
+          "id": "met-291549",
+          "distance": 0.6079489829462342,
+          "rank": 8,
+          "title": "Polysiphonia byssoides"
+        }
+      ]
+    },
+    {
+      "query": "car",
+      "lexicalMatches": 279,
+      "semanticDimensions": [],
+      "residualOnly": true,
+      "fast": [
+        {
+          "id": "met-550055",
+          "distance": 0.3068481003096505,
+          "rank": 1,
+          "title": "Left shoulder and chest with cartouches of Aten"
+        },
+        {
+          "id": "met-399298",
+          "distance": 0.3120745035501201,
+          "rank": 2,
+          "title": "Hidden Door covered with a Mirror in the Trianon Palace, plate V from \"Portes a Placard et Lambris\""
+        },
+        {
+          "id": "met-444901",
+          "distance": 0.32070645964657607,
+          "rank": 3,
+          "title": "Tile with Floral Cartouche Design on Ebru (Marble Imitation Pattern) Background"
+        },
+        {
+          "id": "met-759534",
+          "distance": 0.32861121486859135,
+          "rank": 4,
+          "title": "Plate 26: Marriage of convenience, from 'Caricaturana,' published in Les Robert Macaires"
+        },
+        {
+          "id": "met-759525",
+          "distance": 0.32869204633618665,
+          "rank": 5,
+          "title": "Plate 32: What in the devil Macaire!, from 'Caricaturana,' published in Les Robert Macaires"
+        },
+        {
+          "id": "met-447881",
+          "distance": 0.3291057897343824,
+          "rank": 6,
+          "title": "Scarf End (Tenchifa)"
+        },
+        {
+          "id": "met-419820",
+          "distance": 0.33486748294220514,
+          "rank": 7,
+          "title": "St. Bonaventure, Cardinal, July 14th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-559670",
+          "distance": 0.33524135189279125,
+          "rank": 8,
+          "title": "Scarab Inscribed with the Throne Name of Thutmose I"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-291928",
+          "distance": 0.26603712066425755,
+          "rank": 1,
+          "title": "[Carpenter or Cabinetmaker Standing Before a Sign Advertising His Trade]"
+        },
+        {
+          "id": "met-447251",
+          "distance": 0.2759178776334684,
+          "rank": 2,
+          "title": "Tile"
+        },
+        {
+          "id": "met-550055",
+          "distance": 0.3068481003096505,
+          "rank": 3,
+          "title": "Left shoulder and chest with cartouches of Aten"
+        },
+        {
+          "id": "met-399298",
+          "distance": 0.3120745035501201,
+          "rank": 4,
+          "title": "Hidden Door covered with a Mirror in the Trianon Palace, plate V from \"Portes a Placard et Lambris\""
+        },
+        {
+          "id": "met-549671",
+          "distance": 0.3179274507373897,
+          "rank": 5,
+          "title": "Arm with Aten cartouches belonging with 21.9.431"
+        },
+        {
+          "id": "met-444901",
+          "distance": 0.32070645964657607,
+          "rank": 6,
+          "title": "Tile with Floral Cartouche Design on Ebru (Marble Imitation Pattern) Background"
+        },
+        {
+          "id": "met-759534",
+          "distance": 0.32861121486859135,
+          "rank": 7,
+          "title": "Plate 26: Marriage of convenience, from 'Caricaturana,' published in Les Robert Macaires"
+        },
+        {
+          "id": "met-759525",
+          "distance": 0.32869204633618665,
+          "rank": 8,
+          "title": "Plate 32: What in the devil Macaire!, from 'Caricaturana,' published in Les Robert Macaires"
+        }
+      ]
+    },
+    {
+      "query": "automobile",
+      "lexicalMatches": 0,
+      "semanticDimensions": [],
+      "residualOnly": true,
+      "fast": [
+        {
+          "id": "met-420045",
+          "distance": 0.8448421201730877,
+          "rank": 1,
+          "title": "S. Ferréol, martyr (St. Ferreolus, Martyr), September 18th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420035",
+          "distance": 0.847000136946461,
+          "rank": 2,
+          "title": "S. Polien et S. Nemesien (St. Polianus and St. Nemesianus), September 10th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420037",
+          "distance": 0.88733791394279,
+          "rank": 3,
+          "title": "S. Paphnuce, évêque (St. Paphnutius, Bishop), September 11th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420034",
+          "distance": 0.8893450873712859,
+          "rank": 4,
+          "title": "S. Nicolas de Tolentino (St. Nicholas of Tolentino), September 10th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420033",
+          "distance": 0.8894943068167347,
+          "rank": 5,
+          "title": "S. Gorgon et St. Dorothée, martyrs (St. Gorgonius and St. Dorotheus, Martyrs), September 9th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420432",
+          "distance": 0.9072142030022285,
+          "rank": 6,
+          "title": "S. Vincent Ferrier (St. Vincent Ferrer), April 5th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420124",
+          "distance": 0.9309825154977586,
+          "rank": 7,
+          "title": "S. Florentin, évêque (St. Florentius, Bishop), October 17th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        },
+        {
+          "id": "met-420039",
+          "distance": 0.9310338851236039,
+          "rank": 8,
+          "title": "S. Amé, abbé (St. Amatus, Abbot), September 13th, from \"Les Images De Tous Les Saincts et Saintes de L'Année\" (Images of All of the Saints and Religious Events of the Year)"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-313232",
+          "distance": 0.40893139886868024,
+          "rank": 1,
+          "title": "Wearing Blanket"
+        },
+        {
+          "id": "met-291808",
+          "distance": 0.6319468638695928,
+          "rank": 2,
+          "title": "[Metalworker in Apron Working with a Vise]"
+        },
+        {
+          "id": "met-347296",
+          "distance": 0.70653476232858,
+          "rank": 3,
+          "title": "Il Trinciante. . .Ampliato et Perfettione ridoto dal Cavalier Reale Fusoritto da Narni"
+        },
+        {
+          "id": "met-343855",
+          "distance": 0.7188364300997285,
+          "rank": 4,
+          "title": "I) Herbarum, Arborum, Fructium, Frumentorum, c. 1540 ... II) De Speciali quarundam plantarum, Frankfurt: Egenolff 1552"
+        },
+        {
+          "id": "met-316931",
+          "distance": 0.722974775204562,
+          "rank": 5,
+          "title": "Headband"
+        },
+        {
+          "id": "met-736315",
+          "distance": 0.7378202258330226,
+          "rank": 6,
+          "title": "Diagonally twined carrying basket"
+        },
+        {
+          "id": "met-548987",
+          "distance": 0.7382315229837395,
+          "rank": 7,
+          "title": "Sheet, linen mark, fine spin, medium weave"
+        },
+        {
+          "id": "met-314219",
+          "distance": 0.7391492946350986,
+          "rank": 8,
+          "title": "Mantle"
+        }
+      ]
+    },
+    {
+      "query": "carriage",
+      "lexicalMatches": 2,
+      "semanticDimensions": [],
+      "residualOnly": true,
+      "fast": [
+        {
+          "id": "met-52322",
+          "distance": 0.35923048538324853,
+          "rank": 1,
+          "title": "Dish with Court Carriage beneath a Cherry Tree"
+        },
+        {
+          "id": "met-6452",
+          "distance": 0.8412896235916901,
+          "rank": 2,
+          "title": "Plate"
+        },
+        {
+          "id": "met-6456",
+          "distance": 0.8412896235916901,
+          "rank": 3,
+          "title": "Plate"
+        },
+        {
+          "id": "met-6461",
+          "distance": 0.8412896235916901,
+          "rank": 4,
+          "title": "Plate"
+        },
+        {
+          "id": "met-1105",
+          "distance": 0.8529912159642538,
+          "rank": 5,
+          "title": "George Washington"
+        },
+        {
+          "id": "met-6162",
+          "distance": 0.8672051402666238,
+          "rank": 6,
+          "title": "Plate"
+        },
+        {
+          "id": "met-6203",
+          "distance": 0.8672519623149981,
+          "rank": 7,
+          "title": "Plate"
+        },
+        {
+          "id": "met-6133",
+          "distance": 0.8672894775947454,
+          "rank": 8,
+          "title": "Plate"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-52322",
+          "distance": 0.35923048538324853,
+          "rank": 1,
+          "title": "Dish with Court Carriage beneath a Cherry Tree"
+        },
+        {
+          "id": "met-291601",
+          "distance": 0.6257385297031913,
+          "rank": 2,
+          "title": "Confera arcta - the three upper specimens in the young state"
+        },
+        {
+          "id": "met-446232",
+          "distance": 0.6503158976552963,
+          "rank": 3,
+          "title": "Pendant Cross"
+        },
+        {
+          "id": "met-410141",
+          "distance": 0.6830571721648042,
+          "rank": 4,
+          "title": "Charles Comiskey, Baseball Player, from World's Champions, Series 1 (N28) for Allen & Ginter Cigarettes"
+        },
+        {
+          "id": "met-291808",
+          "distance": 0.7488168242179489,
+          "rank": 5,
+          "title": "[Metalworker in Apron Working with a Vise]"
+        },
+        {
+          "id": "met-894326",
+          "distance": 0.7528636693747737,
+          "rank": 6,
+          "title": "The analysis of beauty : written with a view of fixing the fluctuating ideas of taste"
+        },
+        {
+          "id": "met-576184",
+          "distance": 0.7584291598156743,
+          "rank": 7,
+          "title": "Funerary Cone of the Scribe Neta"
+        },
+        {
+          "id": "met-444476",
+          "distance": 0.7761371849135738,
+          "rank": 8,
+          "title": "Plate with Vegetal Decoration in a Seven-pointed Star"
+        }
+      ]
+    },
+    {
+      "query": "cats",
+      "lexicalMatches": 102,
+      "semanticDimensions": [
+        "cat"
+      ],
+      "residualOnly": false,
+      "fast": [
+        {
+          "id": "met-436433",
+          "distance": 0.11880005805342764,
+          "rank": 1,
+          "title": "A Boy with a Cat—Morning"
+        },
+        {
+          "id": "met-626268",
+          "distance": 0.17640700929334363,
+          "rank": 2,
+          "title": "Candelabra grotesque with four children with a cat and a dog, from a series of twelve candelabra grotesques"
+        },
+        {
+          "id": "met-53653",
+          "distance": 0.23407292776590727,
+          "rank": 3,
+          "title": "A Woman and a Cat"
+        },
+        {
+          "id": "met-662262",
+          "distance": 0.32323841654144914,
+          "rank": 4,
+          "title": "Trionfo Di Virtu. Libro Novo..., page 24 (recto)"
+        },
+        {
+          "id": "met-287893",
+          "distance": 0.3913533699641467,
+          "rank": 5,
+          "title": "Feeding Poor Puss"
+        },
+        {
+          "id": "met-436545",
+          "distance": 0.393489317807987,
+          "rank": 6,
+          "title": "Manuel Osorio Manrique de Zuñiga (1784–1792)"
+        },
+        {
+          "id": "met-811952",
+          "distance": 0.39465294243422,
+          "rank": 7,
+          "title": "Ducking a Scold"
+        },
+        {
+          "id": "met-194164",
+          "distance": 0.396155091722723,
+          "rank": 8,
+          "title": "Joseph and Potiphar's Wife"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-436433",
+          "distance": 0.11880005805342764,
+          "rank": 1,
+          "title": "A Boy with a Cat—Morning"
+        },
+        {
+          "id": "met-626268",
+          "distance": 0.17640700929334363,
+          "rank": 2,
+          "title": "Candelabra grotesque with four children with a cat and a dog, from a series of twelve candelabra grotesques"
+        },
+        {
+          "id": "met-53653",
+          "distance": 0.23407292776590727,
+          "rank": 3,
+          "title": "A Woman and a Cat"
+        },
+        {
+          "id": "met-662262",
+          "distance": 0.32323841654144914,
+          "rank": 4,
+          "title": "Trionfo Di Virtu. Libro Novo..., page 24 (recto)"
+        },
+        {
+          "id": "met-287893",
+          "distance": 0.3913533699641467,
+          "rank": 5,
+          "title": "Feeding Poor Puss"
+        },
+        {
+          "id": "met-436545",
+          "distance": 0.393489317807987,
+          "rank": 6,
+          "title": "Manuel Osorio Manrique de Zuñiga (1784–1792)"
+        },
+        {
+          "id": "met-811952",
+          "distance": 0.39465294243422,
+          "rank": 7,
+          "title": "Ducking a Scold"
+        },
+        {
+          "id": "met-194164",
+          "distance": 0.396155091722723,
+          "rank": 8,
+          "title": "Joseph and Potiphar's Wife"
+        }
+      ]
+    },
+    {
+      "query": "doors",
+      "lexicalMatches": 327,
+      "semanticDimensions": [],
+      "residualOnly": true,
+      "fast": [
+        {
+          "id": "met-471169",
+          "distance": 0.3315710311543769,
+          "rank": 1,
+          "title": "Doors"
+        },
+        {
+          "id": "met-445997",
+          "distance": 0.40429770486460426,
+          "rank": 2,
+          "title": "Pair of Doors"
+        },
+        {
+          "id": "met-189365",
+          "distance": 0.40510204402570815,
+          "rank": 3,
+          "title": "Set of bookcase doors"
+        },
+        {
+          "id": "met-472341",
+          "distance": 0.40694800049232926,
+          "rank": 4,
+          "title": "One of Two Doors with Ironwork"
+        },
+        {
+          "id": "met-209227",
+          "distance": 0.41113713970795784,
+          "rank": 5,
+          "title": "Pair of doors with scenes after Angelica Kauffman"
+        },
+        {
+          "id": "met-385038",
+          "distance": 0.41166006994752713,
+          "rank": 6,
+          "title": "Elevation of a paneled interior with double doors and gaslight sconces"
+        },
+        {
+          "id": "met-201932",
+          "distance": 0.4120621559514106,
+          "rank": 7,
+          "title": "Pair of doors"
+        },
+        {
+          "id": "met-544474",
+          "distance": 0.5339538000215763,
+          "rank": 8,
+          "title": "Upper Part of a Door Panel"
+        }
+      ],
+      "exact": [
+        {
+          "id": "met-471169",
+          "distance": 0.3315710311543769,
+          "rank": 1,
+          "title": "Doors"
+        },
+        {
+          "id": "met-445997",
+          "distance": 0.40429770486460426,
+          "rank": 2,
+          "title": "Pair of Doors"
+        },
+        {
+          "id": "met-189365",
+          "distance": 0.40510204402570815,
+          "rank": 3,
+          "title": "Set of bookcase doors"
+        },
+        {
+          "id": "met-472341",
+          "distance": 0.40694800049232926,
+          "rank": 4,
+          "title": "One of Two Doors with Ironwork"
+        },
+        {
+          "id": "met-209227",
+          "distance": 0.41113713970795784,
+          "rank": 5,
+          "title": "Pair of doors with scenes after Angelica Kauffman"
+        },
+        {
+          "id": "met-385038",
+          "distance": 0.41166006994752713,
+          "rank": 6,
+          "title": "Elevation of a paneled interior with double doors and gaslight sconces"
+        },
+        {
+          "id": "met-201932",
+          "distance": 0.4120621559514106,
+          "rank": 7,
+          "title": "Pair of doors"
+        },
+        {
+          "id": "met-544474",
+          "distance": 0.5339538000215763,
+          "rank": 8,
+          "title": "Upper Part of a Door Panel"
+        }
+      ]
+    }
+  ]
+}

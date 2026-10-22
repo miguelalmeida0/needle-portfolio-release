@@ -19,6 +19,7 @@
 .needle-app [hidden] { display: none !important; }
 .needle-app button { -webkit-tap-highlight-color: transparent; }
 .needle-app :focus-visible { outline: 2px solid var(--needle-green); outline-offset: 4px; }
+.needle-app h1[tabindex="-1"]:focus { outline: none; }
 .needle-app .needle-search input:focus-visible { outline: none; }
 .needle-header {
   position: relative;
