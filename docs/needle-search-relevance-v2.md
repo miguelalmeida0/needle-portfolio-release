@@ -20,7 +20,31 @@ The original reproduction failed 8 new relevance tests before the fix, including
 
 Three read-only simplification reviews covered reuse, quality and resource usage, followed by a targeted manual correctness scan. Applied findings: remove retained per-document token maps; retain field weights with normalized fields instead of reconstructing them per phrase; correct coordinated exclusions; reject blank filter values; complete wall memo dependencies. The suggested removal of unrelated positive-map context was declined because the user expressly requested that labelled context. Kept two lines of wall response selection local to preserve its isolated renderer boundary.
 
-Preservation tests remain intact and do not certify the new ranking by themselves. New relevance tests validate the corrected boundary. Full release checks and final test count are recorded with live evidence after deployment. No new framework, model provider, paid infrastructure, data records or replacement images were introduced.
+Preservation tests remain intact and do not certify the new ranking by themselves. New relevance tests validate the corrected boundary. No new framework, model provider, paid infrastructure, data records or replacement images were introduced.
+
+## Release and live evidence
+
+`npm run verify` completed with **105 passed, 0 failed, 0 skipped**. The frozen runtime/data/image contracts, exported worker execution, local fallback binding, relevance regressions and wall/map state checks passed. Controlled regression cases establish these specific behaviors; they are not a universal search accuracy benchmark.
+
+Production code commit: `460a69791bfe4da27991e9e764107af3322b8ed9`. Render deployment `dep-dbcrohivcj2c73flda90` became live on 2026-10-22 at 07:34:14 UTC. Verified the exact custom hostname `https://needle.miguelalmeida.xyz/` loaded `/assets/bootstrap-880A9278.js`, which binds the versioned worker `/assets/search-relevant-BA61762A.js`.
+
+Completed live browser checks:
+
+- `cars`: zero wall artworks, explicit no-catalogue-match status, no map-preview CTA. No Emma Carson false positive.
+- `cats`: eight real result artworks, starting with *Feeding Poor Puss*, *A Woman and a Cat* and *A Boy with a Cat—Morning*. The wall does not append the 10K browse collection.
+- `cats without dogs`: excludes the cat-and-dog candelabra work.
+- Map for that positive query: eight marked matches among 132 real artworks, with the context explicitly labelled “Alongside the collection”; zero visible pending images at inspection.
+- Changing that map query to `cars`: zero map artworks and the no-match message, followed by the results view on submission.
+
+![Live cars no-match state](../evidence/needle-search-cars-no-match.jpg)
+
+An additional post-release attempt to open an artwork was interrupted by a browser-tool connection stall; it is not counted as a completed live check. The original image/detail retrieval path is unchanged, and image/mixed-query delegation is covered by automated tests. The evidence-only documentation commit does not require a new application deployment.
+
+## Prevention and confidence
+
+Keep the whole-token, unknown-object, conjunction, exclusion and honest-empty-state regressions in the release check. Keep executing the shipped worker, rather than testing only an imported source class. Require catalogue evidence before vector tie-breaking and keep collection browsing distinct from active text results.
+
+Confidence is high for the reproduced false-positive and filler-result defects and the covered parser boundaries. Confidence for arbitrary subject recall is limited by the existing catalogue metadata. No new model or independently labelled visual benchmark was introduced.
 
 ## Limits
 
