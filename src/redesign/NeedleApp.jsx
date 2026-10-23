@@ -39,6 +39,7 @@ import { CollectionWall } from "./CollectionWall.jsx";
 import { CategoryMap } from "./CategoryMap.jsx";
 import { mapArtworks } from "./map-artworks.mjs";
 import { textResult } from '../search/result-state.mjs';
+import homePreviews from './home-previews.json';
 
 const DetailSearchOverlay = React.lazy(() =>
   import(
@@ -320,7 +321,7 @@ export function NeedleApp() {
         )}
         {home && (
           <main className="needle-home">
-            <HomeBackdrop items={state.corpus?.items ?? []} />
+            <HomeBackdrop />
             <section className="needle-home-panel">
               <h1>What would you like to see?</h1>
               <p>
@@ -691,17 +692,10 @@ function Tools({ onClose, onAdvanced, onResults, onArtwork, focusArtworkId }) {
   );
 }
 
-function HomeBackdrop({ items }) {
-  const artworks = useMemo(
-    () =>
-      items
-        .filter((item) => item.previewRank != null && item.previewRank < 120)
-        .slice(0, 12),
-    [items],
-  );
+function HomeBackdrop() {
   return (
     <div className="needle-backdrop" aria-hidden="true">
-      {artworks.map((item, index) => (
+      {homePreviews.artworks.map((item, index) => (
         <div
           key={item.id}
           style={{
@@ -709,13 +703,14 @@ function HomeBackdrop({ items }) {
             top: `${index < 6 ? 14 + (index % 3) * 6 : 72 + (index % 3) * 5}%`,
           }}
         >
-          <ArtworkImage
-            src={item.thumbnailUrl || item.imageUrl}
-            fallbackSrc={item.thumbnailFallbackUrls?.[0]}
+          <img
+            src={item.src}
             alt=""
-            width={item.imageWidth}
-            height={item.imageHeight}
-            sizes="72px"
+            width={item.width}
+            height={item.height}
+            loading="eager"
+            decoding="sync"
+            draggable={false}
           />
         </div>
       ))}

@@ -2,10 +2,15 @@ import { build } from "esbuild";
 import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { redesignImages } from "./redesign-images.mjs";
-import { buildPreviewAtlas } from "./build-preview-atlas.mjs";
+import { buildPreviewAtlas, buildHomePreviews } from "./build-preview-atlas.mjs";
 import { searchRelevance } from './search-relevance.mjs';
 const checking = process.argv.includes("--check");
 const digest = (bytes) => createHash("sha256").update(bytes).digest("hex");
+const homePreviews = JSON.stringify(await buildHomePreviews()) + '\n';
+if (checking) {
+  if (await readFile('src/redesign/home-previews.json', 'utf8') !== homePreviews)
+    throw new Error('Stale opening previews');
+} else await writeFile('src/redesign/home-previews.json', homePreviews);
 const atlas = await buildPreviewAtlas();
 const atlasManifest = JSON.stringify(atlas.manifest) + '\n';
 if (checking) {

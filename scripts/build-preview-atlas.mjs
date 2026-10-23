@@ -3,6 +3,30 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
+// The opening screen must not depend on loading/initializing the full catalogue.
+// Tiny inline derivatives share the bootstrap's immutable cache entry and make
+// no separate image requests. Original pack images remain untouched.
+export async function buildHomePreviews() {
+  const pointer = JSON.parse(await fs.readFile('data-packs/active.json', 'utf8'));
+  if (!/^[a-z0-9-]+$/.test(pointer.packId)) throw new Error('Invalid opening pack ID');
+  const corpus = JSON.parse(await fs.readFile(`data-packs/${pointer.packId}/corpus.json`, 'utf8'));
+  // Preserve the existing HomeBackdrop's exact artwork selection and order.
+  const items = corpus.items.filter(item => item.previewRank != null && item.previewRank < 120).slice(0, 12);
+  if (items.length !== 12) throw new Error('Opening screen requires twelve real previews');
+  const artworks = [];
+  let totalBytes = 0;
+  for (const item of items) {
+    const source = item.thumbnailUrl || item.imageUrl;
+    if (!source.startsWith(`/packs/${pointer.packId}/images/`) || source.includes('..')) throw new Error('Nonlocal opening preview');
+    const bytes = await sharp(path.join('data-packs', source.slice('/packs/'.length)))
+      .rotate().resize(140, 176, { fit: 'cover' }).webp({ quality: 64, effort: 4 }).toBuffer();
+    totalBytes += bytes.length;
+    artworks.push({ id: item.id, source, width: 140, height: 176, src: `data:image/webp;base64,${bytes.toString('base64')}` });
+  }
+  if (totalBytes > 48000) throw new Error('Opening pictures exceed the combined 48 KB budget');
+  return { artworks };
+}
+
 // A delivery derivative of the frozen 120 previews, never a replacement corpus.
 // One immutable request paints the map instead of 120 lazy image requests.
 export async function buildPreviewAtlas() {

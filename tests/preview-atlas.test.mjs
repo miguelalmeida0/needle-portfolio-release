@@ -3,6 +3,37 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import sharp from 'sharp';
 
+test('opening pictures render before the search catalogue exists and need no image requests', async () => {
+  const { transform } = await import('esbuild');
+  const corpus = JSON.parse(await readFile('data-packs/met-10k-lean-v2/corpus.json', 'utf8'));
+  const expected = corpus.items.filter(item => item.previewRank != null && item.previewRank < 120).slice(0, 12);
+  const homePreviews = await readFile('src/redesign/home-previews.json', 'utf8')
+    .then(JSON.parse).catch(error => { if (error.code === 'ENOENT') return { artworks: [] }; throw error; });
+  const source = await readFile('src/redesign/NeedleApp.jsx', 'utf8');
+  const component = (await transform(source.slice(source.indexOf('function HomeBackdrop(')), { loader: 'jsx' })).code;
+  const React = { createElement: (type, props, ...children) => ({ type, props, children }) };
+  const HomeBackdrop = new Function('React', 'useMemo', 'ArtworkImage', 'homePreviews', component + '\nreturn HomeBackdrop;')(
+    React, callback => callback(), () => {}, homePreviews);
+  const initial = HomeBackdrop({ items: [] });
+  const pictures = initial.children[0];
+  assert.equal(pictures.length, 12, 'all opening pictures must exist while the catalogue is unavailable');
+  assert.equal(initial.props['aria-hidden'], 'true', 'decoration stays outside the accessibility tree');
+  assert.deepEqual(pictures.map(picture => picture.props.key), expected.map(item => item.id), 'preserve the exact original twelve artworks and order');
+  let bytes = 0;
+  for (const picture of pictures) {
+    const image = picture.children[0];
+    assert.equal(image.type, 'img');
+    assert.equal(image.props.loading, 'eager');
+    assert.match(image.props.src, /^data:image\/webp;base64,/, 'opening must not wait for HTTP, transforms or the museum');
+    const encoded = Buffer.from(image.props.src.split(',')[1], 'base64');
+    const metadata = await sharp(encoded).metadata();
+    assert.equal(metadata.width, 140);
+    assert.equal(metadata.height, 176);
+    bytes += encoded.length;
+  }
+  assert.ok(bytes < 48000, 'the twelve inline pictures have a 48 KB combined image budget');
+});
+
 // Regression: the clear-search map used 120 independent image requests.
 // Value: protects=all bundled map artworks share one immutable delivery asset;
 // fails_when=atlas loses identity or falls back to per-tile transforms;
