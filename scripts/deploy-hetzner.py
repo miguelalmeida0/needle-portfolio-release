@@ -12,11 +12,11 @@ import tempfile
 import time
 import urllib.request
 
-RELEASE = "b23f5d2fc4575084c7cc5988db21eeb0eb54ef50"
+RELEASE = "ce4b1bb3a005d6e71f146a4446b57d452a55f8a8"
 REPOSITORY = "https://github.com/miguelalmeida0/needle-portfolio-release.git"
 DOMAIN = "needle.miguelalmeida.xyz"
 ASSETS = {
-    "/assets/bootstrap-880A9278.js": "880a9278e09b4009a49130632f7c828229f7200d3a7bcd6d940a732c904dc722",
+    "/assets/bootstrap-1FB9CE23.js": "1fb9ce2389fbf35885ca39447d15139d17ee49a8a314ccac7326d4fb6d5a6daa",
     "/assets/redesign-07B0D620.css": "07b0d62053c44e89a70fd40af90d5e29233b009543e68447b6ba742146770378",
     "/assets/search-relevant-BA61762A.js": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f",
 }
@@ -62,7 +62,7 @@ def verify(base, fetch=None):
             with urllib.request.urlopen(base + path, timeout=15) as response:
                 return response.read()
     html = fetch("/")
-    if b"/assets/bootstrap-880A9278.js" not in html:
+    if b"/assets/bootstrap-1FB9CE23.js" not in html:
         raise RuntimeError("Unexpected HTML release")
     for path, expected in ASSETS.items():
         if hashlib.sha256(fetch(path)).hexdigest() != expected:

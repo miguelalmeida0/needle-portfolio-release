@@ -114,7 +114,7 @@ class DeploymentTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             deployment.verify("unused", lambda path: b"old release")
         with self.assertRaisesRegex(RuntimeError, "checksum"):
-            deployment.verify("unused", lambda path: b"/assets/bootstrap-880A9278.js" if path == "/" else b"corrupt")
+            deployment.verify("unused", lambda path: b"/assets/bootstrap-1FB9CE23.js" if path == "/" else b"corrupt")
 
 
 if __name__ == "__main__":

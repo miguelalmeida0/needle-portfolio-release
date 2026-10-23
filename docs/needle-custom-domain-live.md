@@ -9,13 +9,13 @@ the restored route; that server was still serving bootstrap `9FA4D098` at this
 point. DNS restoration alone did not deploy the latest application.
 
 `scripts/deploy-hetzner.py` deploys pinned application commit
-`b23f5d2fc4575084c7cc5988db21eeb0eb54ef50` to the existing Docker/Caddy host.
+`ce4b1bb3a005d6e71f146a4446b57d452a55f8a8` to the existing Docker/Caddy host.
 It preserves container environment and image cache, checks a candidate before
 switching loopback port 8000, validates release asset hashes through Caddy HTTPS,
 and retains the previous container for rollback. It changes no DNS or Caddy
 configuration. Run it from the existing root SSH session, using an immutable
 download and SHA-256 verification. Deployment is complete only when its checks
-pass and the public site serves bootstrap `880A9278`.
+pass and the public site serves bootstrap `1FB9CE23`.
 
 Local deployment tests: `python3 -m unittest discover -s tests -p 'deploy_hetzner_test.py'`.
 
