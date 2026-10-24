@@ -5,9 +5,18 @@ const origin = process.env.NEEDLE_BROWSER_ORIGIN || 'http://127.0.0.1:4173';
 const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
 let failure = false;
 try {
-  for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-    const page = await browser.newPage({ viewport, reducedMotion: 'reduce' });
-    const label = viewport.width === 390 ? 'mobile' : 'desktop';
+  for (const profile of [
+    { label: 'desktop', width: 1440, height: 900, hasTouch: false },
+    { label: 'mobile-touch', width: 390, height: 844, hasTouch: true },
+    { label: 'narrow-pointer', width: 390, height: 844, hasTouch: false },
+  ]) {
+    const page = await browser.newPage({
+      viewport: { width: profile.width, height: profile.height },
+      isMobile: profile.hasTouch,
+      hasTouch: profile.hasTouch,
+      reducedMotion: 'reduce',
+    });
+    const label = profile.label;
     page.on('pageerror', err => console.error('PAGE ERROR:', err.message));
     try {
       await page.goto(origin, { waitUntil: 'domcontentloaded', timeout: 30000 });
