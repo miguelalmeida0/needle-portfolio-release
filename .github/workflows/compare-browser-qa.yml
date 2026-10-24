@@ -1,0 +1,46 @@
+name: Artwork comparison browser QA
+on:
+  push:
+    branches: [test]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Install pinned browser tester
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start Needle and check readiness
+        run: |
+          npm run dev > /tmp/needle-server.log 2>&1 &
+          echo $! > /tmp/needle-server.pid
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/needle-server.log
+          exit 1
+      - name: Exercise desktop and mobile comparison
+        run: node tests/browser-comparison.mjs
+      - name: Capture browser evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: needle-comparison-browser-failure
+          path: |
+            /tmp/needle-compare-*.png
+            /tmp/needle-server.log
+          if-no-files-found: ignore
