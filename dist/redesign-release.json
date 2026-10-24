@@ -1,8 +1,8 @@
 {
-  "bootstrap": "/assets/bootstrap-D5181917.js",
-  "stylesheet": "/assets/redesign-1170B872.css",
-  "bootstrapSha256": "d518191748d5c42da40946d34e6f4ee3ce163ca6d53752899f2bc04a4fa3be94",
-  "stylesheetSha256": "1170b872ea0360bab9d91203df55432d0f9c81332d90bb69f86a5052e6ac00ff",
+  "bootstrap": "/assets/bootstrap-627F899F.js",
+  "stylesheet": "/assets/redesign-356C7A7B.css",
+  "bootstrapSha256": "627f899f4b5ae4340ad919e5a60f9094ddb645ec23b44d4e7ab646a8a2f87824",
+  "stylesheetSha256": "356c7a7b122a2d9753c184d185c2f46dac023df010c3d2652c8c0e0b34ac4a03",
   "searchWorker": "/assets/search-relevant-BA61762A.js",
   "searchWorkerSha256": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f",
   "preservedBootstrap": "/assets/bootstrap-9FA4D098.js",

@@ -325,6 +325,25 @@ async function identityEffect(state, route, visited = [route.view]) {
   return { calls, restore: effects[2], tree };
 }
 
+// Regression: ISSUE-001 — native dragging must not lift controls or selected text.
+// Found by /qa on 2026-10-24. Browser layout is checked separately.
+test("the shell cancels native drag starts without cancelling pointer or editing events", async () => {
+  const { tree } = await identityEffect(
+    { status: "ready", corpus: { items: [] }, queryFilters: [] },
+    { view: "home", overlay: null },
+  );
+  assert.equal(typeof tree.props.onDragStartCapture, "function");
+  let prevented = 0;
+  for (const tagName of ["INPUT", "BUTTON", "SVG", "IMG", "A"]) {
+    tree.props.onDragStartCapture({ target: { tagName }, preventDefault() { prevented++; } });
+  }
+  assert.equal(prevented, 5);
+  tree.props.onPointerDownCapture({ preventDefault() { throw new Error("Pointer interaction must remain native"); } });
+  assert.equal(tree.props.onTouchMove, undefined, "page scrolling and pinch zoom stay native");
+  assert.equal(tree.props.onSelectStartCapture, undefined, "text selection remains available");
+  assert.equal(tree.props.onDropCapture, undefined, "external image uploads remain available");
+});
+
 test("the shell restores a history artwork after startup, once per route", async () => {
   const state = {
     status: "booting",
