@@ -1,0 +1,60 @@
+/* Needle comparison: selected visual adapted to the existing production presentation. */
+.needle-artwork-frame { position: absolute; top: 0; left: 0; contain: layout paint style; border-radius: 4px; }
+.needle-artwork-frame > .needle-artwork { position: absolute; inset: 0; width: 100%; height: 100%; }
+.needle-artwork-frame.is-comparing > .needle-artwork { outline: 2px solid var(--needle-green); outline-offset: -2px; }
+.needle-artwork-frame > .needle-compare-pick { position: absolute; z-index: 2; right: 10px; top: 10px; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--needle-border); border-radius: 50%; color: var(--needle-ink); background: var(--needle-paper); opacity: 0; cursor: pointer; transition: opacity 160ms, background-color 160ms; }
+.needle-artwork-frame:hover > .needle-compare-pick,
+.needle-artwork-frame:focus-within > .needle-compare-pick,
+.needle-artwork-frame.is-comparing > .needle-compare-pick { opacity: 1; }
+.needle-artwork-frame > .needle-compare-pick:hover,
+.needle-artwork-frame > .needle-compare-pick[aria-pressed='true'] { background: var(--needle-green); color: white; border-color: var(--needle-green); }
+.needle-compare-index { position: absolute; z-index: 2; left: 10px; top: 10px; padding: 8px 10px; color: white; background: var(--needle-green); border-radius: 8px; font: 12px/1.2 var(--sans); pointer-events: none; }
+.needle-compare-tray { position: fixed; z-index: 12; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 18px; border-radius: 12px; color: white; background: var(--needle-green); box-shadow: 0 8px 28px #1e3d2e27; font-size: 13px; white-space: nowrap; }
+.needle-compare-tray button { min-height: 40px; padding: 8px 12px; border-radius: 7px; background: #ffffff17; color: white; font-size: 13px; }
+.needle-compare-layer { position: fixed; z-index: 15; inset: 86px 0 0; display: flex; justify-content: flex-end; pointer-events: none; }
+.needle-compare-scrim { position: absolute; inset: 0; background: #24282126; pointer-events: auto; }
+.needle-compare-panel { position: relative; z-index: 1; width: min(66.8%, 1100px); height: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 28px clamp(26px, 3vw, 52px) 40px; color: var(--needle-ink); background: var(--needle-paper); border-left: 1px solid var(--needle-border); pointer-events: auto; }
+.needle-compare-header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.needle-compare-header > span { color: var(--needle-green); font-size: 11px; line-height: 1.5; letter-spacing: .045em; font-weight: 700; }
+.needle-compare-close { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--needle-border); border-radius: 50%; color: var(--needle-secondary); background: var(--needle-canvas); }
+.needle-compare-close:hover { background: #eaeae0; }
+.needle-compare-panel h2 { margin: 3px 0 4px; font: clamp(29px, 3vw, 47px)/1.13 var(--serif); letter-spacing: -.035em; }
+.needle-compare-subtitle { margin: 0 0 20px; color: var(--needle-secondary); font-size: 14px; }
+.needle-compare-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.needle-compare-work { min-width: 0; margin: 0; }
+.needle-compare-art { height: clamp(210px, 29vw, 420px); overflow: hidden; border-radius: 4px; background: #eeece5; }
+.needle-compare-art img, .needle-compare-art .artwork-image-fallback { display: block; width: 100%; height: 100%; object-fit: contain; }
+.needle-compare-work figcaption { padding-top: 12px; }
+.needle-compare-work__number { margin: 0 0 4px; color: var(--needle-secondary); font-size: 11px; }
+.needle-compare-work h3 { margin: 0 0 4px; font: 19px/1.25 var(--serif); overflow-wrap: anywhere; }
+.needle-compare-work figcaption > p:not(.needle-compare-work__number) { margin: 3px 0 0; color: var(--needle-secondary); font-size: 12px; line-height: 1.45; }
+.needle-compare-work figcaption > .needle-compare-work__medium { margin-top: 9px; }
+.needle-compare-work a { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; color: var(--needle-green); font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.needle-compare-connection { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--needle-border); }
+.needle-compare-connection > div { min-width: 0; max-width: 510px; }
+.needle-compare-eyebrow { margin: 0 0 8px; color: var(--needle-green); font-size: 11px; font-weight: 700; letter-spacing: .035em; }
+.needle-compare-connection > div > p:last-child { margin: 0; font-size: 13px; line-height: 1.55; }
+.needle-compare-save { flex: none; min-width: 150px; min-height: 44px; padding: 12px 16px; color: #fff; background: var(--needle-green); border-radius: 9px; font-size: 13px; font-weight: 600; }
+.needle-compare-save:not(:disabled):hover { background: #2b503b; }
+.needle-compare-save:disabled { opacity: .7; cursor: default; }
+.needle-compare-feedback { margin: 10px 0 0; font-size: 12px; color: var(--needle-green); }
+.needle-compare-feedback:empty { display: none; }
+.needle-compare-unavailable { font-size: 15px; line-height: 1.6; }
+@media (hover: none), (pointer: coarse) { .needle-artwork-frame > .needle-compare-pick { opacity: 1; } }
+@media (max-width: 900px) { .needle-compare-panel { width: min(82%, 900px); } .needle-compare-connection { align-items: stretch; flex-direction: column; gap: 16px; } .needle-compare-save { align-self: flex-start; } }
+@media (max-width: 760px) {
+  .needle-compare-layer { inset-block-start: 142px; }
+  .is-home .needle-compare-layer { inset-block-start: 76px; }
+  .needle-compare-panel { width: 100%; padding: 18px 20px 40px; border-left: 0; }
+  .needle-compare-panel h2 { font-size: clamp(28px, 7vw, 38px); }
+  .needle-compare-pair { gap: 10px; }
+  .needle-compare-art { height: clamp(165px, 54vw, 330px); }
+  .needle-compare-work h3 { font-size: 17px; }
+  .needle-compare-tray { max-width: calc(100vw - 24px); white-space: normal; }
+  .needle-artwork-frame > .needle-compare-pick { top: 6px; right: 6px; width: 34px; height: 34px; }
+}
+@media (max-width: 390px) { .needle-compare-panel { padding-inline: 14px; } .needle-compare-art { height: 155px; } .needle-compare-connection > div > p:last-child { font-size: 12px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .needle-compare-panel { animation: needle-inspector-arrive 240ms cubic-bezier(.22, 1, .36, 1) both; }
+  @keyframes needle-inspector-arrive { from { opacity: .85; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+}
