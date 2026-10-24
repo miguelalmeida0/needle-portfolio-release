@@ -6,7 +6,6 @@ import {
   useState,
 } from "../../dist/modules/apps/web/src/shared/react.js";
 import { ArtworkImage } from "./GalleryImage.jsx";
-import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
 import {
   useAppRuntime,
   useGalleryState,
@@ -224,18 +223,18 @@ export function CollectionWall({ onOpen, onCompareToggle, comparedIds = [], scro
           const selected = state.selectedArtworkId === artwork.id;
           const compareIndex = comparedIds.indexOf(artwork.id);
           return (
-            <div
-              className={"needle-artwork-frame" + (compareIndex >= 0 ? " is-comparing" : "")}
-              key={artwork.id}
-              style={{ width: cardWidth + "px", height: imageHeight + "px", transform: "translate3d(" + (column * (cardWidth + gap)) + "px, " + (row * rowHeight) + "px, 0)" }}
-            >
-              <button
+            <React.Fragment key={artwork.id}>
+            <button
               type="button"
               data-artwork-id={artwork.id}
               data-index={index}
-              className={`needle-artwork${selected ? " is-selected" : ""}${rank ? " is-result" : ""}`}
+              className={`needle-artwork${selected ? " is-selected" : ""}${rank ? " is-result" : ""}${compareIndex >= 0 ? " is-comparing" : ""}`}
               key={artwork.id}
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: `${cardWidth}px`,
+                height: `${imageHeight}px`,
+                transform: `translate3d(${column * (cardWidth + gap)}px, ${row * rowHeight}px, 0)`,
+              }}
               onClick={() => {
                 runtime.selectArtwork(artwork.id);
                 onOpen?.(artwork.id);
@@ -254,14 +253,27 @@ export function CollectionWall({ onOpen, onCompareToggle, comparedIds = [], scro
                 dominantColor={artwork.dominantColor}
               />
             </button>
-              <button type="button" className="needle-compare-pick"
-                aria-label={(compareIndex >= 0 ? "Remove " : "Compare ") + artwork.title + (compareIndex >= 0 ? " from comparison" : " with another artwork")}
-                aria-pressed={compareIndex >= 0}
-                onClick={() => onCompareToggle?.(artwork.id)}>
-                <Icon name={compareIndex >= 0 ? "check" : "compare"} size={17}/>
-              </button>
-              {compareIndex >= 0 && <span className="needle-compare-index">Selected {"0" + (compareIndex + 1)}</span>}
-            </div>
+            <button
+              type="button"
+              className="needle-compare-pick"
+              style={{ transform: "translate3d(" + (column * (cardWidth + gap) + cardWidth - 48) + "px, " + (row * rowHeight + 10) + "px, 0)" }}
+              aria-label={(compareIndex >= 0 ? "Remove " : "Compare ") + artwork.title + (compareIndex >= 0 ? " from comparison" : " with another artwork")}
+              aria-pressed={compareIndex >= 0}
+              onClick={() => onCompareToggle?.(artwork.id)}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                {compareIndex >= 0
+                  ? <path d="m5 12 4 4L19 6"/>
+                  : <><rect x="3" y="5" width="8" height="12" rx="1.5"/><rect x="13" y="7" width="8" height="12" rx="1.5"/></>}
+              </svg>
+            </button>
+            {compareIndex >= 0 && (
+              <span className="needle-compare-index"
+                style={{ transform: "translate3d(" + (column * (cardWidth + gap) + 10) + "px, " + (row * rowHeight + 10) + "px, 0)" }}>
+                Selected {"0" + (compareIndex + 1)}
+              </span>
+            )}
+            </React.Fragment>
           );
         })}
       </div>
