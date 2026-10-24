@@ -67,7 +67,9 @@
   font-weight: 550;
 }
 .needle-actions button:hover, .needle-map-action:hover { background: #eaeae0; border-color: #b7beaf; }
-.needle-search { position: relative; z-index: 6; flex: 1; width: min(520px, 44vw); max-width: 520px; view-transition-name: needle-search; }
+.needle-header-search-slot { flex: 1; min-width: 0; width: min(520px, 44vw); max-width: 520px; }
+.needle-search-host { width: 100%; min-width: 0; }
+.needle-search { position: relative; z-index: 6; width: 100%; max-width: none; view-transition-name: needle-search; }
 .needle-search .search-composer__field { height: 48px; }
 .needle-search .search-composer input {
   height: 48px;
@@ -92,13 +94,11 @@
 .needle-navigation button { display: inline-flex; align-items: center; gap: 8px; min-height: 38px; padding: 5px 0; color: var(--needle-secondary); background: transparent; font-size: 13px; }
 .needle-navigation button:first-child { color: var(--needle-ink); }
 .needle-navigation button:hover { color: var(--needle-green); }
-.needle-home { position: relative; display: grid; flex: 1; min-height: 0; place-items: center; grid-template-columns: minmax(0, 1fr); padding: 30px 24px 100px; overflow: auto; }
+.needle-home { position: relative; display: grid; flex: 1; min-height: 0; place-items: safe center; grid-template-columns: minmax(0, 1fr); padding: 30px 24px 100px; overflow: auto; }
 .needle-home-panel { position: relative; z-index: 2; width: 540px; max-width: 100%; min-width: 0; padding: 26px 30px; background: var(--needle-paper); border: 1px solid var(--needle-border); border-radius: 20px; box-shadow: 0 24px 45px #25271c12; }
 .needle-home-panel h1 { margin: 0 0 16px; font: 38px/1.15 var(--serif); letter-spacing: -1.2px; }
 .needle-home-panel > p { margin: 0 0 24px; color: var(--needle-secondary); font-size: 16px; line-height: 1.5; }
-.needle-home-search-slot { height: 56px; anchor-name: --needle-home-search; }
-/* Measurements are supplied by the shell as the fallback for older browsers. */
-.is-home .needle-search { position: fixed; top: var(--needle-home-search-top, calc(50% - 30px)); left: var(--needle-home-search-left, calc(50% - 240px)); width: var(--needle-home-search-width, 480px); max-width: calc(100vw - 76px); }
+.needle-home-search-slot { min-height: 56px; min-width: 0; }
 .is-home .needle-search .search-composer__field,
 .is-home .needle-search .search-composer input { height: 56px; }
 .is-home .needle-search .search-composer__submit { height: 44px; width: 44px; }
@@ -192,7 +192,7 @@
   .needle-brand { gap: 10px; }
   .needle-actions > span { display: none; }
   .needle-actions button { padding-inline: 11px; }
-  .needle-search { max-width: 460px; }
+  .needle-header-search-slot { max-width: 460px; }
   .needle-navigation { padding-inline: 28px; }
   .needle-results { padding-inline: 28px; }
   .needle-results-summary { grid-template-columns: minmax(0,1fr) 200px; gap: 24px; }
@@ -203,13 +203,12 @@
   .needle-actions { gap: 6px; }
   .needle-actions button { padding-inline: 10px; font-size: 12px; }
   .needle-actions button svg { width: 15px; height: 15px; }
-  .needle-search { order: 3; width: 100%; max-width: none; flex-basis: 100%; }
+  .needle-header-search-slot { order: 3; width: 100%; max-width: none; flex-basis: 100%; }
   .needle-search .search-composer__field, .needle-search .search-composer input { height: 48px; }
   .needle-search .search-composer input { font-size: 16px; }
   .needle-navigation { min-height: 50px; padding: 0 20px 8px; }
   .needle-navigation button { min-height: 42px; }
   .is-home .needle-header { min-height: 76px; }
-  .is-home .needle-search { max-width: calc(100vw - 84px); }
   .needle-home { padding: 30px 20px 80px; }
   .needle-home-panel { padding: 26px 22px; border-radius: 18px; }
   .needle-home-panel h1 { font-size: 31px; line-height: 1.12; letter-spacing: -.8px; max-width: 300px; }

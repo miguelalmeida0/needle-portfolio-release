@@ -89,3 +89,12 @@ test('cached legacy assets retain mobile discovery policy while the new collecti
   assert.match(presentation, /route\.overlay === ["']tools["'] &&\s*\(?\s*<Tools/);
   assert.doesNotMatch(presentation, /<DiscoverySlot|<SearchSidebar/);
 });
+
+test('home search participates in card layout instead of following stale viewport coordinates', async () => {
+  const css = await fs.readFile(new URL('../src/redesign/needle.css', import.meta.url), 'utf8');
+  const app = await fs.readFile(new URL('../src/redesign/NeedleApp.jsx', import.meta.url), 'utf8');
+  assert.doesNotMatch(css, /\.is-home \.needle-search\s*\{[^}]*position:\s*fixed/);
+  assert.doesNotMatch(app, /--needle-home-search-|slot\.current\.getBoundingClientRect/);
+  assert.match(app, /createPortal\(/, 'one stable composer is placed in the actual layout slot');
+  assert.equal((app.match(/<SearchComposer\s*\/>/g)||[]).length, 1, 'never mount duplicate search owners');
+});

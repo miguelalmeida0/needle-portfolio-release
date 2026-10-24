@@ -289,9 +289,11 @@ async function identityEffect(state, route, visited = [route.view]) {
   const effects = [];
   const calls = [];
   const navigation = { current: () => route };
-  const values = [navigation, route, new Set(visited), false];
+  const values = [navigation, route, new Set(visited), false, { remove() {} }];
+  names.push("window");
   const env = Object.fromEntries(names.map((name) => [name, () => undefined]));
   Object.assign(env, {
+    window: { SHAP: { ReactDOM: { createPortal: child => child } } },
     React: {
       createElement: (type, props, ...children) => ({ type, props, children }),
       lazy: () => () => undefined,
@@ -320,7 +322,7 @@ async function identityEffect(state, route, visited = [route.view]) {
     `const {${names.join(",")}} = env;\n${code}\nreturn NeedleApp;`,
   )(env);
   const tree = component();
-  return { calls, restore: effects[1], tree };
+  return { calls, restore: effects[2], tree };
 }
 
 test("the shell restores a history artwork after startup, once per route", async () => {

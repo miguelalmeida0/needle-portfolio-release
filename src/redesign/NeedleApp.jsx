@@ -79,8 +79,14 @@ export function NeedleApp() {
     pages = useRef(null),
     resultsViewport = useRef(null),
     slot = useRef(null),
+    headerSlot = useRef(null),
     search = useRef(null),
     filter = useRef(null);
+  const [searchHost] = useState(() => {
+    const host = document.createElement("div");
+    host.className = "needle-search-host";
+    return host;
+  });
   const composing = useRef(false),
     keyboard = useRef(false),
     returnFocus = useRef(null),
@@ -172,34 +178,22 @@ export function NeedleApp() {
     return () => window.removeEventListener("popstate", pop);
   }, [navigation]);
   useLayoutEffect(() => {
-    if (!home || !slot.current) return;
-    const measure = () => {
-      const rect = slot.current.getBoundingClientRect();
-      for (const [name, value] of Object.entries({
-        top: rect.top,
-        left: rect.left,
-        width: rect.width,
-      }))
-        root.current.style.setProperty(
-          `--needle-home-search-${name}`,
-          `${value}px`,
-        );
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(slot.current);
-    window.addEventListener("resize", measure);
-    window.addEventListener("scroll", measure, true);
-    window.visualViewport?.addEventListener("resize", measure);
-    window.visualViewport?.addEventListener("scroll", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("scroll", measure, true);
-      window.visualViewport?.removeEventListener("resize", measure);
-      window.visualViewport?.removeEventListener("scroll", measure);
-    };
-  }, [home]);
+    const target = home ? slot.current : headerSlot.current;
+    if (!target || searchHost.parentNode === target) return;
+    const active = document.activeElement;
+    const focused = searchHost.contains(active);
+    const selection = focused && typeof active.selectionStart === "number"
+      ? [active.selectionStart, active.selectionEnd, active.selectionDirection] : null;
+    // Keep a single React portal target: moving it must not remount the composer,
+    // reset its draft, or interrupt composition. The browser owns all geometry.
+    if (target.moveBefore && searchHost.isConnected) target.moveBefore(searchHost, null);
+    else target.appendChild(searchHost);
+    if (focused && document.activeElement !== active) {
+      active.focus({ preventScroll: true });
+      if (selection) active.setSelectionRange(...selection);
+    }
+  }, [home, searchHost]);
+  useLayoutEffect(() => () => searchHost.remove(), [searchHost]);
   useLayoutEffect(() => {
     if (route.overlay !== "artwork") {
       inspectedRoute.current = null;
@@ -262,15 +256,7 @@ export function NeedleApp() {
       <a className="needle-skip" href="#needle-main">
         Skip to collection
       </a>
-      <header ref={header} className="needle-header">
-        <button
-          className="needle-brand"
-          aria-label={hasResults ? "Needle — return to results" : "Needle"}
-          onClick={returnToResults}
-        >
-          <LogoMark size={28} />
-          <span>Needle</span>
-        </button>
+      {window.SHAP.ReactDOM.createPortal(
         <div
           ref={search}
           className="needle-search"
@@ -286,7 +272,19 @@ export function NeedleApp() {
           }}
         >
           <SearchComposer />
-        </div>
+        </div>,
+        searchHost,
+      )}
+      <header ref={header} className="needle-header">
+        <button
+          className="needle-brand"
+          aria-label={hasResults ? "Needle — return to results" : "Needle"}
+          onClick={returnToResults}
+        >
+          <LogoMark size={28} />
+          <span>Needle</span>
+        </button>
+        <div ref={headerSlot} className="needle-header-search-slot" hidden={home} />
         <div className="needle-actions">
           <button onClick={() => open("saved")}>
             <Icon name="bookmark" size={17} />
@@ -319,9 +317,8 @@ export function NeedleApp() {
             </button>
           </nav>
         )}
-        {home && (
-          <main className="needle-home">
-            <HomeBackdrop />
+        <main className="needle-home" hidden={!home}>
+            {home && <HomeBackdrop />}
             <section className="needle-home-panel">
               <h1>What would you like to see?</h1>
               <p>
@@ -345,8 +342,7 @@ export function NeedleApp() {
                 </button>
               )}
             </section>
-          </main>
-        )}
+        </main>
         {visited.has("results") && (
           <main ref={resultsViewport} className="needle-results" hidden={route.view !== "results"}>
             <div className="needle-results-summary">
