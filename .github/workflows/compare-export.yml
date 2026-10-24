@@ -2,12 +2,11 @@ name: Candidate comparison export
 on:
   push:
     branches: [test]
-    paths:
-      - .github/workflows/compare-export.yml
 permissions:
   contents: write
 jobs:
   export:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
