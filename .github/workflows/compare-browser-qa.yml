@@ -35,12 +35,15 @@ jobs:
           exit 1
       - name: Exercise desktop and mobile comparison
         run: node tests/browser-comparison.mjs
-      - name: Capture browser evidence on failure
-        if: failure()
+      - name: Inspect responsive layout, controls, focus and map
+        run: node tests/browser-layout.mjs
+      - name: Capture browser screenshots and logs
+        if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: needle-comparison-browser-failure
+          name: needle-comparison-browser-evidence
           path: |
             /tmp/needle-compare-*.png
+            /tmp/needle-layout-*.png
             /tmp/needle-server.log
           if-no-files-found: ignore
