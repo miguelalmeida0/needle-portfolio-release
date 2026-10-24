@@ -37,6 +37,8 @@ import {
 } from "./navigation.mjs";
 import { CollectionWall } from "./CollectionWall.jsx";
 import { CategoryMap } from "./CategoryMap.jsx";
+import { CompareOverlay } from "./CompareOverlay.jsx";
+import { toggleComparison } from "./comparison.mjs";
 import { mapArtworks } from "./map-artworks.mjs";
 import { textResult } from '../search/result-state.mjs';
 import homePreviews from './home-previews.json';
@@ -106,6 +108,8 @@ export function NeedleApp() {
     state.selectedArtworkId, state.scopedCollectionId, state.savedCollections,
   ]);
   const collection = activeCollection(state);
+  const compareIds = route.overlay === "compare" && Array.isArray(route.compareIds)
+    ? route.compareIds : (Array.isArray(state.compareArtworkIds) ? state.compareArtworkIds : []);
   const render = (next, animate = false) => {
     const update = () => {
       setRoute(next);
@@ -147,6 +151,20 @@ export function NeedleApp() {
     if (fromRecommendations) recommendationOrigin.current = artworkId;
     go({ overlay: "artwork", artworkId, fromRecommendations });
   };
+  const toggleCompare = (id) => {
+    if (!artworkById(state, id)) return;
+    const next = toggleComparison(compareIds, id);
+    runtime.store.dispatch({ type: "COMPARE_CHANGED", artworkIds: next });
+    if (next.length === 2) {
+      returnFocus.current = document.activeElement;
+      go({ overlay: "compare", compareIds: next });
+    }
+  };
+  const closeCompare = (event) => {
+    event?.preventDefault?.();
+    runtime.clearCompare();
+    back();
+  };
   const close = (event) => {
     event?.preventDefault();
     back();
@@ -170,10 +188,18 @@ export function NeedleApp() {
   // Capture presentation intent only. The deployed Composer remains the sole
   // owner of IME handling, instant previews and explicit history submission.
   const submitted = () => {
-    if (state.draftQuery.trim()) queueMicrotask(results);
+    if (state.draftQuery.trim()) {
+      runtime.clearCompare();
+      queueMicrotask(results);
+    }
   };
   useEffect(() => {
-    const pop = (event) => render(navigation.restore(event.state));
+    const pop = (event) => {
+      const next = navigation.restore(event.state);
+      if (next.overlay !== "compare" && runtime.store.getSnapshot().compareArtworkIds?.length === 2)
+        runtime.clearCompare();
+      render(next);
+    };
     window.addEventListener("popstate", pop);
     return () => window.removeEventListener("popstate", pop);
   }, [navigation]);
@@ -213,7 +239,7 @@ export function NeedleApp() {
   }, [route, state.corpus, state.status, runtime]);
   useLayoutEffect(() => {
     // Update inert before the following focus restoration effect.
-    const inert = route.overlay === "tools";
+    const inert = route.overlay === "tools" || route.overlay === "compare";
     if (header.current) header.current.inert = inert;
     if (pages.current) pages.current.inert = inert;
     return () => {
@@ -238,6 +264,7 @@ export function NeedleApp() {
       submitted();
   };
   const exampleSearch = (text) => {
+    runtime.clearCompare();
     runtime.setDraft(text);
     void runtime.submitDraft();
     results();
@@ -310,6 +337,7 @@ export function NeedleApp() {
             </button>
             <button
               onClick={() => {
+                runtime.clearCompare();
                 go({ view: "home", overlay: null });
                 requestAnimationFrame(() =>
                   search.current?.querySelector("input")?.select(),
@@ -419,7 +447,8 @@ export function NeedleApp() {
               No catalogue matches for “{state.activeQuery}”.<br />
               <span>Try fewer words or a different subject.</span>
             </p>}
-            <CollectionWall onOpen={openArtwork} scrollRef={resultsViewport} active={route.view === 'results'} />
+            <CollectionWall onOpen={openArtwork} onCompareToggle={toggleCompare}
+              comparedIds={compareIds} scrollRef={resultsViewport} active={route.view === 'results'} />
           </main>
         )}
         {visited.has("map") && (
@@ -464,6 +493,16 @@ export function NeedleApp() {
           </main>
         )}
       </div>
+      {route.view === "results" && !route.overlay && compareIds.length === 1 && (
+        <div className="needle-compare-tray" role="status">
+          <span>1 selected · Choose another artwork to compare</span>
+          <button type="button" onClick={() => runtime.clearCompare()}>Cancel</button>
+        </div>
+      )}
+      {route.overlay === "compare" && (
+        <CompareOverlay ids={route.compareIds} query={state.activeQuery}
+          state={state} onClose={closeCompare} />
+      )}
       {filtersOpen && (
         <QueryFilterMenu
           anchor={filter.current}
