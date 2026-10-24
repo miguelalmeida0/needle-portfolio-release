@@ -49,6 +49,7 @@
   .needle-compare-art { height: clamp(165px, 54vw, 330px); }
   .needle-compare-work h3 { font-size: 17px; }
   .needle-compare-tray { max-width: calc(100vw - 24px); white-space: normal; }
+  .needle-compare-pick { opacity: 1; pointer-events: auto; }
   .needle-compare-pick { width: 34px; height: 34px; }
 }
 @media (max-width: 390px) { .needle-compare-panel { padding-inline: 14px; } .needle-compare-art { height: 155px; } .needle-compare-connection > div > p:last-child { font-size: 12px; } }
