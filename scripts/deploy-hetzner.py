@@ -12,12 +12,12 @@ import tempfile
 import time
 import urllib.request
 
-RELEASE = "8395b9a538411e0703417f26fc2ff1ceb9377c4c"
+RELEASE = "7b2cc444ae20e2a32e6b076ed45a4d26ccb8e458"
 REPOSITORY = "https://github.com/miguelalmeida0/needle-portfolio-release.git"
 DOMAIN = "needle.miguelalmeida.xyz"
 ASSETS = {
-    "/assets/bootstrap-D5181917.js": "d518191748d5c42da40946d34e6f4ee3ce163ca6d53752899f2bc04a4fa3be94",
-    "/assets/redesign-1170B872.css": "1170b872ea0360bab9d91203df55432d0f9c81332d90bb69f86a5052e6ac00ff",
+    "/assets/bootstrap-627F899F.js": "627f899f4b5ae4340ad919e5a60f9094ddb645ec23b44d4e7ab646a8a2f87824",
+    "/assets/redesign-356C7A7B.css": "356c7a7b122a2d9753c184d185c2f46dac023df010c3d2652c8c0e0b34ac4a03",
     "/assets/search-relevant-BA61762A.js": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f"
 }
 
@@ -62,7 +62,7 @@ def verify(base, fetch=None):
             with urllib.request.urlopen(base + path, timeout=15) as response:
                 return response.read()
     html = fetch("/")
-    if b"/assets/bootstrap-D5181917.js" not in html:
+    if b"/assets/bootstrap-627F899F.js" not in html:
         raise RuntimeError("Unexpected HTML release")
     for path, expected in ASSETS.items():
         if hashlib.sha256(fetch(path)).hexdigest() != expected:

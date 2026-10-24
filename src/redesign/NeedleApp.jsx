@@ -246,6 +246,9 @@ export function NeedleApp() {
     <div
       ref={root}
       className={`needle-app is-${route.view}`}
+      // Cancel native drag ghosts, including selected input text and portal content.
+      // Pointer gestures, text selection and external upload drops stay untouched.
+      onDragStartCapture={(event) => event.preventDefault()}
       onKeyDownCapture={() => {
         keyboard.current = true;
       }}

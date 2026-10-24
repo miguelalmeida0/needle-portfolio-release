@@ -17,7 +17,8 @@
   font-family: var(--sans);
 }
 .needle-app [hidden] { display: none !important; }
-.needle-app button { -webkit-tap-highlight-color: transparent; }
+.needle-app, .needle-app * { -webkit-user-drag: none; }
+.needle-app button { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
 .needle-app :focus-visible { outline: 2px solid var(--needle-green); outline-offset: 4px; }
 .needle-app h1[tabindex="-1"]:focus { outline: none; }
 .needle-results-empty { margin: 12px 0 40px; color: var(--needle-ink); font-size: 18px; line-height: 1.6; }
