@@ -62,7 +62,8 @@ def verify(base, fetch=None):
             with urllib.request.urlopen(base + path, timeout=15) as response:
                 return response.read()
     html = fetch("/")
-    if b"/assets/bootstrap-627F899F.js" not in html:
+    expected_bootstrap = next(iter(ASSETS)).encode("ascii")
+    if expected_bootstrap not in html:
         raise RuntimeError("Unexpected HTML release")
     for path, expected in ASSETS.items():
         if hashlib.sha256(fetch(path)).hexdigest() != expected:
