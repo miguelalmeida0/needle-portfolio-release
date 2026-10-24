@@ -12,12 +12,12 @@ import tempfile
 import time
 import urllib.request
 
-RELEASE = "7b2cc444ae20e2a32e6b076ed45a4d26ccb8e458"
+RELEASE = "7c2e1c2d13ca2d22417ad2f8b5ab0c5dbc21ef8c"
 REPOSITORY = "https://github.com/miguelalmeida0/needle-portfolio-release.git"
 DOMAIN = "needle.miguelalmeida.xyz"
 ASSETS = {
-    "/assets/bootstrap-627F899F.js": "627f899f4b5ae4340ad919e5a60f9094ddb645ec23b44d4e7ab646a8a2f87824",
-    "/assets/redesign-356C7A7B.css": "356c7a7b122a2d9753c184d185c2f46dac023df010c3d2652c8c0e0b34ac4a03",
+    "/assets/bootstrap-70AD782D.js": "70ad782d4fe2ffdfac8848f56b0b5706afe284136ed95f9cd922303a1f4bdc7b",
+    "/assets/redesign-5F4798AC.css": "5f4798ace9117df1e433b86a8d9d46d92c62f7ca113b09c776aa30057f080edc",
     "/assets/search-relevant-BA61762A.js": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f"
 }
 
