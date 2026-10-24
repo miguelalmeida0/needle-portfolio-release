@@ -1,4 +1,5 @@
 @import "./category-map.css";
+@import "./needle-compare.css";
 /* Approved Needle presentation. Production tokens and components stay intact. */
 .needle-app {
   --needle-canvas: #f2f0e8;
