@@ -6,6 +6,7 @@ import {
   useState,
 } from "../../dist/modules/apps/web/src/shared/react.js";
 import { ArtworkImage } from "./GalleryImage.jsx";
+import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
 import {
   useAppRuntime,
   useGalleryState,
@@ -21,7 +22,7 @@ const positions = new Map();
 
 // Keep the deployed wall's selection, ordering, windowing and keyboard behavior.
 // Only the image geometry and visible presentation differ from that component.
-export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
+export function CollectionWall({ onOpen, onCompareToggle, comparedIds = [], scrollRef, active = true } = {}) {
   const runtime = useAppRuntime();
   const currentState = useGalleryState();
   const containerRef = useRef(null);
@@ -221,18 +222,20 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
           const row = Math.floor(index / columns);
           const rank = hitRanks.get(artwork.id);
           const selected = state.selectedArtworkId === artwork.id;
+          const compareIndex = comparedIds.indexOf(artwork.id);
           return (
-            <button
+            <div
+              className={"needle-artwork-frame" + (compareIndex >= 0 ? " is-comparing" : "")}
+              key={artwork.id}
+              style={{ width: cardWidth + "px", height: imageHeight + "px", transform: "translate3d(" + (column * (cardWidth + gap)) + "px, " + (row * rowHeight) + "px, 0)" }}
+            >
+              <button
               type="button"
               data-artwork-id={artwork.id}
               data-index={index}
               className={`needle-artwork${selected ? " is-selected" : ""}${rank ? " is-result" : ""}`}
               key={artwork.id}
-              style={{
-                width: `${cardWidth}px`,
-                height: `${imageHeight}px`,
-                transform: `translate3d(${column * (cardWidth + gap)}px, ${row * rowHeight}px, 0)`,
-              }}
+              style={{ width: "100%", height: "100%" }}
               onClick={() => {
                 runtime.selectArtwork(artwork.id);
                 onOpen?.(artwork.id);
@@ -251,6 +254,14 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
                 dominantColor={artwork.dominantColor}
               />
             </button>
+              <button type="button" className="needle-compare-pick"
+                aria-label={(compareIndex >= 0 ? "Remove " : "Compare ") + artwork.title + (compareIndex >= 0 ? " from comparison" : " with another artwork")}
+                aria-pressed={compareIndex >= 0}
+                onClick={() => onCompareToggle?.(artwork.id)}>
+                <Icon name={compareIndex >= 0 ? "check" : "compare"} size={17}/>
+              </button>
+              {compareIndex >= 0 && <span className="needle-compare-index">Selected {"0" + (compareIndex + 1)}</span>}
+            </div>
           );
         })}
       </div>
