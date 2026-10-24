@@ -21,7 +21,7 @@ const positions = new Map();
 
 // Keep the deployed wall's selection, ordering, windowing and keyboard behavior.
 // Only the image geometry and visible presentation differ from that component.
-export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
+export function CollectionWall({ onOpen, onCompareToggle, comparedIds = [], scrollRef, active = true } = {}) {
   const runtime = useAppRuntime();
   const currentState = useGalleryState();
   const containerRef = useRef(null);
@@ -221,12 +221,14 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
           const row = Math.floor(index / columns);
           const rank = hitRanks.get(artwork.id);
           const selected = state.selectedArtworkId === artwork.id;
+          const compareIndex = comparedIds.indexOf(artwork.id);
           return (
+            <React.Fragment key={artwork.id}>
             <button
               type="button"
               data-artwork-id={artwork.id}
               data-index={index}
-              className={`needle-artwork${selected ? " is-selected" : ""}${rank ? " is-result" : ""}`}
+              className={`needle-artwork${selected ? " is-selected" : ""}${rank ? " is-result" : ""}${compareIndex >= 0 ? " is-comparing" : ""}`}
               key={artwork.id}
               style={{
                 width: `${cardWidth}px`,
@@ -251,6 +253,27 @@ export function CollectionWall({ onOpen, scrollRef, active = true } = {}) {
                 dominantColor={artwork.dominantColor}
               />
             </button>
+            <button
+              type="button"
+              className="needle-compare-pick"
+              style={{ transform: "translate3d(" + (column * (cardWidth + gap) + cardWidth - 48) + "px, " + (row * rowHeight + 10) + "px, 0)" }}
+              aria-label={(compareIndex >= 0 ? "Remove " : "Compare ") + artwork.title + (compareIndex >= 0 ? " from comparison" : " with another artwork")}
+              aria-pressed={compareIndex >= 0}
+              onClick={() => onCompareToggle?.(artwork.id)}
+            >
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+                {compareIndex >= 0
+                  ? <path d="m5 12 4 4L19 6"/>
+                  : <><rect x="3" y="5" width="8" height="12" rx="1.5"/><rect x="13" y="7" width="8" height="12" rx="1.5"/></>}
+              </svg>
+            </button>
+            {compareIndex >= 0 && (
+              <span className="needle-compare-index"
+                style={{ transform: "translate3d(" + (column * (cardWidth + gap) + 10) + "px, " + (row * rowHeight + 10) + "px, 0)" }}>
+                Selected {"0" + (compareIndex + 1)}
+              </span>
+            )}
+            </React.Fragment>
           );
         })}
       </div>
