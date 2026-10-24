@@ -1,14 +1,12 @@
-/* Needle comparison: selected visual adapted to the existing production presentation. */
-.needle-artwork-frame { position: absolute; top: 0; left: 0; contain: layout paint style; border-radius: 4px; }
-.needle-artwork-frame > .needle-artwork { position: absolute; inset: 0; width: 100%; height: 100%; }
-.needle-artwork-frame.is-comparing > .needle-artwork { outline: 2px solid var(--needle-green); outline-offset: -2px; }
-.needle-artwork-frame > .needle-compare-pick { position: absolute; z-index: 2; right: 10px; top: 10px; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--needle-border); border-radius: 50%; color: var(--needle-ink); background: var(--needle-paper); opacity: 0; cursor: pointer; transition: opacity 160ms, background-color 160ms; }
-.needle-artwork-frame:hover > .needle-compare-pick,
-.needle-artwork-frame:focus-within > .needle-compare-pick,
-.needle-artwork-frame.is-comparing > .needle-compare-pick { opacity: 1; }
-.needle-artwork-frame > .needle-compare-pick:hover,
-.needle-artwork-frame > .needle-compare-pick[aria-pressed='true'] { background: var(--needle-green); color: white; border-color: var(--needle-green); }
-.needle-compare-index { position: absolute; z-index: 2; left: 10px; top: 10px; padding: 8px 10px; color: white; background: var(--needle-green); border-radius: 8px; font: 12px/1.2 var(--sans); pointer-events: none; }
+/* Screenshot-selected Needle comparison; production wall tile geometry preserved. */
+.needle-artwork.is-comparing { outline: 2px solid var(--needle-green); outline-offset: -2px; }
+.needle-compare-pick { position: absolute; z-index: 3; left: 0; top: 0; display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--needle-border); border-radius: 50%; color: var(--needle-ink); background: var(--needle-paper); opacity: 0; pointer-events: none; cursor: pointer; transition: opacity 160ms, background-color 160ms; }
+.needle-artwork:hover + .needle-compare-pick,
+.needle-artwork:focus-visible + .needle-compare-pick,
+.needle-compare-pick:hover, .needle-compare-pick:focus-visible,
+.needle-compare-pick[aria-pressed='true'] { opacity: 1; pointer-events: auto; }
+.needle-compare-pick:hover, .needle-compare-pick[aria-pressed='true'] { background: var(--needle-green); color: white; border-color: var(--needle-green); }
+.needle-compare-index { position: absolute; z-index: 2; left: 0; top: 0; padding: 8px 10px; color: white; background: var(--needle-green); border-radius: 8px; font: 12px/1.2 var(--sans); pointer-events: none; }
 .needle-compare-tray { position: fixed; z-index: 12; left: 50%; bottom: max(20px, env(safe-area-inset-bottom)); transform: translateX(-50%); display: flex; align-items: center; gap: 14px; padding: 8px 10px 8px 18px; border-radius: 12px; color: white; background: var(--needle-green); box-shadow: 0 8px 28px #1e3d2e27; font-size: 13px; white-space: nowrap; }
 .needle-compare-tray button { min-height: 40px; padding: 8px 12px; border-radius: 7px; background: #ffffff17; color: white; font-size: 13px; }
 .needle-compare-layer { position: fixed; z-index: 15; inset: 86px 0 0; display: flex; justify-content: flex-end; pointer-events: none; }
@@ -40,7 +38,7 @@
 .needle-compare-feedback { margin: 10px 0 0; font-size: 12px; color: var(--needle-green); }
 .needle-compare-feedback:empty { display: none; }
 .needle-compare-unavailable { font-size: 15px; line-height: 1.6; }
-@media (hover: none), (pointer: coarse) { .needle-artwork-frame > .needle-compare-pick { opacity: 1; } }
+@media (hover: none), (pointer: coarse) { .needle-compare-pick { opacity: 1; pointer-events: auto; } }
 @media (max-width: 900px) { .needle-compare-panel { width: min(82%, 900px); } .needle-compare-connection { align-items: stretch; flex-direction: column; gap: 16px; } .needle-compare-save { align-self: flex-start; } }
 @media (max-width: 760px) {
   .needle-compare-layer { inset-block-start: 142px; }
@@ -51,7 +49,7 @@
   .needle-compare-art { height: clamp(165px, 54vw, 330px); }
   .needle-compare-work h3 { font-size: 17px; }
   .needle-compare-tray { max-width: calc(100vw - 24px); white-space: normal; }
-  .needle-artwork-frame > .needle-compare-pick { top: 6px; right: 6px; width: 34px; height: 34px; }
+  .needle-compare-pick { width: 34px; height: 34px; }
 }
 @media (max-width: 390px) { .needle-compare-panel { padding-inline: 14px; } .needle-compare-art { height: 155px; } .needle-compare-connection > div > p:last-child { font-size: 12px; } }
 @media (prefers-reduced-motion: no-preference) {
