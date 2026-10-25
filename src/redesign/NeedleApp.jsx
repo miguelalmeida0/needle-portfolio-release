@@ -384,15 +384,33 @@ export function NeedleApp() {
                 </h1>
                 <div className="needle-result-actions">
                   <button
+                    type="button"
+                    className="needle-filter-trigger"
                     ref={filter}
                     onClick={() => setFiltersOpen((value) => !value)}
                     aria-expanded={filtersOpen}
                   >
-                    <Icon name="filter" size={15} />
-                    Filters
-                    {state.queryFilters.length
-                      ? ` · ${state.queryFilters.length}`
-                      : ""}
+                    <svg
+                      className="needle-filter-icon"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.75"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 6h5m4 0h5M3 14h9m4 0h1" />
+                      <circle cx="10" cy="6" r="2" />
+                      <circle cx="14" cy="14" r="2" />
+                    </svg>
+                    <span className="needle-filter-label">
+                      Filters{state.queryFilters.length
+                        ? ` · ${state.queryFilters.length}`
+                        : ""}
+                    </span>
                   </button>
                   {state.queryFilters.map((item) => (
                     <button
