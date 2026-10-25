@@ -1,0 +1,31 @@
+name: Candidate filter export
+on:
+  push:
+    branches: [test]
+    paths:
+      - .github/workflows/filter-export.yml
+permissions:
+  contents: write
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run build:design
+      - run: npm run verify
+      - name: Commit tested immutable browser assets
+        run: |
+          git add -A dist/assets dist/index.html dist/redesign-release.json src/redesign/home-previews.json src/redesign/preview-atlas.json data-packs
+          if ! git diff --cached --quiet; then
+            git -c user.name='Miguel Almeida' -c user.email='94702822+miguelalmeida0@users.noreply.github.com' commit -m 'build: verified filter-control assets [skip ci]'
+            git push origin HEAD:test
+          fi
