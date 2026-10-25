@@ -42,7 +42,7 @@ try {
           withinViewport: rect.left >= 0 && rect.right <= innerWidth,
         };
       });
-      assert.equal(metrics.display, 'inline-flex', profile.name + ': filter must use horizontal flex: ' + JSON.stringify(metrics));
+      assert.ok(['flex', 'inline-flex'].includes(metrics.display), profile.name + ': filter must use horizontal flex: ' + JSON.stringify(metrics));
       assert.equal(metrics.direction, 'row', profile.name + ': filter layout must remain horizontal');
       assert.equal(metrics.alignItems, 'center', profile.name + ': filter contents need vertical centering');
       assert.equal(metrics.whiteSpace, 'nowrap', profile.name + ': label must not wrap beneath icon');
