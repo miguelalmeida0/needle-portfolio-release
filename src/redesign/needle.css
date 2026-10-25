@@ -119,6 +119,46 @@
 .needle-result-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .needle-result-actions button { min-height: 38px; padding: 8px 13px; border: 1px solid var(--needle-border); border-radius: 999px; color: var(--needle-ink); background: var(--needle-paper); font-size: 13px; }
 .needle-result-actions button[aria-pressed=true] { color: #fff; background: var(--needle-green); border-color: var(--needle-green); }
+
+/* Filter is a compact inline tool, not a stacked tile. The remaining
+   result-action chips keep their existing presentation and behavior. */
+.needle-result-actions > .needle-filter-trigger {
+  display: inline-flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: auto;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px 0 12px;
+  color: var(--needle-ink);
+  background: var(--needle-paper);
+  border: 1px solid var(--needle-border);
+  border-radius: 10px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  box-shadow: none;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.needle-filter-icon { display: block; width: 16px; height: 16px; flex: none; }
+.needle-filter-label { display: inline-block; white-space: nowrap; }
+.needle-result-actions > .needle-filter-trigger:hover {
+  background: #ebece4;
+  border-color: #bac2b4;
+}
+.needle-result-actions > .needle-filter-trigger[aria-expanded="true"] {
+  color: var(--needle-green);
+  background: #e6ede4;
+  border-color: #b0c0ae;
+}
+.needle-result-actions > .needle-filter-trigger:active { background: #dfe8dd; }
+
 .needle-map-preview { display: grid; gap: 8px; }
 .needle-minimap { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; align-items: center; justify-items: center; width: 100%; height: 132px; padding: 14px; overflow: hidden; background: var(--needle-paper); border: 1px solid var(--needle-border); border-radius: 12px; cursor: pointer; }
 .needle-minimap img { width: 20px; height: 28px; object-fit: cover; border-radius: 2px; }
@@ -227,6 +267,12 @@
   .needle-map-action { min-height: 44px; padding: 9px 12px; font-size: 12px; }
   .needle-result-actions { gap: 6px; margin-top: 10px; }
   .needle-result-actions button { min-height: 38px; padding-inline: 10px; font-size: 12px; }
+  .needle-result-actions > .needle-filter-trigger {
+    height: 44px;
+    min-height: 44px;
+    padding-inline: 12px 14px;
+    font-size: 13px;
+  }
   .needle-dialog { width: calc(100vw - 24px); max-height: calc(100dvh - 32px); padding: 20px; border-radius: 16px; }
   .needle-dialog-heading { margin-bottom: 18px; gap: 12px; }
   .needle-dialog-heading h2 { font-size: 26px; }
