@@ -26,6 +26,12 @@ try {
       await search.fill('dogs');
       await search.press('Enter');
       await page.locator('#needle-results-title').waitFor({ state: 'visible', timeout: 30000 });
+      await page.waitForFunction(
+        () => document.querySelector('#needle-results-title')?.textContent?.trim().toLowerCase() === 'dogs',
+        null,
+        { timeout: 30000 },
+      );
+      await page.locator('.needle-artwork[data-artwork-id]').first().waitFor({ state: 'visible', timeout: 30000 });
 
       const filter = page.locator('.needle-results:not([hidden]) .needle-result-actions > button').first();
       await filter.waitFor({ state: 'visible', timeout: 15000 });
@@ -54,6 +60,7 @@ try {
         profile.name + ': icon and label vertically misaligned: ' + JSON.stringify(metrics));
       assert.ok(metrics.withinViewport, profile.name + ': filter button beyond viewport');
       await page.screenshot({ path: '/tmp/needle-filter-' + profile.name + '.png' });
+      await filter.screenshot({ path: '/tmp/needle-filter-' + profile.name + '-control.png' });
       await filter.click({ timeout: 7000 });
       assert.equal(await filter.getAttribute('aria-expanded'), 'true', profile.name + ': open state is not announced');
       await page.locator('.query-filter-menu[role="dialog"]').waitFor({ state: 'visible', timeout: 7000 });
