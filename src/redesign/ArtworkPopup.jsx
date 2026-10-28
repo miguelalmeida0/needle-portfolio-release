@@ -56,8 +56,9 @@ function Navigation({ onDiscover, onCompare, onSaved, compareCount, active }) {
     notice && h("p", { ref: compareNotice, className: "nd-nav-note", role: "status" }, "Select two artworks with the compare button on each image.")
   );
 }
-function ArtworkPopup({ artwork: a, runtime, state, onOpen, onCompare, resultIds = [] }) {
+function ArtworkPopup({ artwork: a, runtime, state, onOpen, onCompare, onOpenCollection, resultIds = [] }) {
   const [phase, setPhase] = useState("artwork"), [busy, setBusy] = useState(false), [error, setError] = useState(""), [data, setData] = useState(null), [image, setImage] = useState(null), [crop, setCrop] = useState({ x: 0.275, y: 0.275, width: 0.45, height: 0.45 }), [matches, setMatches] = useState([]), [visible, setVisible] = useState(12), [collection, setCollection] = useState(""), [notice, setNotice] = useState(""), [sourceIndex, setSourceIndex] = useState(0), [saving, setSaving] = useState(false);
+  const [savedDestination, setSavedDestination] = useState(null);
   const operation = useRef(0), stage = useRef(null), drag = useRef(null), cropButton = useRef(null), searchButton = useRef(null), resultsHeading = useRef(null), artworkHeading = useRef(null), mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
@@ -139,11 +140,15 @@ function ArtworkPopup({ artwork: a, runtime, state, onOpen, onCompare, resultIds
     if (saving) return;
     setSaving(true);
     setNotice("");
+    setSavedDestination(null);
     try {
       const id = collection || state.savedCollections[0]?.id;
       if (id) await runtime.addArtworkToCollection(id, a.id);
       else await runtime.createCollectionFromArtwork(a.id);
-      if (mounted.current) setNotice("Artwork saved.");
+      const updated = runtime.store.getSnapshot().savedCollections;
+      const destination = id ? updated.find(item => item.id === id) : updated[0];
+      if (!destination?.artworkIds.includes(a.id)) throw Error("Save failed");
+      if (mounted.current) { setNotice("Artwork saved."); setSavedDestination(destination.id); }
     } catch (error2) {
       if (mounted.current) setNotice("The artwork could not be saved. Try again.");
     } finally {
@@ -194,7 +199,7 @@ function ArtworkPopup({ artwork: a, runtime, state, onOpen, onCompare, resultIds
         onCompare(a.id);
       }, { className: "nd-button" + (comparison.selected ? " nd-selected" : ""), "aria-pressed": comparison.selected })),
       state.savedCollections.length > 0 && h("div", { className: "nd-collection-label" }, h("span", null, "Save to"), h(Select, { value: collection || state.savedCollections[0].id, onChange: setCollection, label: "Save to collection", options: state.savedCollections.map((c) => ({ value: c.id, label: c.name })) })),
-      h("p", { role: "status", className: "nd-fine" }, notice),
+      h("div", { className: "nd-save-feedback" }, h("p", { role: "status", className: "nd-fine" }, notice), savedDestination && onOpenCollection && button("View collection", () => onOpenCollection(savedDestination), {className:"nd-inline-action"})),
       h("dl", null, [["Medium", a.medium], ["Culture", a.culture], ["Credit", a.creditLine]].filter(([, v]) => v).map(([label, value]) => h("div", { key: label }, h("dt", null, label), h("dd", null, value)))),
       h("a", { href: a.objectUrl, target: "_blank", rel: "noopener noreferrer", className: "nd-source" }, "View the museum record \u2197")
     )

@@ -41,6 +41,8 @@ jobs:
         run: node tests/browser-filter-control.mjs
       - name: Check popup, custom dropdown, detail search and outside dismissal
         run: node tests/browser-enhancements.mjs
+      - name: Check saved collection search and navigation
+        run: node tests/browser-collections.mjs
       - name: Capture browser screenshots and logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
@@ -51,5 +53,6 @@ jobs:
             /tmp/needle-layout-*.png
             /tmp/needle-filter-*.png
             /tmp/needle-enhancements-*.png
+            /tmp/needle-collections-*.png
             /tmp/needle-server.log
           if-no-files-found: ignore

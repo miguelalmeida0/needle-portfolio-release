@@ -1,8 +1,8 @@
 {
-  "bootstrap": "/assets/bootstrap-87AC312F.js",
-  "stylesheet": "/assets/redesign-3BEFE723.css",
-  "bootstrapSha256": "87ac312fcff1ee3087c03685400d997a39d06fd47be2ff13745aa5ef2e7f3bd0",
-  "stylesheetSha256": "3befe7237ad89569a419411b48510405664cd8fab59f417fe5b698b1e4f71e9d",
+  "bootstrap": "/assets/bootstrap-6C9FF544.js",
+  "stylesheet": "/assets/redesign-3201AD3B.css",
+  "bootstrapSha256": "6c9ff5448f0eac50166f84940fe44de2ba0cccc143d9abb511e5367764892646",
+  "stylesheetSha256": "3201ad3b807f673c82db65dd9f24dfbb970888c9bc09081217d1204c98933c43",
   "searchWorker": "/assets/search-relevant-BA61762A.js",
   "searchWorkerSha256": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f",
   "preservedBootstrap": "/assets/bootstrap-9FA4D098.js",

@@ -10,7 +10,7 @@ import {
 
 const read = (path) => readFile(new URL("../" + path, import.meta.url), "utf8");
 const source = (
-  await read("dist/modules/apps/web/src/features/search/SearchComposer.js")
+  await read("src/redesign/SearchComposer.jsx")
 )
   .replace(/^import .*;\n/gm, "")
   .replace("export function SearchComposer", "function SearchComposer");
@@ -173,13 +173,13 @@ test("empty and disabled search controls do not request presentation changes", (
   );
 });
 
-test("the presentation wrapper consumes the tested boundary while retaining the deployed Composer", async () => {
+test("the presentation wrapper consumes the tested boundary while retaining the tested Composer", async () => {
   const app = await read("src/redesign/NeedleApp.jsx");
   assert.match(
     app,
     /isSearchSubmission\(event, state\.draftQuery, composing\.current\)/,
   );
-  assert.match(app, /<SearchComposer\s*\/>/);
+  assert.match(app, /<SearchComposer\b[^>]*\/>/);
   assert.match(app, /onClickCapture=\{explicitCapture\}/);
   assert.match(app, /onKeyDownCapture=\{explicitCapture\}/);
 });
@@ -425,4 +425,39 @@ test("opening search retains a results destination after a reloaded map", async 
     ),
     false,
   );
+});
+
+test('opening a collection clears input even when the prior query was typed during startup',()=>{
+ const state={draftQuery:'',corpus:null,status:'booting',indexBuildProgress:{total:0}};
+ let value='',effect,dependencies,refIndex=0;const refs=[];
+ const component=compileComposer(
+  {createElement:(type,props,...children)=>({type,props,children})},
+  ()=>[value,next=>{value=next;}],(fn,deps)=>{effect=(!dependencies||deps.some((value,index)=>value!==dependencies[index]))?fn:()=>{};dependencies=deps;},
+  initial=>refs[refIndex++]??(refs[refIndex-1]={current:initial}),()=>{},()=>{},
+  ()=>({setDraft:next=>{state.draftQuery=next;},submitDraft:()=>{}}),()=>state);
+ const render=()=>{refIndex=0;const nodes=[];const visit=n=>{if(n?.children){nodes.push(n);n.children.flat(Infinity).forEach(visit);}};visit(component());return nodes;};
+ const input=render().find(n=>n.type==='input');effect();
+ input.props.onInput({currentTarget:{value:'cat'}});render();effect();assert.equal(value,'cat');
+ // The runtime preserves the typed query while boot completes. The next change is collection reset.
+ state.corpus={};state.status='ready';render();effect();
+ state.draftQuery='';render();effect();
+ assert.equal(value,'','A startup edit must not suppress an explicit collection reset');
+});
+
+test('corpus readiness preserves an unfinished startup composition',()=>{
+ const state={draftQuery:'',corpus:null,status:'booting',indexBuildProgress:{total:0}};
+ let value='',effect,dependencies,refIndex=0;const refs=[];
+ const component=compileComposer(
+  {createElement:(type,props,...children)=>({type,props,children})},
+  ()=>[value,next=>{value=next;}],(fn,deps)=>{effect=(!dependencies||deps.some((value,index)=>value!==dependencies[index]))?fn:()=>{};dependencies=deps;},
+  initial=>refs[refIndex++]??(refs[refIndex-1]={current:initial}),()=>{},()=>{},
+  ()=>({setDraft:next=>{state.draftQuery=next;},submitDraft:()=>{}}),()=>state);
+ const render=()=>{refIndex=0;const nodes=[];const visit=n=>{if(n?.children){nodes.push(n);n.children.flat(Infinity).forEach(visit);}};visit(component());return nodes;};
+ const input=render().find(n=>n.type==='input');effect();
+ input.props.onCompositionStart();input.props.onInput({currentTarget:{value:'猫'}});render();effect();
+ state.corpus={};state.status='searching';state.draftQuery='default startup query';render();effect();
+ assert.equal(value,'猫','Boot readiness must not overwrite ongoing composition');
+ state.draftQuery='猫';render();effect();
+ input.props.onCompositionEnd({currentTarget:{value:'猫'}});
+ assert.equal(value,'猫');
 });

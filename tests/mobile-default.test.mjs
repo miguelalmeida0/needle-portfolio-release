@@ -96,5 +96,5 @@ test('home search participates in card layout instead of following stale viewpor
   assert.doesNotMatch(css, /\.is-home \.needle-search\s*\{[^}]*position:\s*fixed/);
   assert.doesNotMatch(app, /--needle-home-search-|slot\.current\.getBoundingClientRect/);
   assert.match(app, /createPortal\(/, 'one stable composer is placed in the actual layout slot');
-  assert.equal((app.match(/<SearchComposer\s*\/>/g)||[]).length, 1, 'never mount duplicate search owners');
+  assert.equal((app.match(/<SearchComposer\b[^>]*\/>/g)||[]).length, 1, 'never mount duplicate search owners');
 });
