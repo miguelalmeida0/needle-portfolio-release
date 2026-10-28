@@ -12,7 +12,7 @@ import tempfile
 import time
 import urllib.request
 
-RELEASE = "3c64e53cdc5f238b806523b770cf96edf785ef1b"
+RELEASE = "b7819ec6e201cd539edd327b788bf1f810eaeafd"
 REPOSITORY = "https://github.com/miguelalmeida0/needle-portfolio-release.git"
 DOMAIN = "needle.miguelalmeida.xyz"
 ASSETS = {
