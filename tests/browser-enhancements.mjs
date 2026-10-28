@@ -12,7 +12,7 @@ try {
     const page=await browser.newPage({viewport:{width:profile.width,height:profile.height},hasTouch:profile.hasTouch,isMobile:profile.hasTouch,reducedMotion:profile.reducedMotion});
     const errors=[];page.on('pageerror',e=>errors.push(e.message));
     // Isolated test storage: exercise the real collection picker at its maximum persisted length.
-    await page.addInitScript(()=>localStorage.setItem('needle.saved-collections.v1',JSON.stringify(Array.from({length:16},(_,i)=>({id:'qa-'+i,name:'Collection '+String(i+1).padStart(2,'0'),artworkIds:['met-12538'],createdAt:1})))));
+    await page.addInitScript(()=>!localStorage.getItem('needle.saved-collections.v1') && localStorage.setItem('needle.saved-collections.v1',JSON.stringify(Array.from({length:16},(_,i)=>({id:'qa-'+i,name:'Collection '+String(i+1).padStart(2,'0'),artworkIds:['met-12538'],createdAt:1})))));
     try {
       await page.goto(origin,{waitUntil:'domcontentloaded'});
       const input=page.getByRole('textbox',{name:'Describe something difficult to find'});
@@ -94,6 +94,10 @@ try {
       assert.equal(await page.locator('.needle-compare-pick[aria-pressed="true"]').count(),0);
       assert.deepEqual(errors,[]);
       console.log('ENHANCEMENTS PASS',profile.name,'automatic search, popup, picker, save, detail retry/results, compare backdrop');
+    } catch(error) {
+      await page.screenshot({path:'/tmp/needle-enhancements-'+profile.name+'-failure.png'}).catch(()=>{});
+      console.error('ENHANCEMENTS FAIL',profile.name,error);
+      throw error;
     } finally {await page.close();}
   }
 } finally {await browser.close();}
