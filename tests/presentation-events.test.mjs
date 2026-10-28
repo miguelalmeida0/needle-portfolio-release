@@ -437,7 +437,7 @@ test('opening a collection clears input even when the prior query was typed duri
   ()=>({setDraft:next=>{state.draftQuery=next;},submitDraft:()=>{}}),()=>state);
  const render=()=>{refIndex=0;const nodes=[];const visit=n=>{if(n?.children){nodes.push(n);n.children.flat(Infinity).forEach(visit);}};visit(component());return nodes;};
  const input=render().find(n=>n.type==='input');effect();
- input.props.onInput({currentTarget:{value:'cat'}});assert.equal(value,'cat');
+ input.props.onInput({currentTarget:{value:'cat'}});render();effect();assert.equal(value,'cat');
  // The runtime preserves the typed query while boot completes. The next change is collection reset.
  state.corpus={};state.status='ready';render();effect();
  state.draftQuery='';render();effect();
