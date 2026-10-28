@@ -10,7 +10,7 @@ import {
 
 const read = (path) => readFile(new URL("../" + path, import.meta.url), "utf8");
 const source = (
-  await read("dist/modules/apps/web/src/features/search/SearchComposer.js")
+  await read("src/redesign/SearchComposer.jsx")
 )
   .replace(/^import .*;\n/gm, "")
   .replace("export function SearchComposer", "function SearchComposer");
@@ -173,13 +173,13 @@ test("empty and disabled search controls do not request presentation changes", (
   );
 });
 
-test("the presentation wrapper consumes the tested boundary while retaining the deployed Composer", async () => {
+test("the presentation wrapper consumes the tested boundary while retaining the tested Composer", async () => {
   const app = await read("src/redesign/NeedleApp.jsx");
   assert.match(
     app,
     /isSearchSubmission\(event, state\.draftQuery, composing\.current\)/,
   );
-  assert.match(app, /<SearchComposer\s*\/>/);
+  assert.match(app, /<SearchComposer\b[^>]*\/>/);
   assert.match(app, /onClickCapture=\{explicitCapture\}/);
   assert.match(app, /onKeyDownCapture=\{explicitCapture\}/);
 });

@@ -1,3 +1,4 @@
+import { browseCollection } from "./collection-navigation.mjs";
 import { ArtworkPopup, Navigation } from "./ArtworkPopup.jsx";
 import { dismissOverlay } from "./ui-controls.jsx";
 import {
@@ -21,11 +22,11 @@ import { discoveryItems } from "../../dist/modules/apps/web/src/app/discovery.se
 import { LogoMark } from "../../dist/modules/apps/web/src/shared/ui/LogoMark.js";
 import { Icon } from "../../dist/modules/apps/web/src/shared/icons.js";
 import { ArtworkImage } from "./GalleryImage.jsx";
-import { SearchComposer } from "../../dist/modules/apps/web/src/features/search/SearchComposer.js";
+import { SearchComposer } from "./SearchComposer.jsx";
 import { QueryCanvas } from "../../dist/modules/apps/web/src/features/query/QueryCanvas.js";
 import { QueryFilterMenu } from "../../dist/modules/apps/web/src/features/query/QueryFilterMenu.js";
 import { RecentQueries } from "../../dist/modules/apps/web/src/features/history/RecentQueries.js";
-import { SavedCollections } from "../../dist/modules/apps/web/src/features/collections/SavedCollections.js";
+import { SavedCollections } from "./SavedCollections.jsx";
 import { AccuracyControl } from "../../dist/modules/apps/web/src/features/tuning/AccuracyControl.js";
 import { TruthLens } from "../../dist/modules/apps/web/src/features/truth/TruthLens.js";
 import { MapToolbar } from "../../dist/modules/apps/web/src/features/topbar/MapToolbar.js";
@@ -168,6 +169,14 @@ export function NeedleApp() {
     dismissOverlay(back, event);
   };
   const results = () => go({ view: "results", overlay: null });
+  const openCollection = (id) => {
+    if (!browseCollection(runtime, id)) return;
+    setFiltersOpen(false);
+    returnFocus.current = null;
+    go({view:"results",overlay:null}, Boolean(route.overlay));
+    requestAnimationFrame(() => document.getElementById("needle-results-title")?.focus({preventScroll:true}));
+  };
+  const discover = () => collection ? openCollection(null) : results();
   const returnToResults = () => {
     if (!hasResults) {
       search.current?.querySelector("input")?.focus();
@@ -301,7 +310,7 @@ export function NeedleApp() {
             composing.current = false;
           }}
         >
-          <SearchComposer />
+          <SearchComposer collectionName={collection?.name} />
         </div>,
         searchHost,
       )}
@@ -316,7 +325,7 @@ export function NeedleApp() {
         </button>
         <div ref={headerSlot} className="needle-header-search-slot" hidden={home} />
         <div className="needle-actions">
-          {!home && <Navigation onDiscover={() => go({view:"results",overlay:null})} onCompare={() => go({overlay:"compare",compareIds})} onSaved={() => open("saved")} compareCount={compareIds.length} active={route.overlay || "discover"} />}
+          {!home && <Navigation onDiscover={discover} onCompare={() => go({overlay:"compare",compareIds})} onSaved={() => open("saved")} compareCount={compareIds.length} active={route.overlay || (collection ? "saved" : "discover")} />}
           {home && <button onClick={() => open("saved")}>
             <Icon name="bookmark" size={17} />
             <span>Saved</span>
@@ -338,7 +347,7 @@ export function NeedleApp() {
             </button>
             <button
               onClick={() => {
-                runtime.clearCompare();
+                browseCollection(runtime, null);
                 go({ view: "home", overlay: null });
                 requestAnimationFrame(() =>
                   search.current?.querySelector("input")?.select(),
@@ -379,14 +388,16 @@ export function NeedleApp() {
           <main ref={resultsViewport} className="needle-results" hidden={route.view !== "results"}>
             <div className="needle-results-summary">
               <div>
-                <p>{collection?.name || "From The Met collection"}</p>
+                <p>{collection ? `Saved collection · ${collection.artworkIds.length} ${collection.artworkIds.length === 1 ? "artwork" : "artworks"}` : "From The Met collection"}</p>
                 <h1 id="needle-results-title" tabIndex={-1}>
-                  {state.activeQuery || "The collection"}
+                  {collection?.name || state.activeQuery || "The collection"}
                 </h1>
                 <div className="needle-result-actions">
                   <button
                     type="button"
                     className="needle-filter-trigger"
+                    disabled={!state.queryVector}
+                    title={!state.queryVector ? "Enter a search to filter results" : undefined}
                     ref={filter}
                     onClick={() => setFiltersOpen((value) => !value)}
                     aria-expanded={filtersOpen}
@@ -419,18 +430,18 @@ export function NeedleApp() {
                       onClick={() => void runtime.removeFilter(item.id)}
                       aria-label={`Remove ${item.label}`}
                     >
-                      {item.label}
+                      <span>{item.label}</span>
                       <Icon name="close" size={13} />
                     </button>
                   ))}
                   {state.activeClusterId && (
                     <button onClick={() => runtime.setClusterFilter(null)}>
-                      All categories <Icon name="close" size={13} />
+                      <span>All categories</span><Icon name="close" size={13} />
                     </button>
                   )}
                   {state.scopedCollectionId && (
-                    <button onClick={() => void runtime.scopeCollection(null)}>
-                      Entire collection <Icon name="close" size={13} />
+                    <button type="button" className="needle-scope-exit" onClick={() => openCollection(null)}>
+                      <span>Browse all artworks</span><Icon name="arrow-right" size={13} />
                     </button>
                   )}
                 </div>
@@ -462,9 +473,14 @@ export function NeedleApp() {
                 </button>
               </div>}
             </div>
+            {collection && (state.activeQuery || state.queryFilters.length>0 || state.activeClusterId) &&
+              <div className="needle-collection-search-status">
+                <span>{state.status === "searching" ? "Searching…" : `${hits.length} ${hits.length === 1 ? "match" : "matches"}`}{state.activeQuery ? ` for “${state.activeQuery}”` : " with these filters"}</span>
+                <button type="button" onClick={() => openCollection(collection.id)}>Show all saved artworks</button>
+              </div>}
             {noMatches && <p className="needle-results-empty" role="status">
-              No catalogue matches for “{state.activeQuery}”.<br />
-              <span>Try fewer words or a different subject.</span>
+              {collection ? `No saved artworks match “${state.activeQuery}”.` : `No catalogue matches for “${state.activeQuery}”.`}<br />
+              <span>{collection ? "Your saved artworks are still in this collection." : "Try fewer words or a different subject."}</span>
             </p>}
             <CollectionWall onOpen={openArtwork} onCompareToggle={toggleCompare}
               comparedIds={compareIds} scrollRef={resultsViewport} active={route.view === 'results'} />
@@ -533,16 +549,7 @@ export function NeedleApp() {
         label="Saved collections"
         onClose={close}
       >
-        <div
-          onClick={(event) => {
-            if (event.target.closest(".saved-collections__list button"))
-              queueMicrotask(() =>
-                go({ view: "results", overlay: null }, true),
-              );
-          }}
-        >
-          <SavedCollections />
-        </div>
+        <SavedCollections onOpenCollection={openCollection} />
       </NativeDialog>
       <NativeDialog
         open={route.overlay === "artwork"}
@@ -553,7 +560,7 @@ export function NeedleApp() {
         <ArtworkPopup key={route.artworkId}
           artwork={artworkById(state,route.artworkId)} runtime={runtime} state={state}
           onOpen={id => { runtime.selectArtwork(id); go({overlay:"artwork",artworkId:id},true); }}
-          onCompare={toggleCompare} resultIds={hits.map(hit => hit.artwork?.id || hit.id).filter(Boolean)} />
+          onCompare={toggleCompare} onOpenCollection={openCollection} resultIds={hits.map(hit => hit.artwork?.id || hit.id).filter(Boolean)} />
       </NativeDialog>
       {route.overlay === "tools" && (
         <Tools
