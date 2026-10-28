@@ -9,7 +9,7 @@ export function SearchComposer({ collectionName } = {}) {
     const editingDuringBoot = useRef(false);
     const composing = useRef(false);
     useEffect(() => {
-        if (!editingDuringBoot.current)
+        if (state.corpus || !editingDuringBoot.current)
             setDraft(state.draftQuery);
         if (state.corpus)
             editingDuringBoot.current = false;

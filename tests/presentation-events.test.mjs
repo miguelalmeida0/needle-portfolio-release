@@ -426,3 +426,19 @@ test("opening search retains a results destination after a reloaded map", async 
     false,
   );
 });
+
+test('opening a collection clears input even when the prior query was typed during startup',()=>{
+ const state={draftQuery:'',corpus:null,status:'booting',indexBuildProgress:{total:0}};
+ let value='',effect,refIndex=0;const refs=[];
+ const component=compileComposer(
+  {createElement:(type,props,...children)=>({type,props,children})},
+  ()=>[value,next=>{value=next;}],fn=>{effect=fn;},
+  initial=>refs[refIndex++]??(refs[refIndex-1]={current:initial}),()=>{},()=>{},
+  ()=>({setDraft:next=>{state.draftQuery=next;},submitDraft:()=>{}}),()=>state);
+ const render=()=>{refIndex=0;const nodes=[];const visit=n=>{if(n?.children){nodes.push(n);n.children.flat(Infinity).forEach(visit);}};visit(component());return nodes;};
+ const input=render().find(n=>n.type==='input');effect();
+ input.props.onInput({currentTarget:{value:'cat'}});assert.equal(value,'cat');
+ // The runtime preserves the typed query while boot completes. The next change is collection reset.
+ state.corpus={};state.status='ready';state.draftQuery='';render();effect();
+ assert.equal(value,'','A startup edit must not suppress an explicit collection reset');
+});
