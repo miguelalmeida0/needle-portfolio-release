@@ -5,7 +5,7 @@ try {
  for(const width of [1440,390,320]) {
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:'reduce',hasTouch:width===390});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.addInitScript(()=>{if(!localStorage.getItem('needle.saved-collections.v1'))localStorage.setItem('needle.saved-collections.v1',JSON.stringify(Array.from({length:5},(_,i)=>({id:'saved-'+i,name:'Saved '+(i+1),artworkIds:['met-12538'],createdAt:1}))));});
+  await page.addInitScript(()=>{if(!localStorage.getItem('needle.saved-collections.v1'))localStorage.setItem('needle.saved-collections.v1',JSON.stringify(Array.from({length:5},(_,i)=>({id:'saved-'+i,name:'Saved '+(i+1),artworkIds:['met-199528'],createdAt:1}))));});
   try {
    await page.goto(process.env.NEEDLE_BROWSER_ORIGIN||'http://127.0.0.1:4173');
    const input=page.locator('.needle-search input');
