@@ -30,3 +30,9 @@ jobs:
       - run: npm run security:history
       - run: npm audit --omit=dev
       - run: npm run prepare:previews
+      - name: Build and smoke-test production container
+        run: |
+          docker build --tag needle-release-qa .
+          docker run --detach --rm --name needle-release-qa --publish 127.0.0.1:4180:8000 needle-release-qa
+          trap 'docker stop needle-release-qa' EXIT
+          node scripts/smoke-container.mjs

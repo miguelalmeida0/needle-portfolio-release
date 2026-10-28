@@ -8,3 +8,6 @@ dist/data/corpus.json
 *.key
 *.p12
 *.pfx
+
+__pycache__/
+*.pyc

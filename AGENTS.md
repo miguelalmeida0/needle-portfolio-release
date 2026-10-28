@@ -13,3 +13,9 @@ These instructions apply to coding agents, local automation, and repository main
 - For locally authored changes, set both Git author and committer to `Miguel Almeida <94702822+miguelalmeida0@users.noreply.github.com>`. Do not add automated-agent co-author trailers.
 - Preserve real contributor provenance when it differs from this single-owner assumption; stop for review rather than silently misattributing another human's work.
 <!-- END: owner-branch-policy -->
+
+## Critical UI rules
+
+- Never use native/default select dropdowns. Reuse the custom Select in `src/redesign/ui-controls.jsx`; support outside-click, Escape, Tab, keyboard navigation, and typeahead.
+- Preserve Needle's font families and original homepage. Keep controls compact, chevrons close to labels, and transitions subtle with reduced-motion support.
+- Popups must close on outside click, including the header area outside Compare.

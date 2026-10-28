@@ -60,8 +60,8 @@ for (const [name, state] of Object.entries(states)) {
     const legacy = renderLegacy(state, { width: 900, height: 1e7, scrollTop: 0 });
     const orderedIds = legacy.cards.map(card => card.props['data-artwork-id']);
     assert.deepEqual(orderedIds.slice(0, fixture.walls[name].mountedIds.length), fixture.walls[name].mountedIds);
-    for (const [width, columns] of [[390, 2], [768, 3], [1024, 4], [1440, 5]]) {
-      const gap = width < 620 ? 10 : 18;
+    for (const [width, columns] of [[390, 2], [768, 4], [1024, 5], [1200, 6], [1440, 7]]) {
+      const gap = width < 620 ? 10 : 16;
       const rowHeight = (width - gap * (columns - 1)) / columns * 1.25 + gap;
       for (const scrollTop of [0, Math.max(0, (Math.ceil(orderedIds.length / columns) - 2) * rowHeight)]) {
         const { tree, cards } = renderDesign(state, { width, height: 680, scrollTop });
@@ -102,7 +102,7 @@ test('wall keyboard traversal follows the responsive columns and leaves collecti
   const originalFrame = globalThis.requestAnimationFrame;
   try {
     globalThis.requestAnimationFrame = callback => { callback(); return 0; };
-    for (const [width, columns] of [[390, 2], [768, 3], [1024, 4], [1440, 5]]) {
+    for (const [width, columns] of [[390, 2], [768, 4], [1024, 5], [1200, 6], [1440, 7]]) {
       const { tree } = renderDesign(states.all, { width, height: 680, scrollTop: 0 });
       const focused = [];
       tree.props.ref.current = { scrollTop: 0, querySelector: selector => ({ focus: options => focused.push([selector, options]) }) };

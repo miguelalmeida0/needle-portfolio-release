@@ -76,3 +76,9 @@ Application code: [MIT](LICENSE). Dataset and artwork attribution: [third-party 
 Older hashed JS/CSS generations remain available for existing tabs and cached entrypoints. Retire them only after a measured compatibility window; do not delete immutable public URLs during housekeeping.
 
 [Cleanup and preservation record](docs/CLEANUP_2026-10-09.md)
+
+### Artwork details and compact controls
+
+Click any gallery or map artwork to open its details, save it to a collection, compare it, or search a selected region. Detail search ranks color and texture across 262 locally indexed Met artworks; it does not identify objects or search all 10,000 records visually. Museum images outside the bundled subset use the existing same-origin image service for canvas access, with bounded loading and a retryable error when unavailable.
+
+`src/redesign/ArtworkPopup.jsx`, `ui-controls.jsx`, and `detail-core.mjs` are authorable source. Run `npm run build:design` after edits; commit the new hashed assets and release manifest. Native select dropdowns are prohibited; use the shared keyboard-accessible custom Select. `tests/browser-enhancements.mjs` covers detail-search retry/results, collection persistence, custom controls, and Compare outside dismissal in desktop and narrow/touch profiles.
