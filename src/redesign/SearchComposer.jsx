@@ -9,11 +9,11 @@ export function SearchComposer({ collectionName } = {}) {
     const editingDuringBoot = useRef(false);
     const composing = useRef(false);
     useEffect(() => {
-        if (state.corpus || !editingDuringBoot.current)
+        if (!editingDuringBoot.current)
             setDraft(state.draftQuery);
         if (state.corpus)
             editingDuringBoot.current = false;
-    }, [state.draftQuery]);
+    }, [state.draftQuery, state.corpus]);
     const busy = state.status === 'searching' || state.status === 'truth-checking' || state.status === 'probing';
     const submit = () => {
         runtime.setDraft(draft);
