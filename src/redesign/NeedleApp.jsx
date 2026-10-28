@@ -1,3 +1,5 @@
+import { ArtworkPopup, Navigation } from "./ArtworkPopup.jsx";
+import { dismissOverlay } from "./ui-controls.jsx";
 import {
   React,
   useEffect,
@@ -24,7 +26,6 @@ import { QueryCanvas } from "../../dist/modules/apps/web/src/features/query/Quer
 import { QueryFilterMenu } from "../../dist/modules/apps/web/src/features/query/QueryFilterMenu.js";
 import { RecentQueries } from "../../dist/modules/apps/web/src/features/history/RecentQueries.js";
 import { SavedCollections } from "../../dist/modules/apps/web/src/features/collections/SavedCollections.js";
-import { InspectorPanel } from "../../dist/modules/apps/web/src/features/inspector/InspectorPanel.js";
 import { AccuracyControl } from "../../dist/modules/apps/web/src/features/tuning/AccuracyControl.js";
 import { TruthLens } from "../../dist/modules/apps/web/src/features/truth/TruthLens.js";
 import { MapToolbar } from "../../dist/modules/apps/web/src/features/topbar/MapToolbar.js";
@@ -134,7 +135,7 @@ export function NeedleApp() {
     );
   const back = () => {
     const fallback = navigation.back();
-    if (fallback) render(fallback);
+    if (fallback) render(fallback, fallback.view !== route.view);
   };
   const open = (overlay) => {
     returnFocus.current = document.activeElement;
@@ -161,13 +162,10 @@ export function NeedleApp() {
     }
   };
   const closeCompare = (event) => {
-    event?.preventDefault?.();
-    runtime.clearCompare();
-    back();
+    dismissOverlay(() => { runtime.clearCompare(); back(); }, event);
   };
   const close = (event) => {
-    event?.preventDefault();
-    back();
+    dismissOverlay(back, event);
   };
   const results = () => go({ view: "results", overlay: null });
   const returnToResults = () => {
@@ -278,9 +276,11 @@ export function NeedleApp() {
       onDragStartCapture={(event) => event.preventDefault()}
       onKeyDownCapture={() => {
         keyboard.current = true;
+        document.documentElement.dataset.ndInput = "keyboard";
       }}
       onPointerDownCapture={() => {
         keyboard.current = false;
+        document.documentElement.dataset.ndInput = "pointer";
       }}
     >
       <a className="needle-skip" href="#needle-main">
@@ -316,10 +316,11 @@ export function NeedleApp() {
         </button>
         <div ref={headerSlot} className="needle-header-search-slot" hidden={home} />
         <div className="needle-actions">
-          <button onClick={() => open("saved")}>
+          {!home && <Navigation onDiscover={() => go({view:"results",overlay:null})} onCompare={() => go({overlay:"compare",compareIds})} onSaved={() => open("saved")} compareCount={compareIds.length} active={route.overlay || "discover"} />}
+          {home && <button onClick={() => open("saved")}>
             <Icon name="bookmark" size={17} />
             <span>Saved</span>
-          </button>
+          </button>}
           {!home && (
             <button onClick={() => open("tools")} aria-label="Search tools">
               <Icon name="settings" size={17} />
@@ -544,21 +545,15 @@ export function NeedleApp() {
         </div>
       </NativeDialog>
       <NativeDialog
-        open={route.overlay === "artwork" && !state.detailSearchArtworkId}
+        open={route.overlay === "artwork"}
         label="Artwork details"
         className="needle-art-dialog"
         onClose={close}
       >
-        <InspectorPanel
-          discoveryReturn={
-            route.fromRecommendations &&
-            state.selectedArtworkId === route.artworkId ? (
-              <button className="discovery-return" onClick={back}>
-                Back to recommendations
-              </button>
-            ) : null
-          }
-        />
+        <ArtworkPopup key={route.artworkId}
+          artwork={artworkById(state,route.artworkId)} runtime={runtime} state={state}
+          onOpen={id => { runtime.selectArtwork(id); go({overlay:"artwork",artworkId:id},true); }}
+          onCompare={toggleCompare} resultIds={hits.map(hit => hit.artwork?.id || hit.id).filter(Boolean)} />
       </NativeDialog>
       {route.overlay === "tools" && (
         <Tools

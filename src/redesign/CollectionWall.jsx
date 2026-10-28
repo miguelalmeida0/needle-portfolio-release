@@ -129,15 +129,8 @@ export function CollectionWall({ onOpen, onCompareToggle, comparedIds = [], scro
     };
   }, [positionKey]);
 
-  const columns =
-    viewport.width >= 1200
-      ? 5
-      : viewport.width >= 980
-        ? 4
-        : viewport.width >= 620
-          ? 3
-          : 2;
-  const gap = viewport.width < 620 ? 10 : 18;
+  const columns = viewport.width >= 1440 ? 7 : viewport.width >= 1120 ? 6 : viewport.width >= 880 ? 5 : viewport.width >= 620 ? 4 : 2;
+  const gap = viewport.width < 620 ? 10 : 16;
   const cardWidth = Math.max(
     1,
     (viewport.width - gap * (columns - 1)) / columns,

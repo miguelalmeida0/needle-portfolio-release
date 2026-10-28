@@ -67,8 +67,8 @@ test('production build routes inspector and comparison images through the galler
   const options = { entryPoints: ['src/redesign/bootstrap.jsx'], bundle: true, write: false, format: 'esm', metafile: true,
     define: { __NEEDLE_SEARCH_WORKER_URL__: '"/assets/search.worker-TI6JI4PU.js"' }, plugins: [redesignImages] };
   const { metafile } = await build(options);
-  for (const panel of ['inspector/InspectorPanel', 'compare/ComparePanel']) {
-    const input = metafile.inputs[`dist/modules/apps/web/src/features/${panel}.js`];
+  for (const panel of ['src/redesign/ArtworkPopup.jsx', 'src/redesign/CompareOverlay.jsx']) {
+    const input = metafile.inputs[panel];
     assert.ok(input.imports.some(item => item.path === 'src/redesign/GalleryImage.jsx'), panel + ' shares the wall image URL');
   }
   const gallery = metafile.inputs['src/redesign/GalleryImage.jsx'];

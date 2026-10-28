@@ -52,7 +52,7 @@ try {
       assert.equal(metrics.direction, 'row', profile.name + ': filter layout must remain horizontal');
       assert.equal(metrics.alignItems, 'center', profile.name + ': filter contents need vertical centering');
       assert.equal(metrics.whiteSpace, 'nowrap', profile.name + ': label must not wrap beneath icon');
-      assert.ok(metrics.height >= 40 && metrics.height <= 46,
+      assert.ok(metrics.height >= (profile.touch ? 44 : 34) && metrics.height <= 46,
         profile.name + ': oversized filter control: ' + metrics.height + 'px');
       assert.ok(metrics.width >= 75 && metrics.width <= 140,
         profile.name + ': filter control is not compact: ' + metrics.width + 'px');

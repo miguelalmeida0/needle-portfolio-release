@@ -290,10 +290,11 @@ async function identityEffect(state, route, visited = [route.view]) {
   const calls = [];
   const navigation = { current: () => route };
   const values = [navigation, route, new Set(visited), false, { remove() {} }];
-  names.push("window");
+  names.push("window", "document");
   const env = Object.fromEntries(names.map((name) => [name, () => undefined]));
   Object.assign(env, {
     window: { SHAP: { ReactDOM: { createPortal: child => child } } },
+    document: { documentElement: { dataset: {} } },
     React: {
       createElement: (type, props, ...children) => ({ type, props, children }),
       lazy: () => () => undefined,
