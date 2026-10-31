@@ -9,22 +9,9 @@ Needle combines a prepared HNSW graph with field-weighted museum metadata and a 
 The useful unit is a visible artwork, not a search timing alone. Index loading, rendering and image delivery have separate budgets and failure modes.
 
 
-## Architecture at a glance
+## Architecture
 
-The chart below summarizes the main source and runtime boundaries documented in this repository; it is a static architecture overview, not an executable dependency trace.
-
-```mermaid
-flowchart LR
-  Browser["Browser gallery + search UI"] --> Worker["Search worker"]
-  Worker --> Corpus["Frozen 10K metadata corpus"]
-  Worker --> Graph["Prepared HNSW graph / checksum guard"]
-  Worker --> Index["Lexical + field-weighted retrieval"]
-  Browser --> Images["Responsive artwork previews"]
-  Images --> Server["Node image delivery"]
-  Server --> Local["120 opening images / active pack"]
-  Server --> Cache["Bounded derivative disk cache"]
-  Server --> Met["Allowlisted Met image host"]
-```
+<p align="center"><img src="./docs/readme/architecture-overview.svg" alt="needle-portfolio-release architecture overview" width="600"></p>
 
 ## Run locally
 
