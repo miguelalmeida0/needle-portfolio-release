@@ -1,34 +1,37 @@
 # Needle
 
-Visual search across 10,000 artworks from The Metropolitan Museum of Art.
+**Explore 10,000 artworks from The Metropolitan Museum of Art.**
 
-[Open Needle](https://needle.miguelalmeida.xyz) · [Documentation](docs/README.md) · [Architecture](docs/architecture.md) · [Operations](docs/operations.md) · [Security](SECURITY.md)
+[Open Needle](https://needle.miguelalmeida.xyz) · [Architecture](docs/architecture.md) · [Operations](docs/operations.md)
 
-Needle combines a prepared HNSW graph with field-weighted museum metadata and a lexical index. Retrieval runs in a browser worker. A Node server delivers the frozen corpus, application modules and size-specific artwork previews.
+Needle combines field-weighted museum metadata, lexical retrieval and a prepared HNSW graph to search a frozen artwork collection. Search runs in a browser worker; the Node server delivers the corpus, application and artwork images.
 
-The useful unit is a visible artwork, not a search timing alone. Index loading, rendering and image delivery have separate budgets and failure modes.
+## Explore the collection
 
+Search and filter works, open their details, save items to a collection and compare artworks. The gallery and spatial view render bounded sets of images instead of mounting all 10,000 records.
 
-## Architecture at a glance
+The main search is **metadata-based**. A separate image-detail feature compares color and texture across **262 locally indexed artworks**; it is not visual recognition across the full corpus.
 
-The chart below summarizes the main source and runtime boundaries documented in this repository; it is a static architecture overview, not an executable dependency trace.
+## Engineering
 
-```mermaid
-flowchart LR
-  Browser["Browser gallery + search UI"] --> Worker["Search worker"]
-  Worker --> Corpus["Frozen 10K metadata corpus"]
-  Worker --> Graph["Prepared HNSW graph / checksum guard"]
-  Worker --> Index["Lexical + field-weighted retrieval"]
-  Browser --> Images["Responsive artwork previews"]
-  Images --> Server["Node image delivery"]
-  Server --> Local["120 opening images / active pack"]
-  Server --> Cache["Bounded derivative disk cache"]
-  Server --> Met["Allowlisted Met image host"]
-```
+- **Search integrity:** The worker checks corpus identity against the prepared graph and rejects stale search results.
+- **Image delivery:** The server produces bounded AVIF/WebP/JPEG derivatives, caches them and falls back when museum images are unavailable. The first 120 opening previews are bundled.
+- **Reproducible release:** `dist/` and `data-packs/` are part of the deployable package. They must not be discarded as disposable generated files. Editable presentation code lives in `src/redesign/`.
+
+## Architecture
+
+<p align="center">
+  <picture>
+    <source media="(max-width: 640px)" srcset="./docs/readme/architecture-mobile.svg">
+    <img src="./docs/readme/architecture-overview.svg" alt="Needle system map: collection browser, local search worker and bounded artwork image delivery." width="920">
+  </picture>
+</p>
+
+[Search and caching details](docs/architecture.md)
 
 ## Run locally
 
-Use Node 26 (see `.node-version`).
+Requires Node.js 26:
 
 ```sh
 npm ci
@@ -37,66 +40,12 @@ npm run prepare:previews
 npm start
 ```
 
-Open `http://localhost:4173`. If the port is occupied, the server tries the next available port and prints the address. Preview preparation uses the 120 bundled opening images; it does not require a museum request.
+Open the address printed by the server (normally `http://localhost:4173`). The bundled previews do not require a live museum request. [Docker and deployment instructions](docs/operations.md) are available separately.
 
-## Container
+## Boundaries
 
-```sh
-docker build -t needle .
-docker run --rm -p 8000:8000 needle
-```
+Opening images are local; other artwork images depend on The Met's availability. Experimental neural retrieval is not enabled on public hosts. The repository is an exported release package, not the original frontend development workspace; see the [documentation index](docs/README.md).
 
-Open `http://localhost:8000`. The image runs as the unprivileged `node` user and prepares opening previews during its build. No API key or `.env` file is required.
+[MIT license](LICENSE) · [Artwork and dataset notices](THIRD_PARTY_NOTICES.md) · [Security](SECURITY.md)
 
-## Repository layout
-
-| Path | Responsibility |
-| --- | --- |
-| `dist/` | Exported browser application, worker modules and prepared graph |
-| `data-packs/` | Frozen 10K corpus, active-pack pointer, manifest and 120 opening images |
-| `src/redesign/` | Approved presentation over the preserved production runtime and image components |
-| `scripts/build-redesign.mjs` | Reproducible immutable browser export and active asset manifest |
-| `scripts/serve.mjs` | Static/data-pack routing, HTTP validation and compression |
-| `scripts/image-delivery.mjs` | Bounded derivative generation and disk cache |
-| `prepare-previews.mjs` | Build-time AVIF preparation using the runtime image pipeline |
-| `tests/` | Release integrity, request boundaries and image-cache behavior |
-
-**Do not remove `dist/` or `data-packs/` as generic generated folders.** This is the deployable release package, exported from application revision `de4c6c46a4503d369a98f9f0a5aab0f5fce5e2f6`. It is not the original frontend development workspace. Browser changes require a new validated application export; server and documentation changes can be made here.
-
-The approved presentation is authored in `src/redesign/`. After editing it, run `npm run build:design` and `npm run verify`. The latter verifies that source reproduces the active immutable assets and that the frozen search, corpus and bundled images remain unchanged. `dist/redesign-release.json` records both the active export and preserved prior assets.
-
-## Verification
-
-```sh
-npm run verify
-npm run security:history
-npm audit --omit=dev
-```
-
-`verify` checks tracked files for recognizable credential patterns and forbidden secret files, validates corpus/manifest/graph identity, and runs the runtime tests. `security:history` also inspects every reachable Git blob. Pattern scanning cannot prove the absence of every possible secret; suspected credentials must be revoked, not merely removed from a later commit.
-
-## Scope and limitations
-
-- The published retrieval representation is metadata-based. Experimental neural retrieval is not enabled on public hosts.
-- Opening previews are local. Other artwork images depend on museum availability and may show an explicit fallback.
-- A prepared graph removes graph construction from the compatible startup path. The corpus must still transfer, parse and be encoded.
-- Runtime derivatives are cached in the container filesystem. They need an explicit persistent mount to survive container replacement.
-- This package does not include the original before/after performance reports. It does not certify historical speedup claims or internet latency.
-
-## License
-
-Application code: [MIT](LICENSE). Dataset and artwork attribution: [third-party notices](THIRD_PARTY_NOTICES.md).
-
-## Release assembly
-
-`data-packs/` owns the canonical corpus. `npm ci` recreates `dist/data/corpus.json` byte-for-byte; `npm run assemble:release` does the same before a static export. The Docker build, integrity verification and npm start also assemble it. Ship the assembled `dist/` directory for static hosting. The 10,000 records, static fallback URL, graph and live browser assets are unchanged.
-
-Older hashed JS/CSS generations remain available for existing tabs and cached entrypoints. Retire them only after a measured compatibility window; do not delete immutable public URLs during housekeeping.
-
-[Cleanup and preservation record](docs/CLEANUP_2026-10-09.md)
-
-### Artwork details and compact controls
-
-Click any gallery or map artwork to open its details, save it to a collection, compare it, or search a selected region. Detail search ranks color and texture across 262 locally indexed Met artworks; it does not identify objects or search all 10,000 records visually. Museum images outside the bundled subset use the existing same-origin image service for canvas access, with bounded loading and a retryable error when unavailable.
-
-`src/redesign/ArtworkPopup.jsx`, `ui-controls.jsx`, and `detail-core.mjs` are authorable source. Run `npm run build:design` after edits; commit the new hashed assets and release manifest. Native select dropdowns are prohibited; use the shared keyboard-accessible custom Select. `tests/browser-enhancements.mjs` covers detail-search retry/results, collection persistence, custom controls, and Compare outside dismissal in desktop and narrow/touch profiles.
+Built by [Miguel Almeida](https://github.com/miguelalmeida0).
