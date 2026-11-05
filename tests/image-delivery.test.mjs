@@ -11,6 +11,74 @@ test('remote sources reject credentials, redirects to other hosts and arbitrary 
   for (const source of ['http://images.metmuseum.org/CRDImages/ep/web-large/example.jpg', 'https://images.metmuseum.org.evil.test/CRDImages/ep/web-large/example.jpg', 'https://user:pass@images.metmuseum.org/CRDImages/ep/web-large/example.jpg', 'https://images.metmuseum.org:444/CRDImages/ep/web-large/example.jpg', 'https://images.metmuseum.org/CRDImages/ep/web-large/example.jpg?q=1', 'https://images.metmuseum.org/private', 'http://127.0.0.1/admin']) assert.equal(remoteImageSource(source), false);
 });
 
+test('remote URL fragments cannot multiply identical source cache entries', () => {
+  assert.equal(remoteImageSource('https://images.metmuseum.org/CRDImages/ep/web-large/example.jpg#cache-buster'), false);
+  assert.equal(remoteImageSource('https://images.metmuseum.org/CRDImages/ep/web-large/example.jpg#'), false);
+});
+
+test('local aliases share one canonical cache entry and exhausted work budgets still serve it', async t => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'needle-images-budget-'));
+  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  const source = path.join(dir, 'source.jpg');
+  await sharp({ create: { width: 400, height: 240, channels: 3, background: '#183c31' } }).jpeg().toFile(source);
+  let remaining = 1;
+  const delivery = createImageDelivery({ cacheRoot: path.join(dir, 'cache'), resolveLocal: async () => source,
+    budget: { reserveTransform() { if (remaining-- <= 0) throw Object.assign(new Error('Budget exhausted'), { statusCode: 429 }); } }
+  });
+  const url = new URL('http://localhost/_image?src=/packs/test/images/1.jpg&w=160&format=webp');
+  const first = await delivery(url);
+  const alias = new URL(url); alias.searchParams.set('src', '/packs/test/images/%31.jpg');
+  assert.equal((await delivery(alias)).etag, first.etag, 'The resolved local file, not a caller spelling, identifies cached work');
+  const cold = new URL(url); cold.searchParams.set('w', '320');
+  await assert.rejects(delivery(cold), error => error.statusCode === 429);
+  assert.equal((await delivery(url)).etag, first.etag, 'Quota exhaustion does not remove cached images');
+});
+
+test('cold HEAD lookups and disabled remote transforms do not start remote work', async () => {
+  const delivery = createImageDelivery({ cacheRoot: '/nonexistent-needle-cache', resolveLocal: async () => null, remoteEnabled: false });
+  const url = new URL('http://localhost/_image?src=https://images.metmuseum.org/CRDImages/ep/web-large/example.jpg&w=160&format=webp');
+  assert.equal(await delivery(url, { create: false }), null);
+  await assert.rejects(delivery(url), error => error.statusCode === 503);
+});
+
+test('equivalent museum URL encodings share downloaded bytes and derivative identity', async t => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'needle-remote-alias-'));
+  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  const bytes = await sharp({ create: { width: 200, height: 120, channels: 3, background: '#183c31' } }).png().toBuffer();
+  const requests = [];
+  const delivery = createImageDelivery({ cacheRoot: dir, resolveLocal: async () => null, fetchRemote: async (url, options) => {
+    requests.push(url); assert.equal(options.redirect, 'error'); assert.ok(options.signal instanceof AbortSignal);
+    return new Response(bytes, { headers: { 'content-type': 'image/png' } });
+  } });
+  const url = new URL('http://localhost/_image?src=https://images.metmuseum.org/CRDImages/ep/web-large/example.jpg&w=160&format=webp');
+  const first = await delivery(url);
+  const alias = new URL(url); alias.searchParams.set('src', 'https://IMAGES.METMUSEUM.ORG/CRDImages/ep/web-large/%65xample.jpg');
+  assert.equal((await delivery(alias)).etag, first.etag);
+  assert.equal(requests.length, 1);
+  const duplicate = new URL(url); duplicate.searchParams.append('w', '320');
+  assert.equal(await delivery(duplicate), null);
+});
+
+test('three active image jobs bound source work and queued requests expire', async t => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'needle-image-queue-'));
+  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  const bytes = await sharp({ create: { width: 200, height: 120, channels: 3, background: '#183c31' } }).png().toBuffer();
+  const releases = [];
+  const delivery = createImageDelivery({ cacheRoot: dir, resolveLocal: async () => null, queueWaitMs: 20,
+    fetchRemote: async () => new Promise(resolve => releases.push(() => resolve(new Response(bytes, { headers: { 'content-type': 'image/png' } }))))
+  });
+  const url = n => new URL(`http://localhost/_image?src=https://images.metmuseum.org/CRDImages/ep/web-large/fixture-${n}.jpg&w=160&format=webp`);
+  const active = [1, 2, 3].map(n => delivery(url(n)));
+  try {
+    const deadline = Date.now() + 2000;
+    while (releases.length < 3 && Date.now() < deadline) await new Promise(resolve => setImmediate(resolve));
+    assert.equal(releases.length, 3);
+    await assert.rejects(delivery(url(4)), error => error.statusCode === 503);
+    assert.equal(releases.length, 3, 'Expired work must not open another museum request');
+  } finally { for (const release of releases) release(); }
+  assert.equal((await Promise.all(active)).length, 3);
+});
+
 test('derivatives share overlapping requests, preserve identity and reject unsupported transforms', async t => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'needle-images-'));
   t.after(() => fs.rm(dir, { recursive: true, force: true }));

@@ -3,12 +3,15 @@ import copy
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
+import sys
 import tempfile
 import unittest
 
 spec = importlib.util.spec_from_file_location("deployment", Path(__file__).parents[1] / "scripts/deploy-hetzner.py")
 deployment = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(deployment)
+RELEASE = "ab" * 20
 
 INFO = {
     "State": {"Running": True}, "Mounts": [],
@@ -30,7 +33,7 @@ class Host:
         if args[:3] == ("docker", "inspect", "needle"):
             return json.dumps([INFO])
         if args[0] == "git":
-            return deployment.RELEASE if args[-1] == "HEAD" else ""
+            return ("b" * 40 if self.failure == "commit" else RELEASE) if args[-1] == "HEAD" else ""
         if args[:3] == ("docker", "inspect", "--format"):
             return json.dumps({"8000/tcp": [{"HostPort": "45678"}]})
         if args[0] != "docker":
@@ -65,12 +68,42 @@ class Host:
 class DeploymentTests(unittest.TestCase):
     def execute(self, host):
         with tempfile.TemporaryDirectory() as root:
-            deployment.deploy(root, host.run, host.ready, host.public)
+            deployment.deploy(root, RELEASE, host.run, host.ready, host.public)
+
+    def test_cli_requires_an_explicit_immutable_release(self):
+        script = Path(deployment.__file__)
+        for args in ([], ["--release", "main"], ["--release", "a" * 39], ["--release", "g" * 40]):
+            with self.subTest(args=args):
+                result = subprocess.run([sys.executable, str(script), *args], capture_output=True, text=True)
+                self.assertEqual(result.returncode, 2)
+                self.assertIn("--release", result.stderr)
+                self.assertNotIn("root SSH", result.stderr)
+        result = subprocess.run([sys.executable, str(script), "--help"], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("--release", result.stdout)
+
+    def test_invalid_release_never_inspects_the_host(self):
+        host = Host()
+        with tempfile.TemporaryDirectory() as root:
+            with self.assertRaises(ValueError):
+                deployment.deploy(root, "main", host.run, host.ready, host.public)
+        self.assertEqual(host.calls, [])
+
+    def test_valid_release_is_normalized_to_lowercase(self):
+        self.assertEqual(deployment.release_sha(RELEASE.upper()), RELEASE)
+
+    def test_checkout_mismatch_never_builds_or_changes_containers(self):
+        host = Host("commit")
+        with self.assertRaisesRegex(RuntimeError, "Source commit mismatch"):
+            self.execute(host)
+        self.assertFalse(any(call[:2] in (("docker", "build"), ("docker", "stop")) for call in host.calls))
 
     def test_success_preserves_environment_cache_and_old_container(self):
         host = Host()
         self.execute(host)
         self.assertTrue(host.containers["needle"]["running"])
+        fetch = next(call for call in host.calls if call[0] == "git" and "fetch" in call)
+        self.assertEqual(fetch[-1], RELEASE)
         originals = [state for state in host.containers.values() if state["original"]]
         self.assertEqual(originals, [{"running": False, "original": True}])
         creates = [call for call in host.calls if call[:2] == ("docker", "create")]
@@ -79,8 +112,12 @@ class DeploymentTests(unittest.TestCase):
             self.assertIn("CUSTOM_SETTING=preserved", call)
             self.assertIn("docker-entrypoint.sh", call)
         copies = [call for call in host.calls if call[:2] == ("docker", "cp")]
-        self.assertEqual(len(copies), 4)
         self.assertTrue(all(call[2] == "--archive" for call in copies))
+        stop_index = next(i for i, call in enumerate(host.calls) if call[:2] == ("docker", "stop") and call[-1] == "needle")
+        rename_index = next(i for i, call in enumerate(host.calls) if call[:3] == ("docker", "rename", "needle"))
+        final_copies = [call for call in host.calls[stop_index + 1:rename_index] if call[:2] == ("docker", "cp")]
+        self.assertEqual(len(final_copies), 1, "The final stopped-container copy must retain the latest durable usage counters")
+        self.assertTrue(final_copies[0][3].startswith("needle:"))
 
     def test_preflight_failure_never_stops_original(self):
         for failure in ("build", "candidate"):
