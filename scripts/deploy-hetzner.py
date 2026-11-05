@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Deploy the pinned Needle release on its existing Docker/Caddy host."""
+"""Deploy an explicitly selected Needle commit on its existing Docker/Caddy host."""
+import argparse
 import fcntl
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -12,7 +14,6 @@ import tempfile
 import time
 import urllib.request
 
-RELEASE = "c4b795966636428b39e96e9a05cce77b2f747f50"
 REPOSITORY = "https://github.com/miguelalmeida0/needle-portfolio-release.git"
 DOMAIN = "needle.miguelalmeida.xyz"
 ASSETS = {
@@ -20,6 +21,12 @@ ASSETS = {
     "/assets/redesign-3201AD3B.css": "3201ad3b807f673c82db65dd9f24dfbb970888c9bc09081217d1204c98933c43",
     "/assets/search-relevant-BA61762A.js": "ba61762a8089b4b36a31c88c77f11090fdd0885dfe6a9c1467b9731d05676d7f"
 }
+
+
+def release_sha(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-fA-F]{40}", value):
+        raise ValueError("--release must be a full 40-character hexadecimal commit SHA")
+    return value.lower()
 
 
 def run(*args, capture=True):
@@ -82,7 +89,8 @@ def await_ready(base):
             time.sleep(1)
 
 
-def deploy(root, command=run, ready=await_ready, public_check=None):
+def deploy(root, release, command=run, ready=await_ready, public_check=None):
+    release = release_sha(release)
     info = json.loads(command("docker", "inspect", "needle"))[0]
     env, cache = contract(info)
     stamp = str(time.time_ns())
@@ -95,11 +103,11 @@ def deploy(root, command=run, ready=await_ready, public_check=None):
     os.chmod(root / "previous-container.json", 0o600)
     command("git", "init", str(release_dir))
     command("git", "-C", str(release_dir), "remote", "add", "origin", REPOSITORY)
-    command("git", "-C", str(release_dir), "fetch", "--depth=1", "origin", RELEASE)
+    command("git", "-C", str(release_dir), "fetch", "--depth=1", "origin", release)
     command("git", "-C", str(release_dir), "checkout", "--detach", "FETCH_HEAD")
-    if command("git", "-C", str(release_dir), "rev-parse", "HEAD") != RELEASE:
+    if command("git", "-C", str(release_dir), "rev-parse", "HEAD") != release:
         raise RuntimeError("Source commit mismatch")
-    image = "needle-portfolio:" + RELEASE[:12]
+    image = "needle-portfolio:" + release[:12]
     print("Building pinned release; the current app stays online.", flush=True)
     command("docker", "build", "--tag", image, str(release_dir), capture=False)
     command("docker", "run", "--rm", image, "node", "scripts/verify-release.mjs", capture=False)
@@ -144,6 +152,9 @@ def deploy(root, command=run, ready=await_ready, public_check=None):
         # Mark before stop so interruption or an ambiguous failure also restarts the old container.
         stopped = True
         command("docker", "stop", "--time", "20", "needle")
+        # Copy the latest usage ledger only after its writer is stopped. A
+        # candidate-build snapshot must not restore a less-spent allowance.
+        command("docker", "cp", "--archive", "needle:" + cache + "/.", str(saved_cache))
         command("docker", "rename", "needle", backup)
         renamed = True
         # Use next_name until its create/copy/start sequence has completed.
@@ -179,7 +190,11 @@ def deploy(root, command=run, ready=await_ready, public_check=None):
     print("Cache snapshot and private runtime backup: " + str(root), flush=True)
 
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--release", required=True, type=release_sha,
+                        help="Reviewed, verified production commit (full 40-character SHA)")
+    release = parser.parse_args(argv).release
     if os.geteuid() != 0:
         raise RuntimeError("Run from the existing root SSH prompt")
     for tool in ("docker", "git", "curl"):
@@ -192,7 +207,7 @@ def main():
     if shutil.disk_usage(base).free < 2 * 1024 ** 3:
         raise RuntimeError("At least 2 GB free disk space required")
     os.umask(0o077)
-    deploy(tempfile.mkdtemp(prefix="deploy-" + RELEASE[:12] + "-", dir=base))
+    deploy(tempfile.mkdtemp(prefix="deploy-" + release[:12] + "-", dir=base), release)
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { defaultGlobalDataPacksRoot } from './data-packs/legacy-pack.mjs';
 import { createImageDelivery } from './image-delivery.mjs';
+import { createImageBudget, imageLimitsFromEnv } from './image-budget.mjs';
 import { createGzip } from 'node:zlib';
 import { decodePublicPath, existingPublicFile } from './http-boundary.mjs';
 
@@ -19,8 +20,13 @@ const dataPacksRoot = path.resolve(args.get('--packs') ?? process.env.NEEDLE_PAC
 const port = Number(args.get('--port') ?? process.env.PORT ?? 4173);
 const host = args.get('--host') ?? process.env.HOST ?? '127.0.0.1';
 const allowDemo = process.env.NEEDLE_ALLOW_DEMO === '1';
+const imageCacheRoot = process.env.NEEDLE_IMAGE_CACHE_ROOT ?? path.join(projectRoot, '.needle-cache', 'derivatives');
+const imageBudget = createImageBudget({ filePath: path.join(imageCacheRoot, '.usage.sqlite'), limits: imageLimitsFromEnv() });
 const deliverImage = createImageDelivery({
-  cacheRoot: process.env.NEEDLE_IMAGE_CACHE_ROOT ?? path.join(projectRoot, '.needle-cache', 'derivatives'),
+  cacheRoot: imageCacheRoot,
+  budget: imageBudget,
+  remoteEnabled: process.env.NEEDLE_IMAGE_REMOTE_ENABLED !== '0',
+  transformsEnabled: process.env.NEEDLE_IMAGE_TRANSFORMS_ENABLED !== '0',
   resolveLocal: async source => {
     const pathname = decodePublicPath(source);
     if (!pathname) return null;
@@ -123,11 +129,12 @@ function cacheControl(filePath, isPack) {
   return 'public, max-age=300';
 }
 
-function writeError(response, status, message) {
+function writeError(response, status, message, retryAfter) {
   response.writeHead(status, {
     'content-type': 'text/plain; charset=utf-8',
     'cache-control': 'no-store',
-    'x-content-type-options': 'nosniff'
+    'x-content-type-options': 'nosniff',
+    ...(retryAfter ? { 'retry-after': String(retryAfter) } : {})
   });
   response.end(message);
 }
@@ -140,7 +147,7 @@ const server = http.createServer(async (request, response) => {
       return;
     }
     const url = new URL(request.url ?? '/', 'http://localhost');
-    const derivative = url.pathname === '/_image' ? await deliverImage(url) : null;
+    const derivative = url.pathname === '/_image' ? await deliverImage(url, { create: request.method !== 'HEAD' }) : null;
     const resolved = url.pathname === '/_image' ? derivative : await resolveFile(request.url ?? '/');
     if (!resolved) {
       writeError(response, 404, 'Not found');
@@ -154,6 +161,8 @@ const server = http.createServer(async (request, response) => {
       response.writeHead(304, { etag, 'cache-control': caching, vary: 'Accept-Encoding' });
       response.end(); return;
     }
+    // Reserve before headers/streaming. Disconnects never refund sent-byte exposure.
+    if (mimeTypes.get(extension)?.startsWith('image/') && request.method === 'GET') imageBudget.reserveDelivery(resolved.stats.size);
     response.writeHead(200, {
       'content-type': mimeTypes.get(extension) ?? 'application/octet-stream',
       ...(compress ? { 'content-encoding': 'gzip' } : { 'content-length': String(resolved.stats.size) }),
@@ -177,7 +186,10 @@ const server = http.createServer(async (request, response) => {
     if (compress) stream.pipe(createGzip()).pipe(response);
     else stream.pipe(response);
   } catch (error) {
-    if (!response.headersSent) writeError(response, 500, 'Needle could not serve this file.');
+    if (!response.headersSent) {
+      const limited = [429, 503].includes(error.statusCode);
+      writeError(response, limited ? error.statusCode : 500, limited ? error.message : 'Needle could not serve this file.', limited ? error.retryAfter : undefined);
+    }
     else response.destroy(error instanceof Error ? error : new Error(String(error)));
   }
 });
